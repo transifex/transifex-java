@@ -1,0 +1,3 @@
+include ':txsdk'
+include ':app'
+rootProject.name = "Transifex Application"

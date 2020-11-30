@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="tx_app">
+        <attr name="theme_string" format="string|reference"/>
+    </declare-styleable>
+</resources>
