@@ -1,0 +1,42 @@
+<resources>
+    <string name="app_name">Transifex Application</string>
+
+    <string name="demo_activity_name">Transifex demo activity</string>
+
+    <string name="title">Transifex SDK</string>
+    <string name="subtitle">String demo</string>
+
+    <string name="hello_world">Hello World!</string>
+
+    <string name="welcome_text">Welcome to our demo</string>
+
+    <string-array name="elements_array">
+        <item>1st element</item>
+        <item>2nd element</item>
+        <item>3rd element</item>
+    </string-array>
+
+    <plurals name="duration_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+
+    <string name="hello_user">Hello, %1$s! You have %2$d new messages.</string>
+
+    <string name="styled_text">A &lt;font color="#FF7700">localization&lt;font/> platform &lt;u>that&lt;/u> moves as &lt;b>fast&lt;/b> as &lt;big>you&lt;/big> do\n https://www.transifex.com/</string>
+
+    <string name="dark_theme">Dark theme</string>
+
+    <string name="light_theme">Light theme</string>
+
+    <string name="press_me">Press me</string>
+
+    <string name="image_description">This is an image</string>
+
+    <string name="tooltip">This is a tooltip</string>
+
+    <string name="edit_text_hint">Type here</string>
+
+    <string name="settings">Settings</string>
+
+</resources>
