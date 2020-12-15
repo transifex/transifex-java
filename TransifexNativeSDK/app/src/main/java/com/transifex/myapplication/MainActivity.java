@@ -33,7 +33,8 @@ public class MainActivity extends BaseAppCompatActivity {
 
         mHelloLabel = findViewById(R.id.hello_label);
 
-        // Different types of strings: https://developer.android.com/guide/topics/resources/string-resource
+        // In this activity, we make use of all the different type of string methods supported by
+        // Android: https://developer.android.com/guide/topics/resources/string-resource
 
         // Simple text
         mWelcomeLabel = findViewById(R.id.welcome_label);

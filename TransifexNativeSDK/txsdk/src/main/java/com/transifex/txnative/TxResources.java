@@ -89,10 +89,10 @@ public class TxResources extends Resources {
         }
 
         if (quantity == 1) {
-            return "%d test";
+            return "test: " + originalString;
         }
         else {
-            return "%d tests";
+            return  "tests " + originalString;
         }
     }
 
