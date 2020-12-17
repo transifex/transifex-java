@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Transifex Application ελ</string>
+
+    <string name="demo_activity_name">Transifex demo activity ελ</string>
+
+    <string name="title">Transifex SDK ελ</string>
+    <string name="subtitle">String demo ελ</string>
+
+    <string name="hello_world">Hello World! ελ</string>
+
+    <string name="welcome_text">Welcome to our demo ελ</string>
+
+    <string-array name="elements_array">
+        <item>1st element ελ</item>
+        <item>2nd element ελ</item>
+        <item>3rd element ελ</item>
+    </string-array>
+
+    <plurals name="duration_seconds">
+        <item quantity="one">%d second ελ</item>
+        <item quantity="other">%d seconds ελ</item>
+    </plurals>
+
+    <string name="hello_user">Hello, %1$s! You have %2$d new messages. ελ</string>
+
+    <string name="styled_text">A &lt;font color="#FF7700">localization&lt;font/> platform &lt;u>that&lt;/u> moves as &lt;b>fast&lt;/b> as &lt;big>you&lt;/big> do\n https://www.transifex.com/ ελ</string>
+
+    <string name="dark_theme">Dark theme ελ</string>
+
+    <string name="light_theme">Light theme ελ</string>
+
+    <string name="press_me">Press me ελ</string>
+
+    <string name="image_description">This is an image ελ</string>
+
+    <string name="tooltip">This is a tooltip ελ</string>
+
+    <string name="edit_text_hint">Type here ελ</string>
+
+    <string name="settings">Settings ελ</string>
+
+    <string name="success">success ελ</string>
+
+</resources>

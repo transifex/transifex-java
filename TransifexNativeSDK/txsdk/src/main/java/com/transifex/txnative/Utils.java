@@ -2,8 +2,15 @@ package com.transifex.txnative;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Locale;
 
 import androidx.annotation.AttrRes;
 import androidx.annotation.NonNull;
@@ -76,5 +83,37 @@ public class Utils {
         }
 
         Log.d(TAG, sb.toString());
+    }
+
+    /**
+     * Reads an input stream to a string.
+     * <p>
+     * The caller should close the input stream.
+     */
+    static String readInputStream(InputStream inputStream) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        StringBuilder result = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            result.append(line);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Utility method to get the current locale as set in Android.
+     */
+    public static Locale getCurrentLocale(Context context){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            return context.getResources().getConfiguration().getLocales().get(0);
+        } else{
+            //noinspection deprecation
+            return context.getResources().getConfiguration().locale;
+        }
+    }
+
+    public static boolean equals(Object a, Object b) {
+        return (a == b) || (a != null && a.equals(b));
     }
 }
