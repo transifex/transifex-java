@@ -4,10 +4,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -15,27 +16,39 @@ import androidx.annotation.Nullable;
 
 /**
  * Keeps track of the locale-related information for the application, such as supported locales,
- * source and current locale.
- * <p>
- * Source locale is the locale used as the source when uploading the files to Transifex.
- * <p>
- * AppLocales is the list of all locales, including the source locale, that this application
- * supports.
+ * source, current locale and resolved locales.
  */
 public class LocaleState {
 
+    private static final String TAG = LocaleState.class.getSimpleName();
+
+    private static final boolean DEBUG = false;
+
     private final String mSourceLocale;
-    private final String[] mAppLocales;
+    private final LinkedHashSet<String> mAppLocales;
     private final String[] mTranslatedLocales;
     private Locale mCurrentLocale;
+    private String mResolvedLocale;
+    private boolean isSourceLocale;
 
     private final Context mContext;
     private CurrentLocaleListener mListener = null;
-    private boolean isRegistered;
+    private boolean mRegisteredSystemLocaleReceiver;
 
+    /**
+     * A listener of the current locale.
+     */
     interface CurrentLocaleListener {
 
-        void onLocaleChanged(Locale newLocale);
+        /**
+         * Called when the current locale changes.
+         *
+         * @param newLocale The new locale. This can be the system locale or the locale set by the
+         *                  user, when {@link #setCurrentLocale(Locale)} is called.
+         * @param resolvedLocale The resolved locale according to the new locale and the app locales;
+         *                       <code>null</code> if no matching locale was found
+         */
+        void onLocaleChanged(@NonNull Locale newLocale, @Nullable String resolvedLocale);
     }
 
     /**
@@ -47,8 +60,8 @@ public class LocaleState {
      * @param appLocales    A list of all locales supported by the application, including the source
      *                      locale; defaults to [sourceLocale]
      *                      if <code>null</code> is provided.
-     * @param currentLocale Set to <code>null</code> to use the system's locale or to a specific
-     *                      locale, if your app uses its own locale.
+     * @param currentLocale Set to <code>null</code> to use the system's locale, or set to a specific
+     *                      locale if your app uses its own locale.
      *
      * @see #setCurrentLocale(Locale)
      */
@@ -65,21 +78,20 @@ public class LocaleState {
         }
 
         if (appLocales == null) {
-            mAppLocales = new String[]{mSourceLocale};
+            mAppLocales = new LinkedHashSet<>(1);
+            mAppLocales.add(sourceLocale);
         }
         else {
             // Make sure that mAppLocales contains mSourceLocale
             ArrayList<String> appLocalesList = new ArrayList<>(Arrays.asList(appLocales));
             if (!appLocalesList.contains(mSourceLocale)) {
                 appLocalesList.add(0, mSourceLocale);
-                mAppLocales = appLocalesList.toArray(new String[0]);
             }
-            else {
-                mAppLocales = appLocales;
-            }
+
+            mAppLocales = new LinkedHashSet<>(appLocalesList);
         }
 
-        ArrayList<String> translatedLocales = new ArrayList<>(Arrays.asList(mAppLocales));
+        ArrayList<String> translatedLocales = new ArrayList<>(mAppLocales);
         translatedLocales.remove(mSourceLocale);
         mTranslatedLocales = translatedLocales.toArray(new String[0]);
 
@@ -88,6 +100,8 @@ public class LocaleState {
 
     /**
      * The source locale.
+     * <p>
+     * This is the locale that is used as the source when uploading the files to Transifex.
      *
      * @see LocaleState
      */
@@ -101,16 +115,33 @@ public class LocaleState {
      * @see LocaleState
      */
     public @NonNull String[] getAppLocales() {
-        return mAppLocales;
+        return mAppLocales.toArray(new String[0]);
     }
 
     /**
-     * An array containing the app's locales without the source locale.
+     * The app's supported locales without the source locale.
      * <p>
      * The array can be empty.
      */
     public @NonNull String[] getTranslatedLocales() {
         return mTranslatedLocales;
+    }
+
+    /**
+     * The current locale as provided by Android or the the locale set
+     * using {@link #setCurrentLocale(Locale)}.
+     */
+    public @NonNull Locale getCurrentLocale() {
+        return mCurrentLocale;
+    }
+
+    /**
+     * The resolved locale is one of the app locales that best matches the current locale.
+     *
+     * @return The resolved locale or <code>null</code> if no app locale matches the current locale.
+     */
+    public @Nullable String getResolvedLocale() {
+        return mResolvedLocale;
     }
 
     /**
@@ -122,6 +153,10 @@ public class LocaleState {
      * <p>
      * If  your app has its own implementation for selecting locale, you should call this method
      * when initializing the SDK and when the locale changes.
+     * <p>
+     * <strong>Warning:</strong> if you set a custom locale, your app should also call the necessary
+     * Android methods for updating the locale there as well. If not, the SDK may not work correctly
+     * in plurals and some other cases.
      *
      * @param currentLocale Set to <code>null</code> to use the system's locale or to a specific
      *                      locale, if your app uses its own locale.
@@ -135,23 +170,32 @@ public class LocaleState {
             newLocale = Utils.getCurrentLocale(mContext);
 
             // Register receiver for system locale
-            IntentFilter filter = new IntentFilter(Intent.ACTION_LOCALE_CHANGED);
-            if (!isRegistered) {
+            if (!mRegisteredSystemLocaleReceiver) {
+                IntentFilter filter = new IntentFilter(Intent.ACTION_LOCALE_CHANGED);
                 mContext.registerReceiver(mBroadcastReceiver, filter);
-                isRegistered = true;
+                mRegisteredSystemLocaleReceiver = true;
             }
         }
         else {
             newLocale = currentLocale;
 
             // Unregister receiver for system locale
-            if (isRegistered) {
+            if (mRegisteredSystemLocaleReceiver) {
                 mContext.unregisterReceiver(mBroadcastReceiver);
-                isRegistered = false;
+                mRegisteredSystemLocaleReceiver = false;
             }
         }
 
         setCurrentLocaleInternal(newLocale);
+    }
+
+    /**
+     * Returns <code>true</code> if the source locale matches {@link #getResolvedLocale()
+     * the resolved locale}. If it's different or the resolved locale is <code>null</code>, it
+     * returns <code>false</code>.
+     */
+    public boolean isSourceLocale() {
+        return isSourceLocale;
     }
 
     /**
@@ -163,8 +207,36 @@ public class LocaleState {
         if (!Utils.equals(currentLocale, mCurrentLocale)) {
             mCurrentLocale = currentLocale;
 
+            // Find an app locale that best matches the current locale according to Android's
+            // resolution strategy: https://developer.android.com/guide/topics/resources/multilingual-support
+            mResolvedLocale = null;
+
+            // Try matching both language and region
+            if (mAppLocales.contains(mCurrentLocale.toString())) {
+                mResolvedLocale = mCurrentLocale.toString();
+            }
+            // Try matching the closest parent dialect (a locale without a region)
+            else if (mAppLocales.contains(mCurrentLocale.getLanguage())) {
+                mResolvedLocale = mCurrentLocale.getLanguage();
+            }
+            // Try matching children locales (locales with different regions)
+            else {
+                for (String appLocale : mAppLocales) {
+                    if (appLocale.startsWith(currentLocale.getLanguage())) {
+                        mResolvedLocale = appLocale;
+                        break;
+                    }
+                }
+            }
+
+            isSourceLocale = mSourceLocale.equals(mResolvedLocale);
+
+            if (DEBUG) {
+                Log.d(TAG, "Locale: " + currentLocale + " resolved: " + mResolvedLocale);
+            }
+
             if (mListener != null) {
-                mListener.onLocaleChanged(mCurrentLocale);
+                mListener.onLocaleChanged(mCurrentLocale, mResolvedLocale);
             }
         }
     }

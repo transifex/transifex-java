@@ -16,6 +16,7 @@ import java.util.concurrent.RejectedExecutionException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 class CDSHandler {
 
@@ -23,7 +24,7 @@ class CDSHandler {
      * A callback that provides the results of {@link #fetchTranslations(String, FetchTranslationsCallback)}
      * when the operation is complete.
      */
-    public interface FetchTranslationsCallback {
+    interface FetchTranslationsCallback {
 
         /**
          * Called when the operation is complete.
@@ -32,6 +33,7 @@ class CDSHandler {
          *
          * @param translationMap A HashMap of locale codes that point to JSON objects.
          */
+        @WorkerThread
         void onComplete(@NonNull HashMap<String, JSONObject> translationMap);
     }
 
@@ -140,7 +142,10 @@ class CDSHandler {
         for (String fetchLocalCode : fetchLocalCodes) {
             FetchLocaleResult results = fetchLocale(cdsHostURI, fetchLocalCode);
             if (results.json != null) {
-                translations.put(fetchLocalCode, results.json);
+                JSONObject jsonData = results.json.optJSONObject("data");
+                if (jsonData != null) {
+                    translations.put(fetchLocalCode, jsonData);
+                }
             }
             if (results.connection != null) {
                 lastConnection = results.connection;

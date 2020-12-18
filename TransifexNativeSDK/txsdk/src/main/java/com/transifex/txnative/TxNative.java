@@ -2,6 +2,7 @@ package com.transifex.txnative;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.transifex.txnative.wrappers.TxContextWrapper;
 
@@ -20,9 +21,6 @@ public class TxNative {
     private static NativeCore sNativeCore = null;
 
     /**
-     *
-     */
-    /**
      * Initialize the SDK.
      * <p>
      *     Should be called in {@link Application#onCreate()}.
@@ -31,8 +29,8 @@ public class TxNative {
      * @param applicationContext The application context.
      * @param locales Configures the locales supported by the SDK.
      * @param token The Transifex token that can be used for retrieving translations from CDS.
-     * @param cdsHost An optional host for the Content Delivery Service; defaults to the production
-     *                host provided by Transifex.
+     * @param cdsHost An optional host for the Content Delivery Service; if set to <code>null</code>,
+     *               the production host provided by Transifex is used.
      */
     public static void init(@NonNull Context applicationContext,
                             @NonNull LocaleState locales,
@@ -43,14 +41,30 @@ public class TxNative {
             throw new RuntimeException("TxNative is already initialized");
         }
 
-        sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost);
+        sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, null);
     }
 
-    //TODO: mention that it works asynchronously and how it affects the cache when we have local
-    // cache implemented
+    /**
+     * When test mode is enabled, TransifexNative functionality is disabled: the translations provided
+     * by the SDK are not used. The original strings, as provided by Android's localization system,
+     * are returned after being prefixed with "test:".
+     */
+    public static void setTestMode(boolean enabled) {
+        if (sNativeCore == null) {
+            throw new RuntimeException("TxNative has not been initialized");
+        }
+
+        sNativeCore.setTestMode(enabled);
+    }
+
+    //TODO: update the documentation, when local cache is implemented, to explain when these
+    // translations affect the app. Currently, they affect it instantly but the activity has
+    // to be reloaded after they have been fetched.
 
     /**
      * Fetches the translations from CDS.
+     * <p>
+     * The call returns instantly and fetches the translations asynchronously.
      *
      * @param localeCode An optional locale to fetch translations from; if  set to <code>null</code>,
      *                   it will fetch translations for all locales as defined in the SDK
@@ -75,7 +89,12 @@ public class TxNative {
      * @return The wrapped context.
      */
     public static Context wrap(Context context) {
-        return ViewPumpContextWrapper.wrap(new TxContextWrapper(context));
+        if (sNativeCore == null) {
+            Log.e(TAG, "Wrapping failed because TxNative has not been initialized yet");
+            return context;
+        }
+
+        return ViewPumpContextWrapper.wrap(new TxContextWrapper(context, sNativeCore));
     }
 
     /**
@@ -91,6 +110,11 @@ public class TxNative {
      * @return teh wrapped context.
      */
     public static Context generalWrap(Context context) {
-        return new TxContextWrapper(context);
+        if (sNativeCore == null) {
+            Log.e(TAG, "Wrapping failed because TxNative has not been initialized yet");
+            return context;
+        }
+
+        return new TxContextWrapper(context, sNativeCore);
     }
 }

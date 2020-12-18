@@ -14,7 +14,7 @@ import androidx.core.app.JobIntentService;
  */
 public class SimpleIntentService extends JobIntentService {
 
-    public static final String TAG = SimpleIntentService.class.toString();
+    public static final String TAG = SimpleIntentService.class.getSimpleName();
 
     static final int JOB_ID = 1000;
 

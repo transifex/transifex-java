@@ -12,6 +12,10 @@ android {
         versionCode 1
         versionName "1.0"
 
+        // https://stackoverflow.com/a/41345440/941314
+        // Needed for multiple locale support after Android N
+        resConfigs "en", "el"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
