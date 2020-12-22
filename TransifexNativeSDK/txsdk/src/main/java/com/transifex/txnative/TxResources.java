@@ -20,6 +20,7 @@ import java.lang.annotation.Native;
 
 import androidx.annotation.AnyRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 
@@ -47,7 +48,6 @@ public class TxResources extends Resources {
         mNativeCore = nativeCore;
     }
 
-
     //region Overrides
 
     @NonNull
@@ -58,13 +58,7 @@ public class TxResources extends Resources {
 
     @Override
     public CharSequence getText(@StringRes int id, CharSequence def) {
-        CharSequence originalString = mResources.getText(id, def);
-
-        if (isAndroidStringResource(id)) {
-            return originalString;
-        }
-
-        return "test";
+        return mNativeCore.translate(this, id, def);
     }
 
     @NonNull
@@ -108,27 +102,30 @@ public class TxResources extends Resources {
         return new String[]{"test1", "test2"};
     }
 
+    //endregion Overrides
+
+    //region Interface
+
     /**
      * Checks if the provided string resource id belongs to Android's resource package.
      *
-     * @param id The string resource id to check.
+     * @param id The string resource ID to check.
+     *
      * @return true if it belong's to Android's resource package, false otherwise.
+     *
+     * @throws NotFoundException Throws NotFoundException if the given ID does not exist.
      */
     boolean isAndroidStringResource(@StringRes int id) {
         String resourcePackageName = mResources.getResourcePackageName(id);
         return resourcePackageName.equals("android");
     }
 
-    //endregion Overrides
-
-    //region Interface
-
     @NonNull CharSequence getOriginalText(@StringRes int id) {
         return mResources.getText(id);
     }
 
-    @NonNull String getOriginalString(@StringRes int id) {
-        return mResources.getString(id);
+    @Nullable CharSequence getOriginalText(@StringRes int id, @Nullable CharSequence def) {
+        return mResources.getText(id, def);
     }
 
     //endregion Interface

@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 /**
  * A cache that holds translations in memory.
  */
-class MemoryCache implements Cache {
+public class MemoryCache implements Cache {
 
     private String mCurrentLocale;
     private JSONObject mCurrentTranslations;

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.wrappers.TxContextWrapper;
 
 import androidx.annotation.NonNull;
@@ -31,23 +32,33 @@ public class TxNative {
      * @param token The Transifex token that can be used for retrieving translations from CDS.
      * @param cdsHost An optional host for the Content Delivery Service; if set to <code>null</code>,
      *               the production host provided by Transifex is used.
+     * @param cache The translation cache that holds the translations from the CDS; MemoryCache is
+     *             used if set to <code>null</code>.
+     * @param missingPolicy Determines how to handle translations that are not available;
+     * {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used
+     *                     if set to <code>null</code>.
      */
     public static void init(@NonNull Context applicationContext,
                             @NonNull LocaleState locales,
                             @NonNull String token,
-                            @Nullable String cdsHost) {
+                            @Nullable String cdsHost,
+                            @Nullable Cache cache,
+                            @Nullable MissingPolicy missingPolicy) {
 
         if (sNativeCore != null) {
             throw new RuntimeException("TxNative is already initialized");
         }
 
-        sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, null);
+        sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, cache, missingPolicy);
     }
 
     /**
      * When test mode is enabled, TransifexNative functionality is disabled: the translations provided
      * by the SDK are not used. The original strings, as provided by Android's localization system,
      * are returned after being prefixed with "test:".
+     * <p>
+     * Test mode can be toggled multiple times while the app is running. The activity has to be
+     * recreated so that the strings are reloaded.
      */
     public static void setTestMode(boolean enabled) {
         if (sNativeCore == null) {
