@@ -1,8 +1,5 @@
 package com.transifex.txnative;
 
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -39,25 +36,10 @@ public interface Cache {
     @Nullable String get(@NonNull String key);
 
     /**
-     * Update the cache with a map containing locale codes as keys and a list of JSONObjects as
-     * values like this:
-     * <p>
-     * <pre>
-     *    {
-     *        'fr' : {
-     *             'key1' : { 'string' : '...' },
-     *             'key2' : { 'string' : '...' },
-     *        },
-     *        'de' : {
-     *             'key3' : { 'string' : '...' },
-     *        },
-     *        'gr' : {
-     *             'key4' : { 'string' : '...' },
-     *        },
-     *    }
-     * </pre>
+     * Update the cache with the provided
+     * {@link com.transifex.txnative.LocaleData.TranslationMap TranslationMap}.
      *
      * @param translationMap The translation map to use in the cache.
      */
-    void update(@NonNull HashMap<String, JSONObject> translationMap);
+    void update(@NonNull LocaleData.TranslationMap translationMap);
 }

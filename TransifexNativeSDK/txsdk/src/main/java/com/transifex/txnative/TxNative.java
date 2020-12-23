@@ -77,7 +77,7 @@ public class TxNative {
      * <p>
      * The call returns instantly and fetches the translations asynchronously.
      *
-     * @param localeCode An optional locale to fetch translations from; if  set to <code>null</code>,
+     * @param localeCode An optional locale to fetch translations for; if  set to <code>null</code>,
      *                   it will fetch translations for all locales as defined in the SDK
      *                   configuration.
      */

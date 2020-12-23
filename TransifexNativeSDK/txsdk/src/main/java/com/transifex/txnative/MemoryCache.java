@@ -1,9 +1,5 @@
 package com.transifex.txnative;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,8 +12,8 @@ import androidx.annotation.Nullable;
 public class MemoryCache implements Cache {
 
     private String mCurrentLocale;
-    private JSONObject mCurrentTranslations;
-    private HashMap<String, JSONObject> mTranslationMap;
+    private LocaleData.LocaleStrings mCurrentLocaleStrings;
+    private LocaleData.TranslationMap mTranslationMap;
 
     @Override
     public void setCurrentLocale(@Nullable String currentLocale) {
@@ -33,28 +29,24 @@ public class MemoryCache implements Cache {
             return new HashSet<>(0);
         }
 
-        return mTranslationMap.keySet();
+        return mTranslationMap.getLocales();
     }
 
 
     @Nullable
     @Override
     public String get(@NonNull String key) {
-        if (mCurrentTranslations == null) {
+        if (mCurrentLocaleStrings == null) {
             return null;
         }
 
-        try {
-            return mCurrentTranslations.getJSONObject(key).getString("string");
-        } catch (JSONException e) {
-            return null;
-        }
+        return mCurrentLocaleStrings.get(key);
     }
 
     @Override
-    public void update(@NonNull HashMap<String, JSONObject> translationMap) {
+    public void update(@NonNull LocaleData.TranslationMap translationMap) {
         mTranslationMap = translationMap;
-        mCurrentTranslations = null;
+        mCurrentLocaleStrings = null;
 
         updateCurrentTranslations();
     }
@@ -64,6 +56,6 @@ public class MemoryCache implements Cache {
             return;
         }
 
-        mCurrentTranslations = mTranslationMap.get(mCurrentLocale);
+        mCurrentLocaleStrings = mTranslationMap.get(mCurrentLocale);
     }
 }

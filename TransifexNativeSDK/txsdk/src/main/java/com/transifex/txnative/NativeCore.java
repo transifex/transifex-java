@@ -7,9 +7,6 @@ import android.os.Handler;
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
 
-import org.json.JSONObject;
-
-import java.util.HashMap;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -102,7 +99,7 @@ public class NativeCore {
     void fetchTranslations(@Nullable String localeCode) {
         mCDSHandler.fetchTranslations(localeCode, new CDSHandler.FetchTranslationsCallback() {
             @Override
-            public void onComplete(final @Nullable HashMap<String, JSONObject> translationMap) {
+            public void onComplete(final @Nullable LocaleData.TranslationMap translationMap) {
                 if (translationMap != null) {
                     //Log.d(TAG, translationMap.toString());
 
