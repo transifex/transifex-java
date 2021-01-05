@@ -3,6 +3,7 @@ package com.transifex.txnative;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
+import android.text.Spanned;
 
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
@@ -12,6 +13,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.text.HtmlCompat;
 import io.github.inflationx.viewpump.ViewPump;
 
 /**
@@ -31,6 +33,7 @@ public class NativeCore {
     final Resources mDefaultResources;      // Non-localized resources
 
     boolean mTestModeEnabled;
+    boolean mSupportSpannableEnabled;
 
     /**
      * Create an instance of the core SDK class.
@@ -91,6 +94,13 @@ public class NativeCore {
     }
 
     /**
+     * @see TxNative#setSupportSpannable(boolean)
+     */
+    void setSupportSpannable(boolean enabled) {
+        mSupportSpannableEnabled = enabled;
+    }
+
+    /**
      * Fetches translations from CDS.
      *
      * @param localeCode If set to <code>null</code>, it will fetch translations for all locales
@@ -127,6 +137,7 @@ public class NativeCore {
      * @throws Resources.NotFoundException Throws NotFoundException if the given ID does not exist
      */
     @NonNull CharSequence translate(TxResources txResources, @StringRes int id) {
+        //noinspection ConstantConditions
         return internalTranslate(txResources, id, null, false);
     }
 
@@ -134,7 +145,7 @@ public class NativeCore {
      * Return the value of the provided string resource ID under the current locale.
      * <p>
      * This method has similar semantics to {@link Resources#getText(int, CharSequence)} in terms of
-     * handling a non existing ID: returns def, which can be <code>null</code>, if the given ID
+     * handling a non existing ID: returns <code>def</code>, which can be <code>null</code>, if the given ID
      * does not exist.
      *
      * @return The string data associated with the resource, plus possibly styled text information,
@@ -157,10 +168,11 @@ public class NativeCore {
      *            is true. Otherwise, it's ignored.
      * @param shouldUseDef Set to false for {@link #translate(TxResources, int)} semantics. Set to
      *                     true for {@link #translate(TxResources, int, CharSequence)} semantics.
-     *                     When set to true, def is returned if the id is not found.
+     *                     When set to true, <code>def</code> is returned if the <code>id</code> is
+     *                     not found.
      *
      * @return The string data associated with the resource, plus possibly styled text information,
-     * or def if id is 0 or not found and shouldUseDef is true.
+     * or <code>def</code> if <code>id</code> is 0 or not found and <code>shouldUseDef</code> is true.
      */
     @Nullable private CharSequence internalTranslate(TxResources txResources, @StringRes int id,
                                                      @Nullable CharSequence def, boolean shouldUseDef) {
@@ -194,20 +206,30 @@ public class NativeCore {
         }
 
         String translatedString = mCache.get(txResources.getResourceEntryName(id));
-        //TODO: I may have to use Html.fromHtml().toString() to convert HTML characters. This
-        // depends on the way the CDS handles HTML and other characters.
 
         // String can be null if:
         // 1. our Cache has not been updated with translations yet
         // 2. the resolved locale is null: there is no app locale that matches the current locale
         // 3. our Cache does not have translations for the resolved locale (this shouldn't happen)
         // 4. the key was not found in the Cache for the resolved locale
-
         if (translatedString == null) {
-            String sourceString = mDefaultResources.getString(id);
-            translatedString = mMissingPolicy.get(sourceString);
+            CharSequence sourceString = mDefaultResources.getText(id);
+            return mMissingPolicy.get(sourceString);
         }
 
-        return translatedString;
+        if (mSupportSpannableEnabled) {
+            // If a span was found, return a "Spanned" object. Otherwise, return "String".
+            Spanned spanned = HtmlCompat.fromHtml(translatedString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+            if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
+                return spanned;
+            }
+            else {
+                return spanned.toString();
+            }
+        }
+        else {
+            // This is faster than "fromHTML()" and is enough for most cases
+            return translatedString.replaceAll("&lt;", "<");
+        }
     }
 }

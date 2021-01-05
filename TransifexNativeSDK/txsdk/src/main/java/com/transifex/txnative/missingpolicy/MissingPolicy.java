@@ -16,5 +16,5 @@ public interface MissingPolicy {
      *
      * @param sourceString The source string.
      */
-    @NonNull String get(@NonNull String sourceString);
+    @NonNull CharSequence get(@NonNull CharSequence sourceString);
 }

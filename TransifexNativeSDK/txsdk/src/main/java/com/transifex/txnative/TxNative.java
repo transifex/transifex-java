@@ -68,6 +68,34 @@ public class TxNative {
         sNativeCore.setTestMode(enabled);
     }
 
+    /**
+     * If enabled, the <code>getText()</code> method can return a {@link android.text.Spanned Spanned}
+     * object. If disabled, a plain String is always returned.
+     * <p>
+     * Enable it, if your strings contain HTML tags using "<" and ">" characters. Leave it disabled
+     * if your strings are HTML-escaped such as the following:
+     * <pre>{@code
+     * <resources>
+     *   <string name="welcome_messages">Hello, %1$s! You have &lt;b>%2$d new messages&lt;/b>.</string>
+     * </resources>
+     * }
+     * </pre>
+     *
+     * <p>
+     * If enabled, {@link android.text.Html#fromHtml(String, int) Html#fromHtml(String, int)} is
+     * used internally which is more CPU demanding than if left disabled.
+     *
+     * @see <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">
+     *     https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML</a>
+     */
+    public static void setSupportSpannable(boolean enabled ){
+        if (sNativeCore == null) {
+            throw new RuntimeException("TxNative has not been initialized");
+        }
+
+        sNativeCore.setSupportSpannable(enabled);
+    }
+
     //TODO: update the documentation, when local cache is implemented, to explain when these
     // translations affect the app. Currently, they affect it instantly but the activity has
     // to be reloaded after they have been fetched.

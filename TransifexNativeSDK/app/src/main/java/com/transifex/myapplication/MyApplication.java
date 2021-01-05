@@ -24,9 +24,9 @@ public class MyApplication extends Application {
                 "en",
                 new String[]{"en", "el", "de", "fr", "ar", "sl"},
                 null);
-        TxNative.init(getApplicationContext(), localeState, token, null);
+        TxNative.init(getApplicationContext(), localeState, token, null, null, null);
 
-        TxNative.setTestMode(true);
+        //TxNative.setTestMode(true);
 
         // Fetch all translations from CDS
         TxNative.fetchTranslations(null);

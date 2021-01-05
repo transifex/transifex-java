@@ -1,7 +1,6 @@
 package com.transifex.myapplication;
 
 import android.os.Bundle;
-import android.text.Html;
 import android.text.Spanned;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -9,6 +8,7 @@ import android.view.MenuInflater;
 import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.HtmlCompat;
 
 
 // Extend your activity from BaseAppCompatActivity or BaseActivity
@@ -71,7 +71,7 @@ public class MainActivity extends BaseAppCompatActivity {
         mStyledLabel = findViewById(R.id.styled_label);
         {
             String string = getResources().getString(R.string.styled_text);
-            Spanned styledString = Html.fromHtml(string);
+            Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
             mStyledLabel.setText(styledString);
         }
 

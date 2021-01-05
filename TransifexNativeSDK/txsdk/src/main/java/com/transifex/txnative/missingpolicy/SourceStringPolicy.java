@@ -18,7 +18,7 @@ public class SourceStringPolicy implements MissingPolicy {
      */
     @NotNull
     @Override
-    public String get(@NonNull String sourceString) {
+    public CharSequence get(@NonNull CharSequence sourceString) {
         return sourceString;
     }
 }
