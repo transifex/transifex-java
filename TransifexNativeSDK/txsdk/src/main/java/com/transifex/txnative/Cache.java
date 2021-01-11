@@ -27,7 +27,7 @@ public interface Cache {
     /**
      * Get the translation for a certain key for the current locale.
      * <p>
-     * {@link #setCurrentLocale(String)} should be called once to set the current locale.
+     * {@link #setCurrentLocale(String)} should be called once before calling this method.
      *
      * @param key The key of the string.
      *

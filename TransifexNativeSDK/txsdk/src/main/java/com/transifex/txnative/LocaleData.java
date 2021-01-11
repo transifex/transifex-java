@@ -20,6 +20,10 @@ public class LocaleData {
      */
     public static class StringInfo {
 
+        public StringInfo(String string) {
+            this.string = string;
+        }
+
         public String string;
 
         @NotNull

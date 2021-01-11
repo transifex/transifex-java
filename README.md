@@ -24,7 +24,7 @@ advantage of the features that Transifex Native offers, such as OTA translations
 ### SDK configuration 
 
 Configure the SDK in your `Application` class. The language codes supported by Transifex can be found [here](https://www.transifex.com/explore/languages/). Keep in mind that in the sample code below you will have to replace 
-`<transifex_token>` with the actual token that are associated with your Transifex project and resource.
+`<transifex_token>` with the actual token that is associated with your Transifex project and resource.
 
 ```java
     @Override
@@ -49,11 +49,27 @@ Configure the SDK in your `Application` class. The language codes supported by T
 If you want to enable [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html) starting from Android N, place the supported app languages in your app's gradle file:
 
 ```gradle
-defaultConfig {
+android {
+    // ...
+    defaultConfig {
 
         resConfigs "en", "el", "de", "fr", "ar", "sl"
 
     }
+```
+
+You can also specify languages (in both the `LocaleState` and your app's gradle file) followed by the regional code:
+
+```java
+    @Override
+    public void onCreate() {
+        // ...	
+        LocaleState localeState = new LocaleState(getApplicationContext(),
+                "en",
+                new String[]{"en", "es_SP", "es_MX"},
+                null);
+        
+     }
 ```
 
 The SDK's functionality is enabled by wrapping the context before calling any [String resource](https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)) related methods.
@@ -71,7 +87,7 @@ public class BaseActivity extends Activity {
 }
 ```
 
-Place the following code in your Appcompat activity or have your activity extend a base class:
+If your activity extends `AppCompatActivity` activity. use the following code or have your activity extend a base class:
 ```java
 public class BaseAppCompatActivity extends AppCompatActivity {
 

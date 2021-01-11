@@ -52,6 +52,7 @@ public class MemoryCache implements Cache {
     }
 
     private void updateCurrentTranslations() {
+        mCurrentLocaleStrings = null;
         if (mTranslationMap == null) {
             return;
         }

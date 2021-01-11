@@ -58,8 +58,8 @@ public class LocaleState {
      * @param sourceLocale  The locale of the source language, defaults to "en" if <code>null</code>
      *                      is provided.
      * @param appLocales    A list of all locales supported by the application, including the source
-     *                      locale; defaults to [sourceLocale]
-     *                      if <code>null</code> is provided.
+     *                      locale; defaults to <code>[sourceLocale]</code> if <code>null</code> is
+     *                      provided.
      * @param currentLocale Set to <code>null</code> to use the system's locale, or set to a specific
      *                      locale if your app uses its own locale.
      *
@@ -79,7 +79,7 @@ public class LocaleState {
 
         if (appLocales == null) {
             mAppLocales = new LinkedHashSet<>(1);
-            mAppLocales.add(sourceLocale);
+            mAppLocales.add(mSourceLocale);
         }
         else {
             // Make sure that mAppLocales contains mSourceLocale
@@ -219,7 +219,7 @@ public class LocaleState {
             else if (mAppLocales.contains(mCurrentLocale.getLanguage())) {
                 mResolvedLocale = mCurrentLocale.getLanguage();
             }
-            // Try matching children locales (locales with different regions)
+            // Try matching children dialects (same language but different regions)
             else {
                 for (String appLocale : mAppLocales) {
                     if (appLocale.startsWith(currentLocale.getLanguage())) {
