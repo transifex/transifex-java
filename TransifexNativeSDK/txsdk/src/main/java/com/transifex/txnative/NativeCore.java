@@ -3,7 +3,10 @@ package com.transifex.txnative;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.SpannedString;
+import android.text.TextUtils;
 
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
@@ -14,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.text.HtmlCompat;
-import io.github.inflationx.viewpump.ViewPump;
 
 /**
  * The main class of the framework, responsible for orchestrating all functionality.
@@ -71,12 +73,6 @@ public class NativeCore {
         mCDSHandler = new CDSHandler(mLocaleState.getTranslatedLocales(), token, null, cdsHost);
 
         mDefaultResources = Utils.getDefaultLanguageResources(mContext);
-
-        // Initialize ViewPump with our interceptor
-        ViewPump.init(ViewPump.builder()
-                .addInterceptor(new TxInterceptor())
-                .build());
-
     }
 
      private final LocaleState.CurrentLocaleListener mCurrentLocaleListener = new LocaleState.CurrentLocaleListener() {
@@ -198,7 +194,7 @@ public class NativeCore {
         }
 
         if (mTestModeEnabled) {
-            return "test: " + txResources.getOriginalText(id);
+            return TextUtils.concat("test: ", txResources.getOriginalText(id));
         }
 
         if (mLocaleState.isSourceLocale()) {
@@ -221,7 +217,7 @@ public class NativeCore {
             // If a span was found, return a "Spanned" object. Otherwise, return "String".
             Spanned spanned = HtmlCompat.fromHtml(translatedString, HtmlCompat.FROM_HTML_MODE_LEGACY);
             if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
-                return spanned;
+                return new SpannedString(spanned);
             }
             else {
                 return spanned.toString();

@@ -3,12 +3,14 @@ package com.transifex.txnative;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.wrappers.TxContextWrapper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
 
@@ -50,6 +52,12 @@ public class TxNative {
         }
 
         sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, cache, missingPolicy);
+
+        // Initialize ViewPump with our interceptor
+        ViewPump.Builder viewPumpBuilder = ViewPump.builder();
+        viewPumpBuilder.addInterceptor(new TxInterceptor());
+        ViewPump viewPump = viewPumpBuilder.build();
+        ViewPump.init(viewPump);
     }
 
     /**
