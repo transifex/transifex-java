@@ -107,7 +107,6 @@ public class NativeCore {
             @Override
             public void onComplete(final @Nullable LocaleData.TranslationMap translationMap) {
                 if (translationMap != null) {
-                    //Log.d(TAG, translationMap.toString());
 
                     // Update mCache using the fetched translationMap in main thread
                     mMainHandler.post(new Runnable() {

@@ -123,7 +123,7 @@ class CDSHandler {
      *
      * @see #fetchTranslations(String, FetchTranslationsCallback)
      */
-    public @NonNull
+    @NonNull
     LocaleData.TranslationMap fetchTranslationsInternal(@Nullable String localeCode) {
         String[] fetchLocalCodes = (localeCode != null) ? new String[]{localeCode} : mLocaleCodes;
         LocaleData.TranslationMap translations = new LocaleData.TranslationMap(fetchLocalCodes.length);
