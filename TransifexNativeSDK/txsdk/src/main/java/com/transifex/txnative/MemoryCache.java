@@ -11,16 +11,7 @@ import androidx.annotation.Nullable;
  */
 public class MemoryCache implements Cache {
 
-    private String mCurrentLocale;
-    private LocaleData.LocaleStrings mCurrentLocaleStrings;
     private LocaleData.TranslationMap mTranslationMap;
-
-    @Override
-    public void setCurrentLocale(@Nullable String currentLocale) {
-        mCurrentLocale = currentLocale;
-
-        updateCurrentTranslations();
-    }
 
     @NonNull
     @Override
@@ -35,28 +26,21 @@ public class MemoryCache implements Cache {
 
     @Nullable
     @Override
-    public String get(@NonNull String key) {
-        if (mCurrentLocaleStrings == null) {
+    public String get(@NonNull String key, @Nullable String locale) {
+        if (mTranslationMap == null || locale == null) {
             return null;
         }
 
-        return mCurrentLocaleStrings.get(key);
+        LocaleData.LocaleStrings localeStrings = mTranslationMap.get(locale);
+        if (localeStrings == null) {
+            return  null;
+        }
+
+        return localeStrings.get(key);
     }
 
     @Override
     public void update(@NonNull LocaleData.TranslationMap translationMap) {
         mTranslationMap = translationMap;
-        mCurrentLocaleStrings = null;
-
-        updateCurrentTranslations();
-    }
-
-    private void updateCurrentTranslations() {
-        mCurrentLocaleStrings = null;
-        if (mTranslationMap == null) {
-            return;
-        }
-
-        mCurrentLocaleStrings = mTranslationMap.get(mCurrentLocale);
     }
 }

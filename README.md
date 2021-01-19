@@ -35,8 +35,8 @@ Configure the SDK in your `Application` class. The language codes supported by T
         String token = "<transifex_token>";
 
         LocaleState localeState = new LocaleState(getApplicationContext(),
-                "en",
-                new String[]{"en", "el", "de", "fr", "ar", "sl"},
+                "en",                                               // source locale
+                new String[]{"en", "el", "de", "fr", "ar", "sl"},   // supported locales
                 null);
         
         TxNative.init(getApplicationContext(), localeState, token, null, null, null);

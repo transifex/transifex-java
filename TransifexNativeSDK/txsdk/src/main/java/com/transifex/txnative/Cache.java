@@ -11,29 +11,20 @@ import androidx.annotation.Nullable;
 public interface Cache {
 
     /**
-     * Sets the locale to get translation from when {@link #get(String)} is used.
-     * <p>
-     * If set to <code>null</code>, {@link #get(String)} will always return <code>null</code>.
-     *
-     * @param currentLocale The locale code.
-     */
-    void setCurrentLocale(@Nullable String currentLocale);
-
-    /**
      * Returns a set of the locale codes supported by the cache.
      */
     @NonNull Set<String> getSupportedLocales();
 
     /**
-     * Get the translation for a certain key for the current locale.
-     * <p>
-     * {@link #setCurrentLocale(String)} should be called once before calling this method.
+     * Get the translation for a certain key and locale pair.
      *
      * @param key The key of the string.
+     * @param locale The locale code.
      *
-     * @return The string or <code>null</code> if it wasn't found.
+     * @return The string or <code>null</code> if it wasn't found or if the provided locale does not
+     * exist in the cache.
      */
-    @Nullable String get(@NonNull String key);
+    @Nullable String get(@NonNull String key, @Nullable String locale);
 
     /**
      * Update the cache with the provided

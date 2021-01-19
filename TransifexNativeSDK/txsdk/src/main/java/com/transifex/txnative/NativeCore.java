@@ -64,7 +64,6 @@ public class NativeCore {
         mLocaleState = localeState;
         mLocaleState.setCurrentLocaleListener(mCurrentLocaleListener);
         mCache = (cache != null) ? cache : new MemoryCache();
-        mCache.setCurrentLocale(mLocaleState.getResolvedLocale());
         mMissingPolicy = (missingPolicy != null) ? missingPolicy : new SourceStringPolicy();
 
         if (cdsHost == null) {
@@ -78,7 +77,7 @@ public class NativeCore {
      private final LocaleState.CurrentLocaleListener mCurrentLocaleListener = new LocaleState.CurrentLocaleListener() {
          @Override
          public void onLocaleChanged(@NonNull Locale newLocale, @Nullable String resolvedLocale) {
-             mCache.setCurrentLocale(resolvedLocale);
+             // Do nothing
          }
     };
 
@@ -200,7 +199,7 @@ public class NativeCore {
             return txResources.getOriginalText(id);
         }
 
-        String translatedString = mCache.get(txResources.getResourceEntryName(id));
+        String translatedString = mCache.get(txResources.getResourceEntryName(id), mLocaleState.getResolvedLocale());
 
         // String can be null if:
         // 1. our Cache has not been updated with translations yet

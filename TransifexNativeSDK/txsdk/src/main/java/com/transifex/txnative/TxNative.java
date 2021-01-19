@@ -77,8 +77,9 @@ public class TxNative {
     }
 
     /**
-     * If enabled, the <code>getText()</code> method can return a {@link android.text.Spanned Spanned}
-     * object. If disabled, a plain String is always returned.
+     * If enabled, the <code>getText()</code> method can return a {@link android.text.SpannedString SpannedString}
+     * if tags exist in the source string. If disabled, a plain String is always returned. It's
+     * disabled by default.
      * <p>
      * Enable it, if your strings contain HTML tags using "<" and ">" characters. Leave it disabled
      * if your strings are HTML-escaped such as the following:

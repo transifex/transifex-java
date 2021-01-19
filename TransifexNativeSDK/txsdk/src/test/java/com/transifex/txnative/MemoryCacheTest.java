@@ -54,25 +54,23 @@ public class MemoryCacheTest {
     public void testGet_emptyCache() {
         MemoryCache cache = new MemoryCache();
 
-        assertThat(cache.get("key1")).isNull();
+        assertThat(cache.get("key1", "el")).isNull();
     }
 
     @Test
-    public void testGet_noCurrentLocaleSet() {
+    public void testGet_localeNotSupported() {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
 
-        assertThat(cache.get("key1")).isNull();
+        assertThat(cache.get("key1", "de")).isNull();
     }
 
     @Test
-    public void testGet_currentLocaleNotSupported() {
+    public void testGet_nullLocale() {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
 
-        cache.setCurrentLocale("de");
-
-        assertThat(cache.get("key1")).isNull();
+        assertThat(cache.get("key1", null)).isNull();
     }
 
     @Test
@@ -80,34 +78,7 @@ public class MemoryCacheTest {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
 
-        cache.setCurrentLocale("el");
-
-        assertThat(cache.get("key1")).isEqualTo("val1");
-    }
-
-    @Test
-    public void testGet_updateCalledAfterSettingCurrentLocale() {
-        MemoryCache cache = new MemoryCache();
-        cache.setCurrentLocale("el");
-
-        cache.update(getDummyTranslationMap());
-
-        assertThat(cache.get("key1")).isEqualTo("val1");
-    }
-
-    @Test
-    public void testGet_setCurrentLocaleCalledMultipleTimes() {
-        MemoryCache cache = new MemoryCache();
-        cache.update(getDummyTranslationMap());
-
-        cache.setCurrentLocale("el");
-        assertThat(cache.get("key1")).isEqualTo("val1");
-
-        cache.setCurrentLocale("es");
-        assertThat(cache.get("key1")).isEqualTo("val1 es");
-
-        cache.setCurrentLocale(null);
-        assertThat(cache.get("key1")).isNull();
+        assertThat(cache.get("key1", "el")).isEqualTo("val1");
     }
 
     @Test
@@ -115,11 +86,9 @@ public class MemoryCacheTest {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
 
-        cache.setCurrentLocale("el");
-
         cache.update(getDummyTranslationMap2());
 
-        assertThat(cache.get("key1")).isNull();
+        assertThat(cache.get("key1", "el")).isNull();
     }
 
 }

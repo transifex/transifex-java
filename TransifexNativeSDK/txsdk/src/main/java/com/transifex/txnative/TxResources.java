@@ -42,6 +42,12 @@ public class TxResources extends Resources {
     private final Resources mResources;
     private final NativeCore mNativeCore;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param baseResources The {@link Resources} object to wrap.
+     * @param nativeCore A {@link NativeCore} instance.
+     */
     public TxResources(@NonNull Resources baseResources, @NonNull NativeCore nativeCore) {
         super(baseResources.getAssets(), baseResources.getDisplayMetrics(), baseResources.getConfiguration());
         mResources = baseResources;

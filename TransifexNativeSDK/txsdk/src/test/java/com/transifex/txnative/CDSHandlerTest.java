@@ -109,7 +109,7 @@ public class CDSHandlerTest {
     @Test
     public void testFetchTranslations_badURL() {
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "wrongurl");
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL");
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal(null);
         assertThat(map).isNotNull();
@@ -209,7 +209,7 @@ public class CDSHandlerTest {
     }
 
     @Test
-    public void testFetchTranslations_202Only() {
+    public void testFetchTranslations_Only202() {
         server = new MockWebServer();
         server.setDispatcher(getElEs202OnceDispatcher(30));
         String baseUrl = server.url("").toString();

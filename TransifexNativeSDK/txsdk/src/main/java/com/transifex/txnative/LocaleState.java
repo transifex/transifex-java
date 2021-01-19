@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 
 /**
  * Keeps track of the locale-related information for the application, such as supported locales,
- * source, current locale and resolved locales.
+ * source, current and resolved locale.
  */
 public class LocaleState {
 
@@ -137,6 +137,13 @@ public class LocaleState {
 
     /**
      * The resolved locale is one of the app locales that best matches the current locale.
+     * <p>
+     * The matching follows Android's
+     * <a href="https://developer.android.com/guide/topics/resources/multilingual-support">resource
+     * resolution strategy</a>. At first, a locale that has the same language and region is searched
+     * for. If this fails, a locale that has the same language but no region defined is searched for.
+     * If this fails, a locale that has the same language but a different region is searched for. If
+     * this fails, the resolved locale is <code>null</code>.
      *
      * @return The resolved locale or <code>null</code> if no app locale matches the current locale.
      */
@@ -200,6 +207,11 @@ public class LocaleState {
 
     /**
      * Sets the current locale and calls the listener if the value changed.
+     * <p>
+     * The method also sets the resolved locale by finding the {@link #getAppLocales() app locale}
+     * that best matches the {@link #getCurrentLocale() current locale}, according to Android's
+     * <a href="https://developer.android.com/guide/topics/resources/multilingual-support">resource
+     * resolution strategy</a>.
      *
      * @param currentLocale The current locale.
      */
@@ -207,8 +219,6 @@ public class LocaleState {
         if (!Utils.equals(currentLocale, mCurrentLocale)) {
             mCurrentLocale = currentLocale;
 
-            // Find an app locale that best matches the current locale according to Android's
-            // resolution strategy: https://developer.android.com/guide/topics/resources/multilingual-support
             mResolvedLocale = null;
 
             // Try matching both language and region
