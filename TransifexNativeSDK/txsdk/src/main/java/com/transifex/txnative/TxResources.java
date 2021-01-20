@@ -16,8 +16,11 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Native;
 
+import androidx.annotation.AnyRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 
@@ -37,46 +40,31 @@ import androidx.annotation.StringRes;
 public class TxResources extends Resources {
 
     private final Resources mResources;
+    private final NativeCore mNativeCore;
 
-    public TxResources(Resources baseResources) {
+    /**
+     * Creates a new instance.
+     *
+     * @param baseResources The {@link Resources} object to wrap.
+     * @param nativeCore A {@link NativeCore} instance.
+     */
+    public TxResources(@NonNull Resources baseResources, @NonNull NativeCore nativeCore) {
         super(baseResources.getAssets(), baseResources.getDisplayMetrics(), baseResources.getConfiguration());
         mResources = baseResources;
+        mNativeCore = nativeCore;
     }
 
-    //TODO: In the future, we want this methods to do nothing if TxNative is not initialized
+    //region Overrides
 
-    //TODO: I may have to use Html.fromHtml() to strip HTML characters
     @NonNull
     @Override
     public CharSequence getText(@StringRes int id) throws NotFoundException {
-        CharSequence originalString = mResources.getText(id);
-
-        // We don't want to alter string resources, such as
-        // "config_inputEventCompatProcessorOverrideClassName", that belong to the android resource
-        // package
-        if (isAndroidStringResource(id)) {
-            return originalString;
-        }
-
-        String resourceName = mResources.getResourceEntryName(id);
-
-        if (originalString.toString().isEmpty()) {
-            return originalString;
-        }
-
-        //return resourceName;
-        return "test: " + originalString;
+        return mNativeCore.translate(this, id);
     }
 
     @Override
     public CharSequence getText(@StringRes int id, CharSequence def) {
-        CharSequence originalString = mResources.getText(id, def);
-
-        if (isAndroidStringResource(id)) {
-            return originalString;
-        }
-
-        return "test";
+        return mNativeCore.translate(this, id, def);
     }
 
     @NonNull
@@ -120,16 +108,33 @@ public class TxResources extends Resources {
         return new String[]{"test1", "test2"};
     }
 
+    //endregion Overrides
+
+    //region Interface
+
     /**
      * Checks if the provided string resource id belongs to Android's resource package.
      *
-     * @param id The string resource id to check.
+     * @param id The string resource ID to check.
+     *
      * @return true if it belong's to Android's resource package, false otherwise.
+     *
+     * @throws NotFoundException Throws NotFoundException if the given ID does not exist.
      */
-    private boolean isAndroidStringResource(@StringRes int id) {
+    boolean isAndroidStringResource(@StringRes int id) {
         String resourcePackageName = mResources.getResourcePackageName(id);
         return resourcePackageName.equals("android");
     }
+
+    @NonNull CharSequence getOriginalText(@StringRes int id) {
+        return mResources.getText(id);
+    }
+
+    @Nullable CharSequence getOriginalText(@StringRes int id, @Nullable CharSequence def) {
+        return mResources.getText(id, def);
+    }
+
+    //endregion Interface
 
     //region Delegation
 
@@ -302,22 +307,22 @@ public class TxResources extends Resources {
     }
 
     @Override
-    public String getResourceName(int resid) throws NotFoundException {
+    public String getResourceName(@AnyRes int resid) throws NotFoundException {
         return mResources.getResourceName(resid);
     }
 
     @Override
-    public String getResourcePackageName(int resid) throws NotFoundException {
+    public String getResourcePackageName(@AnyRes int resid) throws NotFoundException {
         return mResources.getResourcePackageName(resid);
     }
 
     @Override
-    public String getResourceTypeName(int resid) throws NotFoundException {
+    public String getResourceTypeName(@AnyRes int resid) throws NotFoundException {
         return mResources.getResourceTypeName(resid);
     }
 
     @Override
-    public String getResourceEntryName(int resid) throws NotFoundException {
+    public String getResourceEntryName(@AnyRes int resid) throws NotFoundException {
         return mResources.getResourceEntryName(resid);
     }
 

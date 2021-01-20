@@ -1,6 +1,8 @@
 package com.transifex.txnative;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -25,7 +27,7 @@ public class Utils {
      * attribute set and the current theme.
      * <p>
      *     If the attribute does not point to a resource id, the method returns "0". This can happen
-     *     if the attribute is set to hardcoded string or to "@null" or the attribute has not
+     *     if the attribute is set to a hardcoded string or to "@null" or the attribute has not
      *     beet set.
      * </p>
      * @param context The context.
@@ -111,6 +113,30 @@ public class Utils {
             //noinspection deprecation
             return context.getResources().getConfiguration().locale;
         }
+    }
+
+    /**
+     * Returns a Resources object, derived from the one in the provided context, which uses the
+     * desired locale.
+     */
+    @NonNull
+    public static Resources getLocalizedResources(@NonNull Context context, @NonNull Locale desiredLocale) {
+        Configuration conf = context.getResources().getConfiguration();
+        conf = new Configuration(conf);
+        conf.setLocale(desiredLocale);
+        Context localizedContext = context.createConfigurationContext(conf);
+        return localizedContext.getResources();
+    }
+
+    /**
+     * Returns a {@link Resources} object configured for the default (non localized) resources.
+     * <p>
+     * Getting a string from this object, will return the string found in the default
+     * <code>`strings.xml`</code> file.
+     */
+    @NonNull
+    public static Resources getDefaultLanguageResources(@NonNull Context context) {
+        return getLocalizedResources(context, new Locale(""));
     }
 
     public static boolean equals(Object a, Object b) {

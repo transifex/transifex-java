@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 
 import com.transifex.txnative.TxNative;
 
-import org.jetbrains.annotations.NotNull;
-
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -186,7 +184,7 @@ public class TxContextWrappingDelegateJava extends AppCompatDelegate {
         return wrap(superDelegate.attachBaseContext2(super.attachBaseContext2(context)));
     }
 
-    @NotNull
+    @NonNull
     private Context wrap(Context context) {
         return TxNative.wrap(context);
     }

@@ -4,18 +4,18 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.concurrent.RejectedExecutionException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 class CDSHandler {
 
@@ -23,16 +23,18 @@ class CDSHandler {
      * A callback that provides the results of {@link #fetchTranslations(String, FetchTranslationsCallback)}
      * when the operation is complete.
      */
-    public interface FetchTranslationsCallback {
+    interface FetchTranslationsCallback {
 
         /**
          * Called when the operation is complete.
          * <p>
          * If the operation fails, the translationMap will be empty.
          *
-         * @param translationMap A HashMap of locale codes that point to JSON objects.
+         * @param translationMap A {@link com.transifex.txnative.LocaleData.TranslationMap TranslationMap}
+         *                       holding the results.
          */
-        void onComplete(@NonNull HashMap<String, JSONObject> translationMap);
+        @WorkerThread
+        void onComplete(@NonNull LocaleData.TranslationMap translationMap);
     }
 
     public static final String CDS_HOST = "https://cds.svc.transifex.net";
@@ -53,15 +55,17 @@ class CDSHandler {
     // The host of the Content Delivery Service
     private final String mCdsHost;
 
+    private final Gson mGson;
+
     /**
      * Class that contains the result of {@link #fetchLocale(Uri, String)}.
      */
     private static class FetchLocaleResult {
-        JSONObject json;
+        LocaleData.TxResponseData response;
         HttpURLConnection connection;
 
-        public FetchLocaleResult(JSONObject json, HttpURLConnection connection) {
-            this.json = json;
+        public FetchLocaleResult(LocaleData.TxResponseData response, HttpURLConnection connection) {
+            this.response = response;
             this.connection = connection;
         }
     }
@@ -81,6 +85,8 @@ class CDSHandler {
         mToken = token;
         mSecret = secret;
         mCdsHost = csdHost;
+
+        mGson = new Gson();
     }
 
     /**
@@ -98,14 +104,14 @@ class CDSHandler {
             AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
                 @Override
                 public void run() {
-                    HashMap<String, JSONObject> result = fetchTranslationsInternal(localeCode);
+                    LocaleData.TranslationMap result = fetchTranslationsInternal(localeCode);
                     callback.onComplete(result);
                 }
             });
         }
         catch (RejectedExecutionException exception) {
             Log.e(TAG, "Could not execute background task: " + exception);
-            callback.onComplete(new HashMap<String, JSONObject>(0));
+            callback.onComplete(new LocaleData.TranslationMap(0));
         }
     }
 
@@ -117,10 +123,10 @@ class CDSHandler {
      *
      * @see #fetchTranslations(String, FetchTranslationsCallback)
      */
-    public @NonNull
-    HashMap<String, JSONObject> fetchTranslationsInternal(@Nullable String localeCode) {
+    @NonNull
+    LocaleData.TranslationMap fetchTranslationsInternal(@Nullable String localeCode) {
         String[] fetchLocalCodes = (localeCode != null) ? new String[]{localeCode} : mLocaleCodes;
-        HashMap<String, JSONObject> translations = new HashMap<>(fetchLocalCodes.length);
+        LocaleData.TranslationMap translations = new LocaleData.TranslationMap(fetchLocalCodes.length);
 
         Uri cdsHostURI = Uri.parse(mCdsHost).buildUpon().appendEncodedPath("content").build();
 
@@ -139,8 +145,9 @@ class CDSHandler {
         HttpURLConnection lastConnection = null;
         for (String fetchLocalCode : fetchLocalCodes) {
             FetchLocaleResult results = fetchLocale(cdsHostURI, fetchLocalCode);
-            if (results.json != null) {
-                translations.put(fetchLocalCode, results.json);
+            LocaleData.TxResponseData responseData = results.response;
+            if (responseData!= null) {
+                translations.put(fetchLocalCode, new LocaleData.LocaleStrings(responseData.data));
             }
             if (results.connection != null) {
                 lastConnection = results.connection;
@@ -158,7 +165,8 @@ class CDSHandler {
     /**
      * Fetches the translation data for the specified locale.
      * <p>
-     * If the call fails, the "json" field of the returned {@link FetchLocaleResult} is "null".
+     * If the call fails, the <code>data</code> field of the returned
+     * {@link FetchLocaleResult} will be <code>"null"</code>.
      *
      * @return A {@link FetchLocaleResult} object containing data.
      */
@@ -191,18 +199,17 @@ class CDSHandler {
                 int code = connection.getResponseCode();
                 switch (code) {
                     case 200: {
+                        String result = Utils.readInputStream(connection.getInputStream());
+                        connection.getInputStream().close();
+
+                        LocaleData.TxResponseData responseData = null;
                         try {
-                            String result = Utils.readInputStream(connection.getInputStream());
-                            connection.getInputStream().close();
-
-                            JSONObject jsonObject = new JSONObject(result);
-
-                            return new FetchLocaleResult(jsonObject, connection);
-                        } catch (JSONException e) {
-                            Log.e(TAG, "Could not parse response to JSON object for locale " + localeCode);
+                            responseData = mGson.fromJson(result, LocaleData.TxResponseData.class);
+                        } catch (JsonSyntaxException e) {
+                            Log.e(TAG, "Could not parse JSON response to object for locale " + localeCode);
                         }
 
-                        return new FetchLocaleResult(null, connection);
+                        return new FetchLocaleResult(responseData, connection);
                     }
                     case 202:
                         // try one more time

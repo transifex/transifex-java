@@ -1,29 +1,41 @@
 package com.transifex.txnative;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.res.Resources;
+import android.os.Handler;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.SpannedString;
+import android.text.TextUtils;
 
-import org.json.JSONObject;
+import com.transifex.txnative.missingpolicy.MissingPolicy;
+import com.transifex.txnative.missingpolicy.SourceStringPolicy;
 
-import java.util.HashMap;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import io.github.inflationx.viewpump.ViewPump;
+import androidx.annotation.StringRes;
+import androidx.core.text.HtmlCompat;
 
 /**
  * The main class of the framework, responsible for orchestrating all functionality.
  */
 public class NativeCore {
 
-    public static final String TAG = NativeCore.class.getSimpleName().toString();
+    public static final String TAG = NativeCore.class.getSimpleName();
 
     final Context mContext;
     final LocaleState mLocaleState;
+    final Cache mCache;
+    final MissingPolicy mMissingPolicy;
 
+    final Handler mMainHandler;
     final CDSHandler mCDSHandler;
+    final Resources mDefaultResources;      // Non-localized resources
 
+    boolean mTestModeEnabled;
+    boolean mSupportSpannableEnabled;
 
     /**
      * Create an instance of the core SDK class.
@@ -35,36 +47,53 @@ public class NativeCore {
      * @param token The Transifex token that can be used for retrieving translations from CDS.
      * @param cdsHost An optional host for the Content Delivery Service; defaults to the production
      *                host provided by Transifex.
+     * @param cache The translation cache that holds the translations from the CDS; MemoryCache is
+     *             used if set to <code>null</code>.
+     * @param missingPolicy Determines how to handle translations that are not available;
+     * {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used
+     *                     if set to <code>null</code>.
      */
     public NativeCore(@NonNull Context applicationContext,
                       @NonNull LocaleState localeState,
                       @NonNull String token,
-                      @Nullable String cdsHost) {
-        mContext = applicationContext;
+                      @Nullable String cdsHost,
+                      @Nullable Cache cache,
+                      @Nullable MissingPolicy missingPolicy) {
+        mContext = applicationContext.getApplicationContext();
+        mMainHandler = new Handler(mContext.getMainLooper());
         mLocaleState = localeState;
-
         mLocaleState.setCurrentLocaleListener(mCurrentLocaleListener);
+        mCache = (cache != null) ? cache : new MemoryCache();
+        mMissingPolicy = (missingPolicy != null) ? missingPolicy : new SourceStringPolicy();
 
         if (cdsHost == null) {
             cdsHost = CDSHandler.CDS_HOST;
         }
         mCDSHandler = new CDSHandler(mLocaleState.getTranslatedLocales(), token, null, cdsHost);
 
-        // Initialize ViewPump with our interceptor
-        ViewPump.init(ViewPump.builder()
-                .addInterceptor(new TxInterceptor())
-                .build());
-
-
+        mDefaultResources = Utils.getDefaultLanguageResources(mContext);
     }
 
-    private LocaleState.CurrentLocaleListener mCurrentLocaleListener = new LocaleState.CurrentLocaleListener() {
-        @Override
-        public void onLocaleChanged(Locale newLocale) {
-            Log.d(TAG, "local changed to " + newLocale);
-            //TODO: update the MemoryCache
-        }
+     private final LocaleState.CurrentLocaleListener mCurrentLocaleListener = new LocaleState.CurrentLocaleListener() {
+         @Override
+         public void onLocaleChanged(@NonNull Locale newLocale, @Nullable String resolvedLocale) {
+             // Do nothing
+         }
     };
+
+    /**
+     * @see TxNative#setTestMode(boolean)
+     */
+    void setTestMode(boolean enabled) {
+        mTestModeEnabled = enabled;
+    }
+
+    /**
+     * @see TxNative#setSupportSpannable(boolean)
+     */
+    void setSupportSpannable(boolean enabled) {
+        mSupportSpannableEnabled = enabled;
+    }
 
     /**
      * Fetches translations from CDS.
@@ -72,16 +101,133 @@ public class NativeCore {
      * @param localeCode If set to <code>null</code>, it will fetch translations for all locales
      *                   as defined in the SDK configuration.
      */
-    public void fetchTranslations(@Nullable String localeCode) {
+    void fetchTranslations(@Nullable String localeCode) {
         mCDSHandler.fetchTranslations(localeCode, new CDSHandler.FetchTranslationsCallback() {
-
             @Override
-            public void onComplete(@Nullable HashMap<String, JSONObject> translationMap) {
-                //TODO: update MemoryCache when implemented
+            public void onComplete(final @Nullable LocaleData.TranslationMap translationMap) {
                 if (translationMap != null) {
-                    Log.d(TAG, translationMap.toString());
+
+                    // Update mCache using the fetched translationMap in main thread
+                    mMainHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mCache.update(translationMap);
+                        }
+                    });
                 }
             }
         });
+    }
+
+    /**
+     * Return the value of the provided string resource ID under the current locale.
+     * <p>
+     * This method has similar semantics to {@link Resources#getText(int)} in terms of handling a
+     * non existing ID: throws NotFoundException if the given ID does not exist; the returned
+     * string is never <code>null</code>.
+     *
+     * @return The string data associated with the resource, plus possibly styled text information.
+     *
+     * @throws Resources.NotFoundException Throws NotFoundException if the given ID does not exist
+     */
+    @NonNull CharSequence translate(TxResources txResources, @StringRes int id) {
+        //noinspection ConstantConditions
+        return internalTranslate(txResources, id, null, false);
+    }
+
+    /**
+     * Return the value of the provided string resource ID under the current locale.
+     * <p>
+     * This method has similar semantics to {@link Resources#getText(int, CharSequence)} in terms of
+     * handling a non existing ID: returns <code>def</code>, which can be <code>null</code>, if the given ID
+     * does not exist.
+     *
+     * @return The string data associated with the resource, plus possibly styled text information,
+     * or <code>def</code> if <code>id</code> is 0 or not found.
+     */
+    @Nullable CharSequence translate(TxResources txResources, @StringRes int id, @Nullable CharSequence def) {
+        return internalTranslate(txResources, id, def, true);
+    }
+
+    /**
+     * Return the value of the provided string resource ID under the current locale.
+     * <p>
+     * If <coode>shouldUseDef</coode> is <code>false</code>, the semantics are described by
+     * {@link #translate(TxResources, int)}. If it's <code>true</code>, they are described by
+     * {@link #translate(TxResources, int, CharSequence)}.
+     *
+     * @param txResources TxResources instance.
+     * @param id The resource ID.
+     * @param def The default CharSequence to return if ID is not found. It's used if shouldUseDef
+     *            is true. Otherwise, it's ignored.
+     * @param shouldUseDef Set to false for {@link #translate(TxResources, int)} semantics. Set to
+     *                     true for {@link #translate(TxResources, int, CharSequence)} semantics.
+     *                     When set to true, <code>def</code> is returned if the <code>id</code> is
+     *                     not found.
+     *
+     * @return The string data associated with the resource, plus possibly styled text information,
+     * or <code>def</code> if <code>id</code> is 0 or not found and <code>shouldUseDef</code> is true.
+     */
+    @Nullable private CharSequence internalTranslate(TxResources txResources, @StringRes int id,
+                                                     @Nullable CharSequence def, boolean shouldUseDef) {
+        try {
+            // We don't want to alter string resources, such as
+            // "config_inputEventCompatProcessorOverrideClassName", that belong to the android resource
+            // package
+            if (txResources.isAndroidStringResource(id)) {
+                return txResources.getOriginalText(id);
+            }
+        }
+        catch (Resources.NotFoundException e) {
+            // The provided ID does not exist. If "shouldUseDef" is true, we emulate the getText(int)
+            // behavior. If it's false, we emulate the getText(int, CharSequence) behavior
+            if (shouldUseDef) {
+                // Return def if the provided id does not exist.
+                return def;
+            }
+            else {
+                // Throw exception if the provided id does not exist.
+                throw e;
+            }
+        }
+
+        if (mTestModeEnabled) {
+            return TextUtils.concat("test: ", txResources.getOriginalText(id));
+        }
+
+        if (mLocaleState.isSourceLocale()) {
+            return txResources.getOriginalText(id);
+        }
+
+        String translatedString = null;
+        if (mLocaleState.getResolvedLocale() != null) {
+            translatedString = mCache.get(txResources.getResourceEntryName(id),
+                    mLocaleState.getResolvedLocale());
+        }
+
+        // String can be null if:
+        // 1. our Cache has not been updated with translations yet
+        // 2. the resolved locale is null: there is no app locale that matches the current locale
+        // 3. our Cache does not have translations for the resolved locale (this shouldn't happen)
+        // 4. the key was not found in the Cache for the resolved locale
+        if (translatedString == null) {
+            CharSequence sourceString = mDefaultResources.getText(id);
+            return mMissingPolicy.get(sourceString);
+        }
+
+        if (mSupportSpannableEnabled) {
+            // If a span was found, return a "Spanned" object. Otherwise, return "String".
+            Spanned spanned = HtmlCompat.fromHtml(translatedString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+            if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
+                return new SpannedString(spanned);
+            }
+            else {
+                return spanned.toString();
+            }
+        }
+        else {
+            // This is faster than "fromHTML()" and is enough for most cases
+            return translatedString.replaceAll("&lt;", "<");
+        }
     }
 }

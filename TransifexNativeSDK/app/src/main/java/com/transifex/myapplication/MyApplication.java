@@ -18,11 +18,15 @@ public class MyApplication extends Application {
         // Initialize TxNative
         String token = null;
 
+        // The app locales entered here should match the ones in `resConfigs` in gradle, so that
+        // multi locale support works for newer Androids.
         LocaleState localeState = new LocaleState(getApplicationContext(),
                 "en",
                 new String[]{"en", "el", "de", "fr", "ar", "sl"},
                 null);
-        TxNative.init(getApplicationContext(), localeState, token, null);
+        TxNative.init(getApplicationContext(), localeState, token, null, null, null);
+
+        //TxNative.setTestMode(true);
 
         // Fetch all translations from CDS
         TxNative.fetchTranslations(null);

@@ -12,8 +12,7 @@ import com.transifex.txnative.transformers.TextViewTransformer;
 import com.transifex.txnative.transformers.ToolbarTransformer;
 import com.transifex.txnative.transformers.ViewTransformer;
 
-import org.jetbrains.annotations.NotNull;
-
+import androidx.annotation.NonNull;
 import io.github.inflationx.viewpump.InflateResult;
 import io.github.inflationx.viewpump.Interceptor;
 
@@ -44,9 +43,9 @@ class TxInterceptor implements Interceptor {
         mSupportToolbarTransformer = new SupportToolbarTransformer();
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public InflateResult intercept(@NotNull Chain chain) {
+    public InflateResult intercept(@NonNull Chain chain) {
         InflateResult result = chain.proceed(chain.request());
 
         View view = result.view();
