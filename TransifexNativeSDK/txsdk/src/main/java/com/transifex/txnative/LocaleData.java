@@ -2,13 +2,11 @@ package com.transifex.txnative;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Classes that hold the localization data when received by CDS or stored locally.
@@ -26,7 +24,7 @@ public class LocaleData {
 
         public String string;
 
-        @NotNull
+        @NonNull
         @Override
         public String toString() {
             return "{" + "string='" + string + '\'' + '}';
@@ -58,7 +56,7 @@ public class LocaleData {
 
         public HashMap<String, StringInfo> data;
 
-        @NotNull
+        @NonNull
         @Override
         public String toString() {
             return "{" + "data=" + data + '}';
@@ -94,7 +92,8 @@ public class LocaleData {
          * Return the string value associated with the provided key, or <code>null</code>
          * if it isn't found.
          */
-        @Nullable public String get(String key) {
+        @Nullable
+        public String get(String key) {
             StringInfo stringInfo = mHashMap.get(key);
             if (stringInfo != null) {
                 return stringInfo.string;
@@ -102,7 +101,7 @@ public class LocaleData {
             return null;
         }
 
-        @NotNull
+        @NonNull
         @Override
         public String toString() {
             return mHashMap.toString();
@@ -173,7 +172,7 @@ public class LocaleData {
             return mHashMap.keySet();
         }
 
-        @NotNull
+        @NonNull
         @Override
         public String toString() {
             return mHashMap.toString();

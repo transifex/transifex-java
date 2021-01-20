@@ -1,7 +1,5 @@
 package com.transifex.txnative.missingpolicy;
 
-import org.jetbrains.annotations.NotNull;
-
 import androidx.annotation.NonNull;
 
 /**
@@ -16,7 +14,7 @@ public class SourceStringPolicy implements MissingPolicy {
      *
      * @return The source string.
      */
-    @NotNull
+    @NonNull
     @Override
     public CharSequence get(@NonNull CharSequence sourceString) {
         return sourceString;

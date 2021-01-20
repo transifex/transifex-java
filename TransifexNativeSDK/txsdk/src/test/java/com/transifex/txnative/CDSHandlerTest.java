@@ -2,7 +2,6 @@ package com.transifex.txnative;
 
 import android.os.Build;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +10,7 @@ import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 
+import androidx.annotation.NonNull;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -39,7 +39,7 @@ public class CDSHandlerTest {
     private Dispatcher getElEsDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
 
-            @NotNull
+            @NonNull
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
@@ -59,7 +59,7 @@ public class CDSHandlerTest {
     private Dispatcher getElDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
 
-            @NotNull
+            @NonNull
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
@@ -81,7 +81,7 @@ public class CDSHandlerTest {
             int elCounter = 0;
             int eSCounter = 0;
 
-            @NotNull
+            @NonNull
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 

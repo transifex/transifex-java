@@ -26,8 +26,8 @@ public class MemoryCache implements Cache {
 
     @Nullable
     @Override
-    public String get(@NonNull String key, @Nullable String locale) {
-        if (mTranslationMap == null || locale == null) {
+    public String get(@NonNull String key, @NonNull String locale) {
+        if (mTranslationMap == null) {
             return null;
         }
 

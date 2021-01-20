@@ -199,7 +199,11 @@ public class NativeCore {
             return txResources.getOriginalText(id);
         }
 
-        String translatedString = mCache.get(txResources.getResourceEntryName(id), mLocaleState.getResolvedLocale());
+        String translatedString = null;
+        if (mLocaleState.getResolvedLocale() != null) {
+            translatedString = mCache.get(txResources.getResourceEntryName(id),
+                    mLocaleState.getResolvedLocale());
+        }
 
         // String can be null if:
         // 1. our Cache has not been updated with translations yet

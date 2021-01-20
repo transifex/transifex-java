@@ -24,7 +24,7 @@ public interface Cache {
      * @return The string or <code>null</code> if it wasn't found or if the provided locale does not
      * exist in the cache.
      */
-    @Nullable String get(@NonNull String key, @Nullable String locale);
+    @Nullable String get(@NonNull String key, @NonNull String locale);
 
     /**
      * Update the cache with the provided

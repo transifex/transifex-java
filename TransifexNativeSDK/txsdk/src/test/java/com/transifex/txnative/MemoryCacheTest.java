@@ -66,14 +66,6 @@ public class MemoryCacheTest {
     }
 
     @Test
-    public void testGet_nullLocale() {
-        MemoryCache cache = new MemoryCache();
-        cache.update(getDummyTranslationMap());
-
-        assertThat(cache.get("key1", null)).isNull();
-    }
-
-    @Test
     public void testGet() {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
