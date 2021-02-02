@@ -3,11 +3,11 @@ package com.transifex.txnative;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.TextUtils;
 
+import com.transifex.common.LocaleData;
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
 
@@ -31,7 +31,7 @@ public class NativeCore {
     final MissingPolicy mMissingPolicy;
 
     final Handler mMainHandler;
-    final CDSHandler mCDSHandler;
+    final CDSHandlerAndroid mCDSHandler;
     final Resources mDefaultResources;      // Non-localized resources
 
     boolean mTestModeEnabled;
@@ -67,9 +67,9 @@ public class NativeCore {
         mMissingPolicy = (missingPolicy != null) ? missingPolicy : new SourceStringPolicy();
 
         if (cdsHost == null) {
-            cdsHost = CDSHandler.CDS_HOST;
+            cdsHost = CDSHandlerAndroid.CDS_HOST;
         }
-        mCDSHandler = new CDSHandler(mLocaleState.getTranslatedLocales(), token, null, cdsHost);
+        mCDSHandler = new CDSHandlerAndroid(mLocaleState.getTranslatedLocales(), token, null, cdsHost);
 
         mDefaultResources = Utils.getDefaultLanguageResources(mContext);
     }
@@ -102,7 +102,7 @@ public class NativeCore {
      *                   as defined in the SDK configuration.
      */
     void fetchTranslations(@Nullable String localeCode) {
-        mCDSHandler.fetchTranslations(localeCode, new CDSHandler.FetchTranslationsCallback() {
+        mCDSHandler.fetchTranslationsAsync(localeCode, new CDSHandlerAndroid.FetchTranslationsCallback() {
             @Override
             public void onComplete(final @Nullable LocaleData.TranslationMap translationMap) {
                 if (translationMap != null) {

@@ -1,5 +1,7 @@
 package com.transifex.txnative;
 
+import com.transifex.common.LocaleData;
+
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -28,7 +30,7 @@ public interface Cache {
 
     /**
      * Update the cache with the provided
-     * {@link com.transifex.txnative.LocaleData.TranslationMap TranslationMap}.
+     * {@link com.transifex.common.LocaleData.TranslationMap TranslationMap}.
      *
      * @param translationMap The translation map to use in the cache.
      */

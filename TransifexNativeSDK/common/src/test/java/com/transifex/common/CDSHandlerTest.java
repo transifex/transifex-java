@@ -1,14 +1,13 @@
-package com.transifex.txnative;
+package com.transifex.common;
 
-import android.os.Build;
+import com.google.gson.Gson;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 
 import androidx.annotation.NonNull;
 import okhttp3.mockwebserver.Dispatcher;
@@ -18,11 +17,16 @@ import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.google.common.truth.Truth.assertThat;
 
-@RunWith(RobolectricTestRunner.class)
-@Config(sdk = Build.VERSION_CODES.P)
 public class CDSHandlerTest {
 
     private MockWebServer server = null;
+    private String baseUrl = null;
+
+    @Before
+    public void setUp() {
+        server = new MockWebServer();
+        baseUrl = server.url("").toString();
+    }
 
     @After
     public void Teardown() {
@@ -35,6 +39,7 @@ public class CDSHandlerTest {
 
     private static final String elBody = "{\"data\":{\"test_key\":{\"string\":\"Καλημέρα\"},\"another_key\":{\"string\":\"Καλό απόγευμα\"},\"key3\":{\"string\":\"\"}}}";
     private  static final String esBody = "{\"data\":{\"test_key\":{\"string\":\"Buenos días\"},\"another_key\":{\"string\":\"Buenas tardes\"},\"key3\":{\"string\":\"\"}}}";
+    private static final String elBodyBadFormatting = "not a JSON format";
 
     private Dispatcher getElEsDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
@@ -66,6 +71,24 @@ public class CDSHandlerTest {
                 switch (request.getPath()) {
                     case "/content/el":
                         return new MockResponse().setResponseCode(200).setBody(elBody);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        return dispatcher;
+    }
+
+    private Dispatcher getElDispatcherBadJsonFormatting() {
+        Dispatcher dispatcher = new Dispatcher() {
+
+            @NonNull
+            @Override
+            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
+
+                switch (request.getPath()) {
+                    case "/content/el":
+                        return new MockResponse().setResponseCode(200).setBody(elBodyBadFormatting);
                 }
                 return new MockResponse().setResponseCode(404);
             }
@@ -106,26 +129,64 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
+    private Dispatcher getPostDispatcher() {
+        Dispatcher dispatcher = new Dispatcher() {
+
+            @NonNull
+            @Override
+            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
+
+                switch (request.getPath()) {
+                    case "/content":
+                        return new MockResponse().setResponseCode(200).setBody(elBody);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        return dispatcher;
+    }
+
+    private LocaleData.TxPostData getPostData() {
+        LinkedHashMap<String, LocaleData.StringInfo> data = new LinkedHashMap<>();
+        data.put("key1", new LocaleData.StringInfo("This is a source string."));
+        data.put("key2", new LocaleData.StringInfo("Using special \ncharacters εδώ."));
+
+        LocaleData.TxPostData.Meta meta = new LocaleData.TxPostData.Meta();
+        meta.purge = true;
+
+        return new LocaleData.TxPostData(data, meta);
+    }
+
     @Test
     public void testFetchTranslations_badURL() {
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL");
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).isEmpty();
     }
 
     @Test
     public void testFetchTranslations_normalResponse() {
-        server = new MockWebServer();
         server.setDispatcher(getElEsDispatcher());
-        String baseUrl = server.url("").toString();
 
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+
+        RecordedRequest recordedRequest = null;
+        try {
+            recordedRequest = server.takeRequest();
+        } catch (InterruptedException ignored) {
+        }
+        assertThat(recordedRequest).isNotNull();
+        assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+        assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
+        assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el", "es");
 
@@ -144,14 +205,12 @@ public class CDSHandlerTest {
 
     @Test
     public void testFetchTranslations_onlyElInResponse() {
-        server = new MockWebServer();
         server.setDispatcher(getElDispatcher());
-        String baseUrl = server.url("").toString();
 
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el");
 
@@ -164,14 +223,12 @@ public class CDSHandlerTest {
 
     @Test
     public void testFetchTranslations_specifyLocale_normalResponse() {
-        server = new MockWebServer();
         server.setDispatcher(getElEsDispatcher());
-        String baseUrl = server.url("").toString();
 
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal("el");
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations("el");
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el");
 
@@ -184,14 +241,12 @@ public class CDSHandlerTest {
 
     @Test
     public void testFetchTranslations_first202_thenNormalResponse() {
-        server = new MockWebServer();
         server.setDispatcher(getElEs202OnceDispatcher(10));
-        String baseUrl = server.url("").toString();
 
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el", "es");
 
@@ -210,16 +265,67 @@ public class CDSHandlerTest {
 
     @Test
     public void testFetchTranslations_Only202() {
-        server = new MockWebServer();
         server.setDispatcher(getElEs202OnceDispatcher(30));
-        String baseUrl = server.url("").toString();
 
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslationsInternal(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).isEmpty();
     }
 
+    @Test
+    public void testFetchTranslations_onlyElInResponse_badJSONFormatting() {
+        server.setDispatcher(getElDispatcherBadJsonFormatting());
+
+        String[] localeCodes = new String[]{"el"};
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        assertThat(map).isNotNull();
+        assertThat(map.getLocales()).isEmpty();
+    }
+
+    @Test
+    public void testPostSourceStrings_badURL() {
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", "invalidHostURL");
+
+        LocaleData.TxPostData postData = getPostData();
+        boolean success = cdsHandler.postSourceStrings(postData);
+
+        assertThat(success).isFalse();
+    }
+
+    @Test
+    public void testPostSourceStrings_normal() {
+        server.setDispatcher(getPostDispatcher());
+
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
+
+        LocaleData.TxPostData postData = getPostData();
+        boolean success = cdsHandler.postSourceStrings(postData);
+
+        assertThat(success).isTrue();
+
+        RecordedRequest recordedRequest = null;
+        try {
+            recordedRequest = server.takeRequest();
+        } catch (InterruptedException ignored) {
+        }
+        assertThat(recordedRequest).isNotNull();
+
+        assertThat(recordedRequest.getMethod()).isEqualTo("POST");
+        assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token:secret");
+        assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+
+        String postBody = recordedRequest.getBody().readUtf8();
+        Gson gson = new Gson();
+        LocaleData.TxPostData parsedPostData = gson.fromJson(postBody, LocaleData.TxPostData.class);
+        assertThat(parsedPostData.data.keySet()).containsExactly("key1", "key2").inOrder();
+        assertThat(parsedPostData.data.get("key1").string).isEqualTo("This is a source string.");
+        assertThat(parsedPostData.data.get("key2").string).isEqualTo("Using special \ncharacters εδώ.");
+
+        assertThat(parsedPostData.meta.purge).isTrue();
+    }
 }

@@ -1,5 +1,7 @@
 package com.transifex.txnative;
 
+import com.transifex.common.LocaleData;
+
 import org.junit.Test;
 
 import java.util.HashMap;
