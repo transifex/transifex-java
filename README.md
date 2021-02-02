@@ -149,5 +149,53 @@ to the [invalidation endpoint](https://github.com/transifex/transifex-delivery/#
 
 You can see the SDK used and configured in more advanced ways in the provided sample app.
 
+## Transifex Command Line Tool
+
+Transifex Command Line Tool is a command line tool that can assist developers in pushing the source strings of an Android app to Transifex.
+
+### Building
+
+To build the tool, enter the `TransifexNativeSDK` directory and run from the command line:
+
+```
+gradlew :clitool:assemble
+```
+
+You can find the generated ".jar" file at `clitool/build/libs/transifex.jar`. You can copy it wherever you want.
+
+### Running
+
+To run the tool, type:
+```
+java -jar /path/to/transifex.jar
+```
+, where `/path/to/` is the path to the directory you placed "transifex.jar".
+
+Note that even though the tool uses UTF-8 internally, it's recommended to have your JVM's default character encoding set to UTF-8. If this isn't the case for your system, you can use:
+```
+java -jar -Dfile.encoding=UTF8 /path/to/transifex.jar
+```
+
+For simplicity, the following commands will not include the `java -jar` part required to run the file.
+
+### Usage
+
+`transifex`, `transifex -h`, `transifex --help`
+Displays a help dialog with all the options and commands.
+
+`transifex -h <command>`
+Get help for a particular command.
+
+To use the tool on your app, enter the root directory of your Android Studio project.
+
+`transifex -t <transifex_token> -s <transifex_secret> push -m <app_module_name>`
+Pushes the source strings of your app residing in a module named "app_module_name". The tool will get the `strings.xml` file found in the main source set of the specified module, process it and push it. 
+
+`transifex -t <transifex_token> -s <transifex_secret> push -f path/to/strings1.xml path2/to/strings2.xml`
+If your app has a more complex string setup, you can specify one or more string files.
+
+`transifex -t <transifex_token> -s <transifex_secret> clear`
+Clears all existing resource content from CDS. This action will also remove existing localizations.
+
 ## License
 Licensed under Apache License 2.0, see [LICENSE](LICENSE) file.
