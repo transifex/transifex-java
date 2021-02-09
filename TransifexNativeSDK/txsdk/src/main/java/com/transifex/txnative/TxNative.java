@@ -3,7 +3,6 @@ package com.transifex.txnative;
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
-import android.view.View;
 
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.wrappers.TxContextWrapper;

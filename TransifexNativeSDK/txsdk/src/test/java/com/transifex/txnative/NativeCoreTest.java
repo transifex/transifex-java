@@ -3,9 +3,10 @@ package com.transifex.txnative;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
-import android.text.Html;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
+
+import com.transifex.common.LocaleData;
 
 import org.junit.Before;
 import org.junit.Test;

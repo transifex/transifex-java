@@ -88,22 +88,6 @@ public class Utils {
     }
 
     /**
-     * Reads an input stream to a string.
-     * <p>
-     * The caller should close the input stream.
-     */
-    static String readInputStream(InputStream inputStream) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        StringBuilder result = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            result.append(line);
-        }
-
-        return result.toString();
-    }
-
-    /**
      * Utility method to get the current locale as set in Android.
      */
     public static Locale getCurrentLocale(Context context){

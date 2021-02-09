@@ -1,8 +1,9 @@
-package com.transifex.txnative;
+package com.transifex.common;
 
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -52,7 +53,7 @@ public class LocaleData {
      * @see <a href="https://github.com/transifex/transifex-delivery/#pull-content">
      *     https://github.com/transifex/transifex-delivery/#pull-content</a>
      */
-    public static class TxResponseData {
+    public static class TxPullResponseData {
 
         public HashMap<String, StringInfo> data;
 
@@ -61,6 +62,54 @@ public class LocaleData {
         public String toString() {
             return "{" + "data=" + data + '}';
         }
+    }
+
+    /**
+     * The data structure the CDS accepts when pushing the source strings.
+     *
+     * @see TxPullResponseData
+     * @see <a href="https://github.com/transifex/transifex-delivery/#push-content">
+     *    https://github.com/transifex/transifex-delivery/#push-content</a>
+     */
+    public static class TxPostData extends TxPullResponseData {
+
+        public static class Meta {
+            public Boolean purge;
+
+            @NonNull
+            @Override
+            public String toString() {
+                return "{purge=" + purge + "}";
+            }
+        }
+
+        public Meta meta;
+
+        public TxPostData(@NonNull LinkedHashMap<String, StringInfo> data, @Nullable Meta meta) {
+            this.data = data;
+            this.meta = meta;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "{" + "data=" + data + ", meta=" + meta + "}";
+        }
+    }
+
+    /**
+     * The data structure that CDS responds with when pushing the source strings.
+     *
+     * @see <a href="https://github.com/transifex/transifex-delivery/#push-content">
+     *     https://github.com/transifex/transifex-delivery/#push-content</a>
+     */
+    public static class TxPostResponseData {
+        public int created;
+        public int updated;
+        public int skipped;
+        public int deleted;
+        public int failed;
+        public String[] errors;
     }
 
     /**
