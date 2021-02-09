@@ -44,9 +44,11 @@ public class MainClassTest {
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
+                String dummyCDSResponse = "{\"created\":0,\"updated\":0,\"skipped\":0,\"deleted\":0,\"failed\":0,\"errors\":[]}";
+
                 switch (request.getPath()) {
                     case "/content":
-                        return new MockResponse().setResponseCode(200);
+                        return new MockResponse().setResponseCode(200).setBody(dummyCDSResponse);
                 }
                 return new MockResponse().setResponseCode(404);
             }
@@ -83,12 +85,12 @@ public class MainClassTest {
     @Test
     public void testPush_useFile() {
         // This test relies on having the following file:
-        // txsdk/src/debug/res/values/strings.xml
+        // txsdk/src/test/res/values/strings.xml
 
         server.setDispatcher(getPostDispatcher());
 
         String args = String.format("-t token -s secret -u %s push -f %s", baseUrl,
-                "../txsdk/src/debug/res/values/strings.xml");
+                "../txsdk/src/test/res/values/strings.xml");
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);
@@ -110,14 +112,14 @@ public class MainClassTest {
     @Test
     public void testPush_useMultipleFiles() {
         // This test relies on having the following files:
-        // txsdk/src/debug/res/values/strings.xml
-        // txsdk/src/debug/res/values-el/strings.xml"
+        // txsdk/src/test/res/values/strings.xml
+        // txsdk/src/test/res/values-el/strings.xml"
 
         server.setDispatcher(getPostDispatcher());
 
         String args = String.format("-t token -s secret -u %s push -f %s -f %s", baseUrl,
-                "../txsdk/src/debug/res/values/strings.xml",
-                "../txsdk/src/debug/res/values-el/strings.xml");
+                "../txsdk/src/test/res/values/strings.xml",
+                "../txsdk/src/test/res/values-el/strings.xml");
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);

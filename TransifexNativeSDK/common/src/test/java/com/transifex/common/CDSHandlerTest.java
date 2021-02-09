@@ -136,9 +136,11 @@ public class CDSHandlerTest {
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
+                String dummyCDSResponse = "{\"created\":0,\"updated\":0,\"skipped\":0,\"deleted\":0,\"failed\":0,\"errors\":[]}";
+
                 switch (request.getPath()) {
                     case "/content":
-                        return new MockResponse().setResponseCode(200).setBody(elBody);
+                        return new MockResponse().setResponseCode(200).setBody(dummyCDSResponse);
                 }
                 return new MockResponse().setResponseCode(404);
             }
@@ -292,9 +294,9 @@ public class CDSHandlerTest {
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", "invalidHostURL");
 
         LocaleData.TxPostData postData = getPostData();
-        boolean success = cdsHandler.postSourceStrings(postData);
+        LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
-        assertThat(success).isFalse();
+        assertThat(response).isNull();
     }
 
     @Test
@@ -304,9 +306,9 @@ public class CDSHandlerTest {
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
 
         LocaleData.TxPostData postData = getPostData();
-        boolean success = cdsHandler.postSourceStrings(postData);
+        LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
-        assertThat(success).isTrue();
+        assertThat(response).isNotNull();
 
         RecordedRequest recordedRequest = null;
         try {

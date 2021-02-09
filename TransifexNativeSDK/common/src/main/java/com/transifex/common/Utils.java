@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import androidx.annotation.NonNull;
+
 public class Utils {
 
     /**
@@ -12,11 +14,7 @@ public class Utils {
      * <p>
      * The caller should close the input stream.
      */
-    public static String readInputStream(InputStream inputStream) throws IOException {
-        if (inputStream == null) {
-            return null;
-        }
-
+    public @NonNull static String readInputStream(@NonNull InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         StringBuilder result = new StringBuilder();
         String line;

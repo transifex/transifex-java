@@ -28,6 +28,9 @@ android {
 }
 
 tasks.withType(Test) {
+    // Have aapt2 use src/test/res for resource generation
+    android.sourceSets.main.res.srcDirs += 'src/test/res'
+
     systemProperty "file.encoding", "UTF-8"
 }
 

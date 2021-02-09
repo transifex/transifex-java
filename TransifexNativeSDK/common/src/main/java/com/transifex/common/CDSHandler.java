@@ -4,7 +4,6 @@ package com.transifex.common;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
-
 import net.moznion.uribuildertiny.URIBuilderTiny;
 
 import java.io.BufferedReader;
@@ -19,7 +18,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,10 +54,10 @@ public class CDSHandler {
      * Class that contains the result of {@link #fetchLocale(URI, String)}.
      */
     private static class FetchLocaleResult {
-        LocaleData.TxResponseData response;
+        LocaleData.TxPullResponseData response;
         HttpURLConnection connection;
 
-        public FetchLocaleResult(LocaleData.TxResponseData response, HttpURLConnection connection) {
+        public FetchLocaleResult(LocaleData.TxPullResponseData response, HttpURLConnection connection) {
             this.response = response;
             this.connection = connection;
         }
@@ -115,7 +113,7 @@ public class CDSHandler {
         HttpURLConnection lastConnection = null;
         for (String fetchLocalCode : fetchLocalCodes) {
             FetchLocaleResult results = fetchLocale(cdsContentURI, fetchLocalCode);
-            LocaleData.TxResponseData responseData = results.response;
+            LocaleData.TxPullResponseData responseData = results.response;
             if (responseData!= null) {
                 translations.put(fetchLocalCode, new LocaleData.LocaleStrings(responseData.data));
             }
@@ -170,10 +168,10 @@ public class CDSHandler {
                 int code = connection.getResponseCode();
                 switch (code) {
                     case 200: {
-                        LocaleData.TxResponseData responseData = null;
+                        LocaleData.TxPullResponseData responseData = null;
                         Reader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
                         try {
-                            responseData = mGson.fromJson(reader, LocaleData.TxResponseData.class);
+                            responseData = mGson.fromJson(reader, LocaleData.TxPullResponseData.class);
                         } catch (JsonSyntaxException e) {
                             LOGGER.log(Level.SEVERE, "Could not parse JSON response to object for locale " + localeCode);
                         }
@@ -214,9 +212,11 @@ public class CDSHandler {
      *
      * @param postData The data containing the source strings and the purge value.
      *
-     * @return <code>true</code> if data were pushed successfully, <code>false</code> otherwise.
+     * @return a {@link LocaleData.TxPostResponseData} object if data were pushed successfully,
+     * <code>null</code> otherwise.
      */
-    public boolean postSourceStrings(@NonNull LocaleData.TxPostData postData) {
+    public @Nullable
+    LocaleData.TxPostResponseData pushSourceStrings(@NonNull LocaleData.TxPostData postData) {
         // Check URL
         URL url = null;
         try {
@@ -225,7 +225,7 @@ public class CDSHandler {
             url = new URL(cdsContentURI.toString());
         } catch (MalformedURLException | URISyntaxException e) {
             LOGGER.log(Level.SEVERE, "Invalid CDS host URL: " + mCdsHost);
-            return false;
+            return null;
         }
 
         // Post data
@@ -234,7 +234,7 @@ public class CDSHandler {
             connection = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "IOException when opening connection: " + e);
-            return false;
+            return null;
         }
 
         addHeaders(connection, true, null);
@@ -252,15 +252,13 @@ public class CDSHandler {
                 case 200: {
                     String result = Utils.readInputStream(connection.getInputStream());
                     connection.getInputStream().close();
+                    LocaleData.TxPostResponseData responseData = mGson.fromJson(result, LocaleData.TxPostResponseData.class);
 
-                    //TODO: (optional) parse the JSON response and return it as an object
-                    // https://github.com/transifex/transifex-delivery/#push-content
-
-                    return true;
+                    return responseData;
                 }
                 default:
                     LOGGER.log(Level.SEVERE, "Server responded with code " + code);
-                    return false;
+                    return null;
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "IOException: " + e);
@@ -272,7 +270,7 @@ public class CDSHandler {
             } catch (IOException ignored) {
             }
 
-            return false;
+            return null;
         } finally {
             connection.disconnect();
         }

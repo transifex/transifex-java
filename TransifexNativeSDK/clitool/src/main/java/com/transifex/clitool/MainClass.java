@@ -7,11 +7,14 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import picocli.CommandLine;
 
 import static picocli.CommandLine.ArgGroup;
@@ -131,10 +134,18 @@ public class MainClass {
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, mainClass.token,
                     mainClass.secret, mainClass.hostURL);
-            boolean success = cdsHandler.postSourceStrings(postData);
+            LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
-            if (success) {
+            if (response != null) {
                 System.out.println("Source strings pushed successfully to CDS");
+
+                System.out.println(getDetailsString(response));
+
+                String errorString = getErrorString(response);
+                if (errorString != null) {
+                    System.out.println(errorString);
+                }
+
                 return 0;
             }
             else {
@@ -162,10 +173,19 @@ public class MainClass {
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, mainClass.token,
                     mainClass.secret, mainClass.hostURL);
-            boolean success = cdsHandler.postSourceStrings(postData);
+            LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
-            if (success) {
+            if (response != null) {
                 System.out.println("Source strings cleared from CDS");
+
+                String details = String.format(Locale.US, "%d strings deleted", response.deleted);
+                System.out.println(details);
+
+                String errorString = getErrorString(response);
+                if (errorString != null) {
+                    System.out.println(errorString);
+                }
+
                 return 0;
             }
             else {
@@ -187,5 +207,34 @@ public class MainClass {
     File getStringFileForModule(@NonNull File projectDirectory, @NonNull String moduleName) {
         Path filePath = Paths.get(projectDirectory.getAbsolutePath(), moduleName, "src", "main", "res", "values", "strings.xml");
         return filePath.toFile();
+    }
+
+    /**
+     * Utility method to get a human-readable string representation of the errors of a TxPostResponseData
+     * object.
+     *
+     * @return A string containing all the errors of the provided response object or
+     * <code>null</code> if the provided response object contains no errors.
+     */
+    static @Nullable
+    String getErrorString(@NonNull LocaleData.TxPostResponseData response) {
+        if (response.errors.length == 0) {
+            return null;
+        }
+
+        return "Errors: " + Arrays.toString(response.errors);
+    }
+
+    /**
+     * Utility method to get a human-readable string representation of the information of a
+     * TxPostResponseData object.
+     *
+     * @return A string containing details about the provided response object.
+     */
+    static @NonNull String getDetailsString(@NonNull LocaleData.TxPostResponseData response) {
+        return String.format(Locale.US, "%d strings created, %d strings updated, " +
+                        "%d strings skipped, %d strings deleted, %d strings failed",
+                response.created, response.updated, response.skipped, response.deleted,
+                response.failed);
     }
 }

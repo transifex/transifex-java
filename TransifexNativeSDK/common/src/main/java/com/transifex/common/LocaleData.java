@@ -53,7 +53,7 @@ public class LocaleData {
      * @see <a href="https://github.com/transifex/transifex-delivery/#pull-content">
      *     https://github.com/transifex/transifex-delivery/#pull-content</a>
      */
-    public static class TxResponseData {
+    public static class TxPullResponseData {
 
         public HashMap<String, StringInfo> data;
 
@@ -67,11 +67,11 @@ public class LocaleData {
     /**
      * The data structure the CDS accepts when pushing the source strings.
      *
-     * @see TxResponseData
+     * @see TxPullResponseData
      * @see <a href="https://github.com/transifex/transifex-delivery/#push-content">
      *    https://github.com/transifex/transifex-delivery/#push-content</a>
      */
-    public static class TxPostData extends TxResponseData {
+    public static class TxPostData extends TxPullResponseData {
 
         public static class Meta {
             public Boolean purge;
@@ -95,6 +95,21 @@ public class LocaleData {
         public String toString() {
             return "{" + "data=" + data + ", meta=" + meta + "}";
         }
+    }
+
+    /**
+     * The data structure that CDS responds with when pushing the source strings.
+     *
+     * @see <a href="https://github.com/transifex/transifex-delivery/#push-content">
+     *     https://github.com/transifex/transifex-delivery/#push-content</a>
+     */
+    public static class TxPostResponseData {
+        public int created;
+        public int updated;
+        public int skipped;
+        public int deleted;
+        public int failed;
+        public String[] errors;
     }
 
     /**
