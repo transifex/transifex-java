@@ -180,22 +180,34 @@ For simplicity, the following commands will not include the `java -jar` part req
 
 ### Usage
 
+To use the tool on your app's Android Studio project, enter the root directory of your project from the command line.
+
+#### Help
+
 `transifex`, `transifex -h`, `transifex --help`
 Displays a help dialog with all the options and commands.
 
-`transifex -h <command>`
+`transifex help <command>`
 Get help for a particular command.
 
-To use the tool on your app, enter the root directory of your Android Studio project.
+#### Pushing
 
-`transifex -t <transifex_token> -s <transifex_secret> push -m <app_module_name>`
-Pushes the source strings of your app residing in a module named "app_module_name". The tool will get the `strings.xml` file found in the main source set of the specified module, process it and push it. 
+`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`
+Pushes the source strings of your app found in a module named "app_module_name". The tool reads the `strings.xml` resource file found in the main source set of the specified module: `app_module_name/src/main/res/values/strings.xml`. It processes it and pushes the result to the Transifex CDS. 
 
-`transifex -t <transifex_token> -s <transifex_secret> push -f path/to/strings1.xml path2/to/strings2.xml`
-If your app has a more complex string setup, you can specify one or more string files.
+`transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml`
+If your app has a more complex string setup, you can specify one or more string resource files.
 
-`transifex -t <transifex_token> -s <transifex_secret> clear`
+`transifex clear -t <transifex_token> -s <transifex_secret>`
 Clears all existing resource content from CDS. This action will also remove existing localizations.
+
+#### Pulling
+
+`transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`
+Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the "assets" directory of the main source set of the specified app module: `app_module_name/src/main/assets/txnative`. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.
+
+`transifex pull -t <transifex_token> -d <directory>`
+If you have a different set-up, you can enter the path to your app's `assets` directory.
 
 ## License
 Licensed under Apache License 2.0, see [LICENSE](LICENSE) file.

@@ -9,9 +9,11 @@ import net.moznion.uribuildertiny.URIBuilderTiny;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -51,16 +53,45 @@ public class CDSHandler {
     private final Gson mGson;
 
     /**
-     * Class that contains the result of {@link #fetchLocale(URI, String)}.
+     * Class that contains the result of {@link #getConnectionForLocale(URI, String)}
      */
-    private static class FetchLocaleResult {
-        LocaleData.TxPullResponseData response;
+    private static class ConnectionData {
         HttpURLConnection connection;
+        InputStream inputStream;
+        Exception exception;
 
-        public FetchLocaleResult(LocaleData.TxPullResponseData response, HttpURLConnection connection) {
-            this.response = response;
+        public ConnectionData(HttpURLConnection connection, InputStream inputStream, Exception exception) {
             this.connection = connection;
+            this.inputStream = inputStream;
+            this.exception = exception;
         }
+    }
+
+    /**
+     * The callback to get the results of {@link #fetchTranslations(String, FetchCallback)}
+     */
+    public interface FetchCallback {
+
+        /**
+         * Called once before initiating the connections to CDS for each of the supplied locale
+         * codes.
+         */
+        void onFetchingTranslations(@NonNull String[] localeCodes);
+
+        /**
+         * Called for each locale when a connection with the CDS is established. The implementation
+         * should consume the provided input stream.
+         * <p>
+         * If an error occurs when establishing the connection, the <code>exception</code> will be
+         * supplied and the input stream will be <code>null</code>.
+         */
+        void onTranslationFetched(@Nullable InputStream inputStream, @NonNull String localeCode,
+                                  @Nullable Exception exception);
+
+        /**
+         * Called once if an exception occurs.
+         */
+        void onFailure(@NonNull Exception exception);
     }
 
     /**
@@ -83,73 +114,27 @@ public class CDSHandler {
     }
 
     /**
-     * Fetch translations from CDS.
+     * Establishes a connection to CDS for the specified locale and returns a
+     * {@link ConnectionData} object containing the connection and its input stream.
      * <p>
-     * The method is synchronous and should only run in a background thread.
-     *
-     * @param localeCode  An optional locale to fetch translations from; if  set to <code>null</code>,
-     *                    it will fetch translations for the locale codes provided in the constructor.
-     */
-    @NonNull
-    public LocaleData.TranslationMap fetchTranslations(@Nullable String localeCode) {
-        String[] fetchLocalCodes = (localeCode != null) ? new String[]{localeCode} : mLocaleCodes;
-        if (fetchLocalCodes == null) {
-            return new LocaleData.TranslationMap(0);
-        }
-        LocaleData.TranslationMap translations = new LocaleData.TranslationMap(fetchLocalCodes.length);
-
-        // Check URL
-        URI cdsContentURI = null;
-        try {
-            cdsContentURI = new URI(mCdsHost);
-            cdsContentURI = new URIBuilderTiny(cdsContentURI).appendPaths("content").build();
-            URL url = new URL(cdsContentURI.toString());
-        } catch (URISyntaxException | MalformedURLException e) {
-            LOGGER.log(Level.SEVERE, "Invalid CDS host URL: " + mCdsHost);
-            return translations;
-        }
-
-        // For each locale
-        HttpURLConnection lastConnection = null;
-        for (String fetchLocalCode : fetchLocalCodes) {
-            FetchLocaleResult results = fetchLocale(cdsContentURI, fetchLocalCode);
-            LocaleData.TxPullResponseData responseData = results.response;
-            if (responseData!= null) {
-                translations.put(fetchLocalCode, new LocaleData.LocaleStrings(responseData.data));
-            }
-            if (results.connection != null) {
-                lastConnection = results.connection;
-            }
-        }
-
-        // Closing one connection, will close the reusable socket
-        if (lastConnection != null) {
-            lastConnection.disconnect();
-        }
-
-        return translations;
-    }
-
-    /**
-     * Fetches the translation data for the specified locale.
+     * If the connection is successful, the <code>inputStream</code> of the returned
+     * {@link ConnectionData} should be consumed and closed.
      * <p>
-     * If the call fails, the <code>data</code> field of the returned
-     * {@link FetchLocaleResult} will be <code>"null"</code>.
+     * If the connection fails, the  input stream will be <code>null</code> and the exception will
+     * contain the reason. The connection may not be <code>null</code>.
      *
-     * @return A {@link FetchLocaleResult} object containing data.
+     * @return A {@link ConnectionData} object containing the connection and it's input
+     * stream.
      */
     private @NonNull
-    FetchLocaleResult fetchLocale(URI cdsContentURI, String localeCode) {
-
+    ConnectionData getConnectionForLocale(URI cdsContentURI, String localeCode) {
         URL url = null;
         try {
             URI uri  = new URIBuilderTiny(cdsContentURI).appendPaths(localeCode).build();
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
             LOGGER.log(Level.SEVERE, "Invalid CDS host URL: " + cdsContentURI);
-        }
-        if (url == null) {
-            return new FetchLocaleResult(null, null);
+            return new ConnectionData(null, null, e);
         }
 
         HttpURLConnection connection = null;
@@ -159,7 +144,7 @@ public class CDSHandler {
                 connection = (HttpURLConnection) url.openConnection();
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "IOException when opening connection for locale " + localeCode + " : " + e);
-                return new FetchLocaleResult(null, connection);
+                return new ConnectionData(null, null, e);
             }
             addHeaders(connection, false, null);
 
@@ -168,25 +153,15 @@ public class CDSHandler {
                 int code = connection.getResponseCode();
                 switch (code) {
                     case 200: {
-                        LocaleData.TxPullResponseData responseData = null;
-                        Reader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-                        try {
-                            responseData = mGson.fromJson(reader, LocaleData.TxPullResponseData.class);
-                        } catch (JsonSyntaxException e) {
-                            LOGGER.log(Level.SEVERE, "Could not parse JSON response to object for locale " + localeCode);
-                        }
-                        finally {
-                            connection.getInputStream().close();
-                        }
-
-                        return new FetchLocaleResult(responseData, connection);
+                        InputStream inputStream = connection.getInputStream();
+                        return new ConnectionData(connection, inputStream, null);
                     }
                     case 202:
                         // try one more time
                         continue;
                     default:
                         LOGGER.log(Level.SEVERE, "Server responded with code " + code + " for locale " + localeCode);
-                        return new FetchLocaleResult(null, connection);
+                        return new ConnectionData(connection, null, new IOException("Server responded with " + code));
                 }
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "IOException for locale " + localeCode + " : " + e);
@@ -194,15 +169,131 @@ public class CDSHandler {
                 // https://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
                 try {
                     Utils.readInputStream(connection.getErrorStream());
-                    connection.getErrorStream().close();
                 } catch (IOException ignored) {}
 
-                return new FetchLocaleResult(null, connection);
+                return new ConnectionData(connection, null, e);
             }
         }
 
         // max tries reached
-        return new FetchLocaleResult(null, connection);
+        return new ConnectionData(connection, null, new IOException("Max retries reached"));
+    }
+
+    /**
+     * Fetches translations from CDS and supplies the raw input stream to the provided
+     * {@link FetchCallback}.
+     * <p>
+     * The method is synchronous and hence the callback is called during the method execution. The
+     * method should only run in a background thread.
+     *
+     * @param localeCode An optional locale to fetch translations from; if  set to <code>null</code>,
+     *                   it will fetch translations for the locale codes provided in the constructor.
+     *
+     * @see FetchCallback
+     */
+    public void fetchTranslations(@Nullable String localeCode, @NonNull FetchCallback callback) {
+        String[] fetchLocalCodes = (localeCode != null) ? new String[]{localeCode} : mLocaleCodes;
+        if (fetchLocalCodes == null) {
+            return;
+        }
+
+        // Check URL
+        URI cdsContentURI = null;
+        try {
+            cdsContentURI = new URI(mCdsHost);
+            cdsContentURI = new URIBuilderTiny(cdsContentURI).appendPaths("content").build();
+            URL url = new URL(cdsContentURI.toString());
+        } catch (URISyntaxException | MalformedURLException e) {
+            LOGGER.log(Level.SEVERE, "Invalid CDS host URL: " + mCdsHost);
+            callback.onFailure(e);
+            return;
+        }
+
+        callback.onFetchingTranslations(fetchLocalCodes);
+
+        // For each locale
+        HttpURLConnection lastConnection = null;
+        for (String fetchLocalCode : fetchLocalCodes) {
+            ConnectionData connectionData = getConnectionForLocale(cdsContentURI, fetchLocalCode);
+            callback.onTranslationFetched(connectionData.inputStream, fetchLocalCode, connectionData.exception);
+
+            if (connectionData.connection != null) {
+                lastConnection = connectionData.connection;
+            }
+        }
+
+        // Closing the last connection so that the the reusable socket is closed
+        if (lastConnection != null) {
+            lastConnection.disconnect();
+        }
+    }
+
+    /**
+     * An {@link FetchCallback} implementation that parses the provided input streams to
+     * {@link LocaleData.TxPostResponseData} objects.
+     * <p>
+     * Each parsed object populates a {@link LocaleData.TranslationMap}, which will contain the
+     * translations for all parsed locales.
+     */
+    private class ParseFetchedTranslationsCallback implements FetchCallback {
+
+        LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(0);
+
+        @Override
+        public void onFetchingTranslations(@NonNull String[] localeCodes) {
+            translationMap = new LocaleData.TranslationMap(localeCodes.length);
+        }
+
+        @Override
+        public void onTranslationFetched(@Nullable InputStream inputStream, @NonNull String localeCode,
+                                         @Nullable Exception exception) {
+            if (inputStream == null) {
+                return;
+            }
+
+            // Parse input stream with Gson
+            LocaleData.TxPullResponseData responseData = null;
+            try {
+                Reader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                responseData = mGson.fromJson(reader, LocaleData.TxPullResponseData.class);
+            } catch (JsonSyntaxException e) {
+                LOGGER.log(Level.SEVERE, "Could not parse JSON response to object for locale " + localeCode);
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.log(Level.SEVERE, "Server responded with unsupported encoding for locale " + localeCode);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException ignored) {}
+            }
+
+            if (responseData == null) {
+                return;
+            }
+
+            translationMap.put(localeCode, new LocaleData.LocaleStrings(responseData.data));
+        }
+
+        @Override
+        public void onFailure(@NonNull Exception exception) {}
+    }
+
+    /**
+     * Fetches translations from CDS.
+     * <p>
+     * The method is synchronous and should only run in a background thread.
+     *
+     * @param localeCode  An optional locale to fetch translations from; if  set to <code>null</code>,
+     *                    it will fetch translations for the locale codes provided in the constructor.
+     *
+     * @return A {@link LocaleData.TranslationMap} object that contains the translations for each
+     * locale. If an error occurs, some or all locales will be missing from the translation map.
+     */
+    @NonNull
+    public LocaleData.TranslationMap fetchTranslations(@Nullable String localeCode) {
+        ParseFetchedTranslationsCallback fetchTranslationsCallback = new ParseFetchedTranslationsCallback();
+        fetchTranslations(localeCode, fetchTranslationsCallback);
+
+        return fetchTranslationsCallback.translationMap;
     }
 
     /**
@@ -251,8 +342,8 @@ public class CDSHandler {
             switch (code) {
                 case 200: {
                     String result = Utils.readInputStream(connection.getInputStream());
-                    connection.getInputStream().close();
-                    LocaleData.TxPostResponseData responseData = mGson.fromJson(result, LocaleData.TxPostResponseData.class);
+                    LocaleData.TxPostResponseData responseData =
+                            mGson.fromJson(result, LocaleData.TxPostResponseData.class);
 
                     return responseData;
                 }

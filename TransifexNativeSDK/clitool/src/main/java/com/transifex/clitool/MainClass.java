@@ -2,12 +2,15 @@ package com.transifex.clitool;
 
 import com.transifex.common.CDSHandler;
 import com.transifex.common.LocaleData;
+import com.transifex.common.TranslationsDownloader;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -19,6 +22,7 @@ import picocli.CommandLine;
 
 import static picocli.CommandLine.ArgGroup;
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
@@ -29,18 +33,20 @@ import static picocli.CommandLine.ParentCommand;
  * own class.
  */
 @Command(name = "transifex", version = "transifex 0.1", mixinStandardHelpOptions = true,
-        subcommands = {MainClass.PushCommand.class, MainClass.ClearCommand.class, CommandLine.HelpCommand.class},
-        synopsisSubcommandLabel = "(push | clear)", sortOptions = false)
+        subcommands = {MainClass.PushCommand.class, MainClass.ClearCommand.class,
+                MainClass.PullCommand.class, CommandLine.HelpCommand.class},
+        description = "Transifex command-line tool for Android",
+        synopsisSubcommandLabel = "(push | pull | clear)", sortOptions = false)
 public class MainClass {
 
     private static final String TAG = MainClass.class.getSimpleName();
     private static final Logger LOGGER = Logger.getLogger(TAG);
 
-    @Option(names = {"-t", "--token"}, required = true, description = "The Transifex token.")
-    String token;
+    static final String OUT_DIR_NAME = "txnative";
+    static final String OUT_FILE_NAME = "txstrings.json";
 
-    @Option(names = {"-s", "--secret"}, required = true, description = "The Transifex secret.")
-    String secret;
+    @Mixin
+    private ReusableAttributes reusable;
 
     @Option(names = {"-u", "--url"}, required = false, description = "The CDS URL.")
     String hostURL = CDSHandler.CDS_HOST;
@@ -58,30 +64,53 @@ public class MainClass {
         return  new CommandLine(new MainClass()).execute(args);
     }
 
+    @Command(descriptionHeading = "%nDescription:%n",
+            optionListHeading = "%nOptions:%n")
+    public static class ReusableAttributes {}
+
+    @Command
+    public static class TokenOption {
+
+        @Mixin
+        private ReusableAttributes reusable;
+
+        @Option(names = {"-t", "--token"}, required = true, description = "The Transifex token.")
+        String token;
+    }
+
+    @Command
+    public static class SecretOptions extends TokenOption {
+
+        @Option(names = {"-s", "--secret"}, required = true, description = "The Transifex secret.")
+        String secret;
+    }
+
     @Command(name = "push", description = "Pushes source strings to CDS", sortOptions = false)
-    public static class PushCommand implements Callable<Integer> {
+    public static class PushCommand extends SecretOptions implements Callable<Integer> {
 
         @ParentCommand
         MainClass mainClass;
-
-        @Option(names = {"-p", "--purge"},
-                description = "If set, the entire resource content is replaced by the pushed content " +
-                        "of this request. Otherwise, source content of this request is appended to " +
-                        "the existing resource content.")
-        boolean purge;
 
         @ArgGroup(exclusive = true, multiplicity = "1")
         StringSources stringSources;
 
         static class StringSources {
             @Option(names = {"-m", "--module"},
-                    description = "The name of the module that contains the source strings")
+                    description = "The name of the module that contains the source strings.",
+                    paramLabel = "<module>")
             String moduleName;
 
             @Option(names = {"-f", "--file"}, arity = "1..",
-                    description = "One or more string.xml files containing source strings")
+                    description = "One or more xml resource files containing source strings.",
+                    paramLabel = "<file>")
             File[] files;
         }
+
+        @Option(names = {"-p", "--purge"},
+                description = "If set, the entire resource content is replaced by the pushed content " +
+                        "of this request. Otherwise, source content of this request is appended to " +
+                        "the existing resource content.")
+        boolean purge;
 
         @Override
         public Integer call() throws Exception {
@@ -132,8 +161,8 @@ public class MainClass {
             LocaleData.TxPostData postData = new LocaleData.TxPostData(sourceStringMap, meta);
 
             // Push to CDS
-            CDSHandler cdsHandler = new CDSHandler(null, mainClass.token,
-                    mainClass.secret, mainClass.hostURL);
+            CDSHandler cdsHandler = new CDSHandler(null, token, secret,
+                    mainClass.hostURL);
             LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
             if (response != null) {
@@ -157,7 +186,7 @@ public class MainClass {
 
     @Command(name = "clear", sortOptions = false,
             description = "Clears all existing resource content from CDS")
-    public static class ClearCommand implements Callable<Integer> {
+    public static class ClearCommand extends SecretOptions implements Callable<Integer> {
 
         @ParentCommand
         MainClass mainClass;
@@ -171,8 +200,8 @@ public class MainClass {
             LocaleData.TxPostData postData = new LocaleData.TxPostData(emptyMap, meta);
 
             // Push to CDS
-            CDSHandler cdsHandler = new CDSHandler(null, mainClass.token,
-                    mainClass.secret, mainClass.hostURL);
+            CDSHandler cdsHandler = new CDSHandler(null, token, secret,
+                    mainClass.hostURL);
             LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
             if (response != null) {
@@ -195,6 +224,77 @@ public class MainClass {
         }
     }
 
+    @Command(name = "pull", description = "Downloads translations from CDS to the specified location",
+            sortOptions = false)
+    public static class PullCommand extends TokenOption implements Callable<Integer> {
+
+        @ParentCommand
+        MainClass mainClass;
+
+        @ArgGroup(exclusive = true, multiplicity = "1")
+        OutputDestination outputDestination;
+
+        static class OutputDestination {
+            @Option(names = {"-m", "--module"},
+                    description = "The name of the app module where the translations will be saved to.",
+                    paramLabel = "<module>")
+            String moduleName;
+
+            @Option(names = {"-d", "--dir"},
+                    description = "The path to the app's \"assets\" directory where the translations " +
+                            "will be saved to.")
+            File directory;
+        }
+
+        @Option(names = {"-l", "--locales"}, arity = "1..", required = true,
+                description = "A list of the target locales to download from CDS. The " +
+                        "source locale should not be included.", paramLabel = "<locale>")
+        String[] translatedLocales;
+
+        @Override
+        public Integer call() throws Exception {
+            // Create output directory
+            Path currentPath = Paths.get(System.getProperty("user.dir"));
+            File parentDir = null;
+
+            if (outputDestination.moduleName != null) {
+                parentDir = getAssetsDirectoryForModule(currentPath.toFile(), outputDestination.moduleName);
+            }
+            else {
+                parentDir = outputDestination.directory;
+            }
+
+            File outDir = new File(parentDir.getAbsolutePath() + File.separator + OUT_DIR_NAME);
+            if (!outDir.exists()) {
+                if (!outDir.mkdirs()) {
+                    System.out.println("Could not create directory: " + outDir.getAbsolutePath());
+                }
+            }
+
+            // Pull from CDS
+            CDSHandler cdsHandler = new CDSHandler(translatedLocales, token, null,
+                    mainClass.hostURL);
+            TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
+            HashMap<String, File> downloadedFiles = downloader.downloadTranslations(null, outDir, OUT_FILE_NAME);
+
+            if (downloadedFiles.keySet().containsAll(Arrays.asList(translatedLocales))) {
+                System.out.println("Translations have been pulled successfully from CDS to: " +
+                        outDir.getAbsolutePath());
+
+                return 0;
+            }
+            else {
+                System.out.println("Error while pulling translations from CDS");
+
+                HashSet<String> nonDownloadedLocales = new HashSet<>(Arrays.asList(translatedLocales));
+                nonDownloadedLocales.removeAll(downloadedFiles.keySet());
+                System.out.println(getNonDownloadedLocalesString(nonDownloadedLocales));
+
+                return 1;
+            }
+        }
+    }
+
     /**
      * Returns the <code>strings.xml</code> file for the provided gradle module under the main source
      * set in the folder <code>res/values</code>.
@@ -210,13 +310,27 @@ public class MainClass {
     }
 
     /**
+     * Returns the assets directory for the provided gradle module under the main source
+     * set.
+     *
+     * @param projectDirectory The root of the gradle project.
+     * @param moduleName       The module that contains the strings.
+     * @return The requested assets directory. The directory is returned even if does not exist.
+     */
+    public static @NonNull
+    File getAssetsDirectoryForModule(@NonNull File projectDirectory, @NonNull String moduleName) {
+        Path filePath = Paths.get(projectDirectory.getAbsolutePath(), moduleName, "src", "main", "assets");
+        return filePath.toFile();
+    }
+
+    /**
      * Utility method to get a human-readable string representation of the errors of a TxPostResponseData
      * object.
      *
      * @return A string containing all the errors of the provided response object or
      * <code>null</code> if the provided response object contains no errors.
      */
-    static @Nullable
+    private static @Nullable
     String getErrorString(@NonNull LocaleData.TxPostResponseData response) {
         if (response.errors.length == 0) {
             return null;
@@ -231,10 +345,17 @@ public class MainClass {
      *
      * @return A string containing details about the provided response object.
      */
-    static @NonNull String getDetailsString(@NonNull LocaleData.TxPostResponseData response) {
+    private static @NonNull String getDetailsString(@NonNull LocaleData.TxPostResponseData response) {
         return String.format(Locale.US, "%d strings created, %d strings updated, " +
                         "%d strings skipped, %d strings deleted, %d strings failed",
                 response.created, response.updated, response.skipped, response.deleted,
                 response.failed);
+    }
+
+    /**
+     * Utility method to get an error description using the non-downloaded locales.
+     */
+    private static @NonNull String getNonDownloadedLocalesString(@NonNull HashSet<String> nonDownloadedLocales) {
+        return "The translations for the following locales were not downloaded: " + Arrays.toString(nonDownloadedLocales.toArray());
     }
 }

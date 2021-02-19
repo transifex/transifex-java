@@ -7,9 +7,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedHashMap;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -37,11 +39,14 @@ public class CDSHandlerTest {
         }
     }
 
-    private static final String elBody = "{\"data\":{\"test_key\":{\"string\":\"Καλημέρα\"},\"another_key\":{\"string\":\"Καλό απόγευμα\"},\"key3\":{\"string\":\"\"}}}";
-    private  static final String esBody = "{\"data\":{\"test_key\":{\"string\":\"Buenos días\"},\"another_key\":{\"string\":\"Buenas tardes\"},\"key3\":{\"string\":\"\"}}}";
-    private static final String elBodyBadFormatting = "not a JSON format";
+    //region CDS mock methods
+    //TODO: The following code should be added in a testFixture once implemented: https://issuetracker.google.com/issues/139762443
 
-    private Dispatcher getElEsDispatcher() {
+    public static final String elBody = "{\"data\":{\"test_key\":{\"string\":\"Καλημέρα\"},\"another_key\":{\"string\":\"Καλό απόγευμα\"},\"key3\":{\"string\":\"\"}}}";
+    public static final String esBody = "{\"data\":{\"test_key\":{\"string\":\"Buenos días\"},\"another_key\":{\"string\":\"Buenas tardes\"},\"key3\":{\"string\":\"\"}}}";
+    public static final String elBodyBadFormatting = "not a JSON format";
+
+    public static Dispatcher getElEsDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
 
             @NonNull
@@ -61,7 +66,7 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    private Dispatcher getElDispatcher() {
+    public static Dispatcher getElDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
 
             @NonNull
@@ -79,7 +84,7 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    private Dispatcher getElDispatcherBadJsonFormatting() {
+    public static Dispatcher getElDispatcherBadJsonFormatting() {
         Dispatcher dispatcher = new Dispatcher() {
 
             @NonNull
@@ -97,7 +102,7 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    private Dispatcher getElEs202OnceDispatcher(final int maxRetryTimes) {
+    public static Dispatcher getElEs202OnceDispatcher(final int maxRetryTimes) {
 
         Dispatcher dispatcher = new Dispatcher() {
 
@@ -129,7 +134,9 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    private Dispatcher getPostDispatcher() {
+    //endregion
+
+    public static Dispatcher getPostDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
 
             @NonNull
@@ -149,7 +156,7 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    private LocaleData.TxPostData getPostData() {
+    private static LocaleData.TxPostData getPostData() {
         LinkedHashMap<String, LocaleData.StringInfo> data = new LinkedHashMap<>();
         data.put("key1", new LocaleData.StringInfo("This is a source string."));
         data.put("key2", new LocaleData.StringInfo("Using special \ncharacters εδώ."));
@@ -158,6 +165,146 @@ public class CDSHandlerTest {
         meta.purge = true;
 
         return new LocaleData.TxPostData(data, meta);
+    }
+
+    private static class DummyFetchCallback implements CDSHandler.FetchCallback {
+
+        boolean onFetchingTranslationsCalled;
+        boolean onTranslationFetchedCalled;
+        boolean onFailureCalled;
+
+        @Override
+        public void onFetchingTranslations(@NonNull String[] localeCodes) {
+            onFetchingTranslationsCalled = true;
+        }
+
+        @Override
+        public void onTranslationFetched(@Nullable InputStream inputStream, @NonNull String localeCode, @Nullable Exception exception) {
+            onTranslationFetchedCalled = true;
+        }
+
+        @Override
+        public void onFailure(@NonNull Exception exception) {
+            onFailureCalled = true;
+        }
+    }
+
+    @Test
+    public void testFetchTranslationsCallback_badURL() {
+        String[] localeCodes = new String[]{"el", "es"};
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL");
+
+        DummyFetchCallback callback = new DummyFetchCallback();
+
+        cdsHandler.fetchTranslations(null, callback);
+
+        assertThat(callback.onFetchingTranslationsCalled).isFalse();
+        assertThat(callback.onFetchingTranslationsCalled).isFalse();
+        assertThat(callback.onFailureCalled).isTrue();
+    }
+
+    @Test
+    public void testFetchTranslationsCallback_normalResponse() {
+        server.setDispatcher(getElEsDispatcher());
+
+        String[] localeCodes = new String[]{"el", "es"};
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+
+        DummyFetchCallback callback = new DummyFetchCallback() {
+
+            @Override
+            public void onFetchingTranslations(@NonNull String[] localeCodes) {
+                super.onFetchingTranslations(localeCodes);
+                assertThat(localeCodes).asList().containsExactly("el", "es");
+            }
+
+            @Override
+            public void onTranslationFetched(@Nullable InputStream inputStream, @NonNull String localeCode, @Nullable Exception exception) {
+                super.onTranslationFetched(inputStream, localeCode, exception);
+
+                assertThat(localeCode).isAnyOf("el", "es");
+
+                String stringResponse = null;
+                try {
+                    stringResponse = Utils.readInputStream(inputStream);
+                } catch (IOException ignored) {}
+                if (localeCode.equals("el")) {
+                    assertThat(stringResponse).isEqualTo(elBody);
+                }
+                else {
+                    assertThat(stringResponse).isEqualTo(esBody);
+                }
+            }
+        };
+
+        cdsHandler.fetchTranslations(null, callback);
+
+        assertThat(callback.onFetchingTranslationsCalled).isTrue();
+        assertThat(callback.onFetchingTranslationsCalled).isTrue();
+        assertThat(callback.onFailureCalled).isFalse();
+
+        RecordedRequest recordedRequest = null;
+        try {
+            recordedRequest = server.takeRequest();
+        } catch (InterruptedException ignored) {
+        }
+        assertThat(recordedRequest).isNotNull();
+        assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+        assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
+        assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+    }
+
+    @Test
+    public void testFetchTranslationsCallback_onlyElInResponse() {
+        server.setDispatcher(getElDispatcher());
+
+        String[] localeCodes = new String[]{"el", "es"};
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+
+        DummyFetchCallback callback = new DummyFetchCallback() {
+
+            @Override
+            public void onFetchingTranslations(@NonNull String[] localeCodes) {
+                super.onFetchingTranslations(localeCodes);
+                assertThat(localeCodes).asList().containsExactly("el", "es");
+            }
+
+            @Override
+            public void onTranslationFetched(@Nullable InputStream inputStream, @NonNull String localeCode, @Nullable Exception exception) {
+                super.onTranslationFetched(inputStream, localeCode, exception);
+
+                assertThat(localeCode).isAnyOf("el", "es");
+
+                if (localeCode.equals("el")) {
+                    assertThat(inputStream).isNotNull();
+                    String stringResponse = null;
+                    try {
+                        stringResponse = Utils.readInputStream(inputStream);
+                    } catch (IOException ignored) {
+                    }
+                    assertThat(stringResponse).isEqualTo(elBody);
+                } else {
+                    assertThat(inputStream).isNull();
+                    assertThat(exception).isNotNull();
+                }
+            }
+        };
+
+        cdsHandler.fetchTranslations(null, callback);
+
+        assertThat(callback.onFetchingTranslationsCalled).isTrue();
+        assertThat(callback.onFetchingTranslationsCalled).isTrue();
+        assertThat(callback.onFailureCalled).isFalse();
+
+        RecordedRequest recordedRequest = null;
+        try {
+            recordedRequest = server.takeRequest();
+        } catch (InterruptedException ignored) {
+        }
+        assertThat(recordedRequest).isNotNull();
+        assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+        assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
+        assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
     }
 
     @Test
@@ -266,7 +413,7 @@ public class CDSHandlerTest {
     }
 
     @Test
-    public void testFetchTranslations_Only202() {
+    public void testFetchTranslations_only202() {
         server.setDispatcher(getElEs202OnceDispatcher(30));
 
         String[] localeCodes = new String[]{"el", "es"};

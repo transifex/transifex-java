@@ -1,6 +1,7 @@
 package com.transifex.common;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,8 +12,6 @@ public class Utils {
 
     /**
      * Reads an input stream to a string.
-     * <p>
-     * The caller should close the input stream.
      */
     public @NonNull static String readInputStream(@NonNull InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
@@ -22,6 +21,25 @@ public class Utils {
             result.append(line);
         }
 
+        reader.close();
+
         return result.toString();
+    }
+
+
+    /**
+     * Deletes a directory including its contents
+     *
+     * @return <code>true</code> if and only if the file or directory is successfully deleted;
+     * <code>false</code> otherwise
+     */
+    public static boolean deleteDirectory(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        return directoryToBeDeleted.delete();
     }
 }
