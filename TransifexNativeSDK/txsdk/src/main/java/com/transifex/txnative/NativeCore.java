@@ -17,6 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.text.HtmlCompat;
+import com.transifex.txnative.cache.MemoryCache;
+import com.transifex.txnative.cache.TxCache;
 
 /**
  * The main class of the framework, responsible for orchestrating all functionality.
@@ -27,7 +29,7 @@ public class NativeCore {
 
     final Context mContext;
     final LocaleState mLocaleState;
-    final Cache mCache;
+    final TxCache mCache;
     final MissingPolicy mMissingPolicy;
 
     final Handler mMainHandler;
@@ -57,7 +59,7 @@ public class NativeCore {
                       @NonNull LocaleState localeState,
                       @NonNull String token,
                       @Nullable String cdsHost,
-                      @Nullable Cache cache,
+                      @Nullable TxCache cache,
                       @Nullable MissingPolicy missingPolicy) {
         mContext = applicationContext.getApplicationContext();
         mMainHandler = new Handler(mContext.getMainLooper());
@@ -205,12 +207,12 @@ public class NativeCore {
                     mLocaleState.getResolvedLocale());
         }
 
-        // String can be null if:
+        // String can be null/empty if:
         // 1. our Cache has not been updated with translations yet
         // 2. the resolved locale is null: there is no app locale that matches the current locale
         // 3. our Cache does not have translations for the resolved locale (this shouldn't happen)
         // 4. the key was not found in the Cache for the resolved locale
-        if (translatedString == null) {
+        if (TextUtils.isEmpty(translatedString)) {
             CharSequence sourceString = mDefaultResources.getText(id);
             return mMissingPolicy.get(sourceString);
         }

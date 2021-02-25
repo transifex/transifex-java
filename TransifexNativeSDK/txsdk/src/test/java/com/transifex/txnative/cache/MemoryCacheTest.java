@@ -1,4 +1,4 @@
-package com.transifex.txnative;
+package com.transifex.txnative.cache;
 
 import com.transifex.common.LocaleData;
 
@@ -45,7 +45,7 @@ public class MemoryCacheTest {
     }
 
     @Test
-    public void testSupportedLocales() {
+    public void testSupportedLocales_normal() {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
 
@@ -68,7 +68,7 @@ public class MemoryCacheTest {
     }
 
     @Test
-    public void testGet() {
+    public void testGet_normal() {
         MemoryCache cache = new MemoryCache();
         cache.update(getDummyTranslationMap());
 
@@ -85,4 +85,19 @@ public class MemoryCacheTest {
         assertThat(cache.get("key1", "el")).isNull();
     }
 
+    @Test
+    public void testGetAll_normal() {
+        MemoryCache cache = new MemoryCache();
+        cache.update(getDummyTranslationMap());
+
+        assertThat(cache.get()).isEqualTo(getDummyTranslationMap());
+    }
+
+    @Test
+    public void testGetAll_emptyCache() {
+        MemoryCache cache = new MemoryCache();
+
+        assertThat(cache.get()).isNotNull();
+        assertThat(cache.get().getLocales()).isEmpty();
+    }
 }

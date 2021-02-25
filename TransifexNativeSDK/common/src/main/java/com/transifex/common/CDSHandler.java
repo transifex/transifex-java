@@ -73,8 +73,8 @@ public class CDSHandler {
     public interface FetchCallback {
 
         /**
-         * Called once before initiating the connections to CDS for each of the supplied locale
-         * codes.
+         * Called once before initiating the connection to CDS. You can get the locales that will be
+         * fetched.
          */
         void onFetchingTranslations(@NonNull String[] localeCodes);
 
@@ -89,7 +89,7 @@ public class CDSHandler {
                                   @Nullable Exception exception);
 
         /**
-         * Called once if an exception occurs.
+         * Called once if an exception occurs during setup.
          */
         void onFailure(@NonNull Exception exception);
     }
@@ -253,8 +253,9 @@ public class CDSHandler {
 
             // Parse input stream with Gson
             LocaleData.TxPullResponseData responseData = null;
+            Reader reader = null;
             try {
-                Reader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 responseData = mGson.fromJson(reader, LocaleData.TxPullResponseData.class);
             } catch (JsonSyntaxException e) {
                 LOGGER.log(Level.SEVERE, "Could not parse JSON response to object for locale " + localeCode);
@@ -262,7 +263,12 @@ public class CDSHandler {
                 LOGGER.log(Level.SEVERE, "Server responded with unsupported encoding for locale " + localeCode);
             } finally {
                 try {
-                    inputStream.close();
+                    if (reader != null) {
+                        reader.close();
+                    }
+                    else {
+                        inputStream.close();
+                    }
                 } catch (IOException ignored) {}
             }
 
@@ -358,8 +364,11 @@ public class CDSHandler {
             try {
                 String errorResponse = Utils.readInputStream(connection.getErrorStream());
                 connection.getErrorStream().close();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
+
+            return null;
+        } catch(JsonSyntaxException e) {
+            LOGGER.log(Level.SEVERE, "Error parsing server response: " + e);
 
             return null;
         } finally {
