@@ -1,8 +1,7 @@
-package com.transifex.txnative;
+package com.transifex.txnative.cache;
 
 import com.transifex.common.LocaleData;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
@@ -11,28 +10,26 @@ import androidx.annotation.Nullable;
 /**
  * A cache that holds translations in memory.
  */
-public class MemoryCache implements Cache {
+public class MemoryCache implements TxCache {
 
-    private LocaleData.TranslationMap mTranslationMap;
+    private LocaleData.TranslationMap mTranslationMap = new LocaleData.TranslationMap(0);
 
     @NonNull
     @Override
     public Set<String> getSupportedLocales() {
-        if (mTranslationMap == null) {
-            return new HashSet<>(0);
-        }
-
         return mTranslationMap.getLocales();
+    }
+
+    @NonNull
+    @Override
+    public LocaleData.TranslationMap get() {
+        return mTranslationMap;
     }
 
 
     @Nullable
     @Override
     public String get(@NonNull String key, @NonNull String locale) {
-        if (mTranslationMap == null) {
-            return null;
-        }
-
         LocaleData.LocaleStrings localeStrings = mTranslationMap.get(locale);
         if (localeStrings == null) {
             return  null;

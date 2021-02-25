@@ -315,6 +315,7 @@ public class MainClass {
      *
      * @param projectDirectory The root of the gradle project.
      * @param moduleName       The module that contains the strings.
+     *
      * @return The requested assets directory. The directory is returned even if does not exist.
      */
     public static @NonNull

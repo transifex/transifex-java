@@ -1,0 +1,1 @@
+{"data":{"test_key":{"string":"Καλημέρα"},"another_key":{"string":"Καλό απόγευμα"},"key3":{"string":""}}}

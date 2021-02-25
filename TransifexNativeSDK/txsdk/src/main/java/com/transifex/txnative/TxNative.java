@@ -9,6 +9,7 @@ import com.transifex.txnative.wrappers.TxContextWrapper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.transifex.txnative.cache.TxCache;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
@@ -43,7 +44,7 @@ public class TxNative {
                             @NonNull LocaleState locales,
                             @NonNull String token,
                             @Nullable String cdsHost,
-                            @Nullable Cache cache,
+                            @Nullable TxCache cache,
                             @Nullable MissingPolicy missingPolicy) {
 
         if (sNativeCore != null) {

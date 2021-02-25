@@ -7,6 +7,7 @@ import android.text.Spanned;
 import android.text.style.StyleSpan;
 
 import com.transifex.common.LocaleData;
+import com.transifex.txnative.cache.MemoryCache;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -19,16 +19,31 @@ public class LocaleData {
      */
     public static class StringInfo {
 
-        public StringInfo(String string) {
+        public StringInfo(@NonNull String string) {
             this.string = string;
         }
 
         public String string;
 
-        @NonNull
         @Override
+        @NonNull
         public String toString() {
             return "{" + "string='" + string + '\'' + '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            StringInfo that = (StringInfo) o;
+            return (string == that.string) || (string != null && string.equals(that.string));
+        }
+
+        @Override
+        public int hashCode() {
+            if (string == null)
+                return 0;
+            return string.hashCode();
         }
     }
 
@@ -57,8 +72,14 @@ public class LocaleData {
 
         public HashMap<String, StringInfo> data;
 
-        @NonNull
+        public TxPullResponseData() {}
+
+        public TxPullResponseData(@NonNull HashMap<String, StringInfo> data) {
+            this.data = data;
+        }
+
         @Override
+        @NonNull
         public String toString() {
             return "{" + "data=" + data + '}';
         }
@@ -76,8 +97,8 @@ public class LocaleData {
         public static class Meta {
             public Boolean purge;
 
-            @NonNull
             @Override
+            @NonNull
             public String toString() {
                 return "{purge=" + purge + "}";
             }
@@ -90,8 +111,8 @@ public class LocaleData {
             this.meta = meta;
         }
 
-        @NonNull
         @Override
+        @NonNull
         public String toString() {
             return "{" + "data=" + data + ", meta=" + meta + "}";
         }
@@ -150,10 +171,35 @@ public class LocaleData {
             return null;
         }
 
-        @NonNull
+        /**
+         * Returns the underlying data structure of the object.
+         */
+        @NonNull HashMap<String, StringInfo> getMap() {
+            return mHashMap;
+        }
+
         @Override
+        @NonNull
         public String toString() {
+            if (mHashMap == null) {
+                return "";
+            }
             return mHashMap.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            LocaleStrings that = (LocaleStrings) o;
+            return (mHashMap == that.mHashMap) || (mHashMap != null && mHashMap.equals(that.mHashMap));
+        }
+
+        @Override
+        public int hashCode() {
+            if (mHashMap == null)
+                return 0;
+            return mHashMap.hashCode();
         }
     }
 
@@ -221,10 +267,29 @@ public class LocaleData {
             return mHashMap.keySet();
         }
 
-        @NonNull
+
         @Override
+        @NonNull
         public String toString() {
+            if (mHashMap == null) {
+                return "";
+            }
             return mHashMap.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            TranslationMap that = (TranslationMap) o;
+            return (mHashMap == that.mHashMap) || (mHashMap != null && mHashMap.equals(that.mHashMap));
+        }
+
+        @Override
+        public int hashCode() {
+            if (mHashMap == null)
+                return 0;
+            return mHashMap.hashCode();
         }
     }
 
