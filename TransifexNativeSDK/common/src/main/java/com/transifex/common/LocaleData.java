@@ -3,19 +3,23 @@ package com.transifex.common;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Classes that hold the localization data when received by CDS or stored locally.
+ * Classes that hold the localization data.
  */
 public class LocaleData {
 
+    //region CDS API
+
     /**
-     * A class that holds a String.
+     * A class that holds a <code>String</code> value.
      */
     public static class StringInfo {
 
@@ -23,7 +27,7 @@ public class LocaleData {
             this.string = string;
         }
 
-        public String string;
+        public final String string;
 
         @Override
         @NonNull
@@ -133,8 +137,13 @@ public class LocaleData {
         public String[] errors;
     }
 
+    //endregion
+
+    //region txNative
+
     /**
-     * A class holding key-value pairs for some locale's strings.
+     * A class holding some locale's strings. It maps <code>String</code> keys
+     * to {@link StringInfo} objects.
      */
     public static class LocaleStrings {
 
@@ -144,18 +153,42 @@ public class LocaleData {
         /**
          * Creates a LocaleStrings object which uses the provided {@link HashMap}.
          * <p>
-         * The HashMap should contain resource entry names as keys and {@link StringInfo} as values
-         * like this:
+         * The HashMap should map Android resource entry names to {@link StringInfo} objects like
+         * this:
          * <p>
          * <pre>
          *    {
-         *        'key1' : { 'string' : '...' },
-         *        'key2' : { 'string' : '...' },
+         *        'key1' : LocaleString,
+         *        'key2' : LocaleString,
          *    }
          * </pre>
          */
         public LocaleStrings(@NonNull HashMap<String, StringInfo> map) {
             mHashMap = map;
+        }
+
+        /**
+         * Creates a new LocaleStrings object by making a copy of the provided one.
+         */
+        public LocaleStrings(@NonNull LocaleStrings localeStrings) {
+            // Just copy the mapping. No need to copy StringInfo objects since they are read-only.
+            mHashMap = new HashMap<>(localeStrings.mHashMap);
+        }
+
+        /**
+         * Creates an empty LocaleStrings object with the specified initial capacity.
+         *
+         * @param initialCapacity The initial capacity. Set to the number of expected strings.
+         */
+        public LocaleStrings(int initialCapacity) {
+            mHashMap = new HashMap<>(initialCapacity);
+        }
+
+        /**
+         * Associates the specified key with the specified {@link StringInfo} object.
+         */
+        public void put(@NonNull String key, @NonNull StringInfo stringInfo) {
+            mHashMap.put(key, stringInfo);
         }
 
         /**
@@ -172,9 +205,11 @@ public class LocaleData {
         }
 
         /**
-         * Returns the underlying data structure of the object.
+         * Returns the underlying data structure.
+         * <p>
+         * Changes to the returned map, will affect the object.
          */
-        @NonNull HashMap<String, StringInfo> getMap() {
+        public @NonNull HashMap<String, StringInfo> getMap() {
             return mHashMap;
         }
 
@@ -204,7 +239,8 @@ public class LocaleData {
     }
 
     /**
-     * A class that maps {@link LocaleStrings} to locales.
+     * A class that holds translations for multiple locales. It maps locale codes to
+     * {@link LocaleStrings} objects.
      */
     public static class TranslationMap {
 
@@ -223,30 +259,35 @@ public class LocaleData {
         /**
          *  Creates a TranslationMap object which uses the provided {@link HashMap}.
          * <p>
-         *  The HashMap should contain locale codes as keys and {@link LocaleStrings} as values like
-         *  this:
+         *  The HashMap should map locale codes to {@link LocaleStrings} like this:
          * <pre>
-         *    {
-         *        'fr' : {
-         *             'key1' : { 'string' : '...' },
-         *             'key2' : { 'string' : '...' },
-         *        },
-         *        'de' : {
-         *             'key1' : { 'string' : '...' },
-         *        },
-         *        'el' : {
-         *             'key1' : { 'string' : '...' },
-         *        },
-         *    }
+         * {
+         *    'fr' : LocaleStrings,
+         *    'de' : LocaleStrings,
+         *    'el' : LocaleStrings,
+         * }
          * </pre>
          */
         public TranslationMap(@NonNull HashMap<String, LocaleStrings> map) {
-            this.mHashMap = map;
+            mHashMap = map;
         }
 
         /**
-         *  Associates the specified locale with the specified {@link LocaleStrings} object in this
-         *  map.
+         * Creates a new TranslationMap object by making a copy of the provided one.
+         */
+        public TranslationMap(@NonNull TranslationMap translationMap) {
+            mHashMap = new HashMap<>(translationMap.mHashMap.size());
+            // Copy mapping and LocaleStrings objects
+            for (Map.Entry<String, LocaleStrings> entry : translationMap.mHashMap.entrySet()) {
+                LocaleStrings localeStrings = entry.getValue();
+                LocaleStrings copiedLocaleStrings =
+                        (localeStrings != null) ? new LocaleStrings(localeStrings) : null;
+                mHashMap.put(entry.getKey(), copiedLocaleStrings);
+            }
+        }
+
+        /**
+         *  Associates the specified locale with the specified {@link LocaleStrings} object.
          */
         public void put(@NonNull String locale, @NonNull LocaleStrings localeStrings) {
             mHashMap.put(locale, localeStrings);
@@ -267,6 +308,14 @@ public class LocaleData {
             return mHashMap.keySet();
         }
 
+        /**
+         * Returns <code>true</code> if the object contains no locale to LocaleStrings mappings.
+         *
+         * @return <code>true</code> if it's empty, <code>false</code> otherwise.
+         */
+        public boolean isEmpty() {
+            return mHashMap.isEmpty();
+        }
 
         @Override
         @NonNull
@@ -292,5 +341,7 @@ public class LocaleData {
             return mHashMap.hashCode();
         }
     }
+
+    //endregion
 
 }

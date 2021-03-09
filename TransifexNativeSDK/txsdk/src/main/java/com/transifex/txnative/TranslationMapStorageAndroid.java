@@ -13,8 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * A class that extends {@link TranslationMapStorage} so that translations can be read from an
- * application's raw asset files.
+ * A class that extends {@link TranslationMapStorage} so that translations can be read from the
+ * application's Assets folder.
+ * <p>
+ * Translations can be bundled in your application's Assets folder, using the Transifex command-line
+ * tool.
+ *
+ * @see TranslationMapStorage
  */
 public class TranslationMapStorageAndroid extends TranslationMapStorage {
 
@@ -36,16 +41,14 @@ public class TranslationMapStorageAndroid extends TranslationMapStorage {
     }
 
     /**
-     * Loads a {@link LocaleData.TranslationMap} from an application's raw asset files under the
+     * Loads a {@link LocaleData.TranslationMap} from an application's Assets folder under the
      * provided path.
      *
      * @param srcDirectoryPath The path to the directory containing translations in the expected
      *                         format.
      *
-     * @return The translation map or <code>null</code> if everything failed. If some locales fail
-     * to load, they won't be added in the returned map.
-     *
-     * @see TranslationMapStorage#fromDisk(File)
+     * @return The translation map or <code>null</code> if the directory isn't found or it's empty.
+     * If some locales fail to load, they won't be added in the returned map.
      */
     public @Nullable LocaleData.TranslationMap fromAssetsDirectory(@NonNull String srcDirectoryPath) {
         return fromDisk(assetFileProvider, assetFileProvider.getFile(srcDirectoryPath));
@@ -63,6 +66,10 @@ public class TranslationMapStorageAndroid extends TranslationMapStorage {
 
         public AssetFile(@NonNull AssetManager manager, @NonNull String pathname) {
             this.manager = manager;
+            // Remove trailing slash
+            if (pathname.endsWith("/")) {
+                pathname = pathname.substring(0, pathname.length() - 1);
+            }
             this.pathname = pathname;
         }
 

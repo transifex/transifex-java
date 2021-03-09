@@ -8,16 +8,20 @@ import android.text.SpannedString;
 import android.text.TextUtils;
 
 import com.transifex.common.LocaleData;
+import com.transifex.common.TranslationMapStorage;
+import com.transifex.txnative.cache.TxStandardCache;
+import com.transifex.txnative.cache.TxUpdateFilterCache;
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
 
+import java.io.File;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.text.HtmlCompat;
-import com.transifex.txnative.cache.MemoryCache;
+import com.transifex.txnative.cache.TxMemoryCache;
 import com.transifex.txnative.cache.TxCache;
 
 /**
@@ -49,8 +53,9 @@ public class NativeCore {
      * @param token The Transifex token that can be used for retrieving translations from CDS.
      * @param cdsHost An optional host for the Content Delivery Service; defaults to the production
      *                host provided by Transifex.
-     * @param cache The translation cache that holds the translations from the CDS; MemoryCache is
-     *             used if set to <code>null</code>.
+     * @param cache The translation cache that holds the translations from the CDS;
+     * {@link com.transifex.txnative.cache.TxStandardCache TxStandardCache} is used if set to
+     *              <code>null</code>.
      * @param missingPolicy Determines how to handle translations that are not available;
      * {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used
      *                     if set to <code>null</code>.
@@ -65,7 +70,7 @@ public class NativeCore {
         mMainHandler = new Handler(mContext.getMainLooper());
         mLocaleState = localeState;
         mLocaleState.setCurrentLocaleListener(mCurrentLocaleListener);
-        mCache = (cache != null) ? cache : new MemoryCache();
+        mCache = (cache != null) ? cache : TxStandardCache.getCache(mContext, null, null);
         mMissingPolicy = (missingPolicy != null) ? missingPolicy : new SourceStringPolicy();
 
         if (cdsHost == null) {
@@ -107,8 +112,7 @@ public class NativeCore {
         mCDSHandler.fetchTranslationsAsync(localeCode, new CDSHandlerAndroid.FetchTranslationsCallback() {
             @Override
             public void onComplete(final @Nullable LocaleData.TranslationMap translationMap) {
-                if (translationMap != null) {
-
+                if (translationMap != null && !translationMap.isEmpty()) {
                     // Update mCache using the fetched translationMap in main thread
                     mMainHandler.post(new Runnable() {
                         @Override

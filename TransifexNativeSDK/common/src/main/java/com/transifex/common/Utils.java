@@ -42,4 +42,22 @@ public class Utils {
         }
         return directoryToBeDeleted.delete();
     }
+
+    /**
+     * Deletes the directory's contents
+     *
+     * @return <code>true</code> if it's a directory and it's content is successfully deleted or
+     * it's already empty; <code>false</code> otherwise
+     */
+    public static boolean deleteDirectoryContents(File directoryToBeDeleted) {
+        File[] allContents = directoryToBeDeleted.listFiles();
+        boolean success = false;
+        if (allContents != null) {
+            success = true;
+            for (File file : allContents) {
+                success &= deleteDirectory(file);
+            }
+        }
+        return  success;
+    }
 }

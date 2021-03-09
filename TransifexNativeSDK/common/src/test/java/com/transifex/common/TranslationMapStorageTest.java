@@ -2,6 +2,7 @@ package com.transifex.common;
 
 import com.google.gson.Gson;
 
+import org.apache.commons.io.FilenameUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -95,6 +97,11 @@ public class TranslationMapStorageTest {
         assertThat(files.get("el").getName()).isEqualTo("strings.txt");
         assertThat(files.get("es").getName()).isEqualTo("strings.txt");
 
+        // Check locale directory name and filename
+        File elStringFile = files.get("el");
+        assertThat(FilenameUtils.getName(elStringFile.getPath())).isEqualTo("strings.txt");
+        assertThat(FilenameUtils.getName(elStringFile.getParent())).isEqualTo("el");
+
         LocaleData.LocaleStrings elLocaleStrings = readLocaleStrings(files.get("el"));
 
         assertThat(elLocaleStrings).isNotNull();
@@ -107,7 +114,7 @@ public class TranslationMapStorageTest {
     }
 
     @Test
-    public void testToDisk_emptyTranslationMap_returnEmptyFileMap() {
+    public void testToDisk_emptyTranslationMap_returnEmptyFileMapAndNoLocaleFolderCreated() {
         boolean tempDirCreated =  tempDir.mkdirs();
         assertThat(tempDirCreated).isTrue();
 
@@ -117,15 +124,15 @@ public class TranslationMapStorageTest {
 
         assertThat(files).isNotNull();
         assertThat(files.keySet()).isEmpty();
+        assertThat(tempDir.list()).asList().isEmpty();
     }
 
     @Test
     public void testToDisk_translationFileExists_overwriteExistingFile() {
+        // Create a pre-existing translation file for el
         File localeDir = new File(tempDir.getAbsoluteFile() + File.separator + "el");
         boolean localeDirCreated =  localeDir.mkdirs();
         assertThat(localeDirCreated).isTrue();
-
-        // Create a pre-existing translation file for el
         File dummyElStringFile = new File(localeDir + File.separator + "strings.txt");
         boolean dummyFileWritten = false;
         try {
@@ -141,11 +148,51 @@ public class TranslationMapStorageTest {
         TranslationMapStorage storage = new TranslationMapStorage("strings.txt");
         HashMap<String, File> files = storage.toDisk(translationMap, tempDir);
 
+        // Check that file is overwritten
         assertThat(files).isNotNull();
         assertThat(files.keySet()).containsExactly("el");
-
+        boolean isSameFile = false;
+        try {
+            isSameFile = Files.isSameFile(dummyElStringFile.toPath(), files.get("el").toPath());
+        } catch (IOException ignore) {
+        }
+        assertThat(isSameFile).isTrue();
         LocaleData.LocaleStrings elLocaleStrings = readLocaleStrings(files.get("el"));
+        assertThat(elLocaleStrings).isNotNull();
+        assertThat(elLocaleStrings).isEqualTo(translationMap.get("el"));
+    }
 
+    @Test
+    public void testToDisk_translationFileExistsForNonSupportedLocale_keepExistingFile() {
+        // Create a pre-existing translation file for de
+        File localeDir = new File(tempDir.getAbsoluteFile() + File.separator + "de");
+        boolean localeDirCreated =  localeDir.mkdirs();
+        assertThat(localeDirCreated).isTrue();
+        File dummyDeStringFile = new File(localeDir + File.separator + "strings.txt");
+        boolean dummyFileWritten = false;
+        try {
+            FileOutputStream outputStream = new FileOutputStream(dummyDeStringFile);
+            String dummyContent = "some text";
+            outputStream.write(dummyContent.getBytes(StandardCharsets.UTF_8));
+            outputStream.close();
+            dummyFileWritten = true;
+        } catch (IOException ignored) {}
+        assertThat(dummyFileWritten).isTrue();
+
+        LocaleData.TranslationMap translationMap = LocaleDataTest.getElTranslationMap();
+        TranslationMapStorage storage = new TranslationMapStorage("strings.txt");
+        HashMap<String, File> files = storage.toDisk(translationMap, tempDir);
+
+        // Check old "de" folder still exists and new "el" was created
+        assertThat(tempDir.list()).asList().containsExactly("el", "de");
+
+        // Check old file for de still exists
+        assertThat(dummyDeStringFile.exists()).isTrue();
+
+        // Check new file for el contains correct data
+        assertThat(files).isNotNull();
+        assertThat(files.keySet()).containsExactly("el");
+        LocaleData.LocaleStrings elLocaleStrings = readLocaleStrings(files.get("el"));
         assertThat(elLocaleStrings).isNotNull();
         assertThat(elLocaleStrings).isEqualTo(translationMap.get("el"));
     }
@@ -159,19 +206,18 @@ public class TranslationMapStorageTest {
     }
 
     @Test
-    public void testFromDisk_emptyDir_returnEmptyTranslationMap() {
+    public void testFromDisk_emptyDir_returnNullTranslationMap() {
         boolean tempDirCreated =  tempDir.mkdirs();
         assertThat(tempDirCreated).isTrue();
 
         TranslationMapStorage storage = new TranslationMapStorage("strings.txt");
         LocaleData.TranslationMap map = storage.fromDisk(tempDir);
 
-        assertThat(map).isNotNull();
-        assertThat(map.getLocales()).isEmpty();
+        assertThat(map).isNull();
     }
 
     @Test
-    public void testFromDisk_haveFileWhereLocaleDirExpected_returnEmptyTranslationMap() {
+    public void testFromDisk_haveFileWhereLocaleDirExpected_returnNullTranslationMap() {
         boolean tempDirCreated =  tempDir.mkdirs();
         assertThat(tempDirCreated).isTrue();
 
@@ -182,8 +228,7 @@ public class TranslationMapStorageTest {
         TranslationMapStorage storage = new TranslationMapStorage("strings.txt");
         LocaleData.TranslationMap map = storage.fromDisk(tempDir);
 
-        assertThat(map).isNotNull();
-        assertThat(map.getLocales()).isEmpty();
+        assertThat(map).isNull();
     }
 
     @Test

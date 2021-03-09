@@ -31,7 +31,7 @@ public class TranslationMapStorageFilesTest {
     public void setUp() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         File filesDir = appContext.getFilesDir();
-        tempDir = new File(filesDir.getPath() + "unitTestTempDir");
+        tempDir = new File(filesDir.getPath() + File.separator + "unitTestTempDir");
         if (tempDir.exists()) {
             com.transifex.common.Utils.deleteDirectory(tempDir);
         }

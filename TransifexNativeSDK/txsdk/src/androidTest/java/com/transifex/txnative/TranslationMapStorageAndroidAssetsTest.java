@@ -19,7 +19,7 @@ import static com.google.common.truth.Truth.assertThat;
 @SmallTest
 public class TranslationMapStorageAndroidAssetsTest {
 
-    // The tests rely on have the following directories:
+    // The tests rely on the following directories:
     //
     // androidTest/assets/test_normal
     // androidTest/assets/test_oneLocaleHasInvalidJson
@@ -39,23 +39,19 @@ public class TranslationMapStorageAndroidAssetsTest {
     }
 
     @Test
-    public void testFromAssetsDirectory_dirDoesNotExist_returnEmptyTranslationMap() {
+    public void testFromAssetsDirectory_dirDoesNotExist_returnNullTranslationMap() {
         TranslationMapStorageAndroid reader = new TranslationMapStorageAndroid(assetManager, "strings.txt");
         LocaleData.TranslationMap map = reader.fromAssetsDirectory("wrongDir");
 
-        // The behavior is different to TranslationMapStorage because the underlying AssetFile
-        // always returns true for "isDir()"
-        assertThat(map).isNotNull();
-        assertThat(map.getLocales()).isEmpty();
+        assertThat(map).isNull();
     }
 
     @Test
-    public void testFromAssetsDirectory_haveFileWhereLocaleDirExpected_returnEmptyTranslationMap() {
+    public void testFromAssetsDirectory_haveFileWhereLocaleDirExpected_returnNullTranslationMap() {
         TranslationMapStorageAndroid reader = new TranslationMapStorageAndroid(assetManager, "strings.txt");
         LocaleData.TranslationMap map = reader.fromAssetsDirectory("test_fileInsteadLocaleDir");
 
-        assertThat(map).isNotNull();
-        assertThat(map.getLocales()).isEmpty();
+        assertThat(map).isNull();
     }
 
     @Test

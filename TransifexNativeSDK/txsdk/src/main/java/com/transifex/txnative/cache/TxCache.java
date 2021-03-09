@@ -13,13 +13,10 @@ import androidx.annotation.Nullable;
 public interface TxCache {
 
     /**
-     * Returns a set of the locale codes supported by cache.
-     */
-    @NonNull Set<String> getSupportedLocales();
-
-    /**
      * Gets all translations from the cache in the form of a
      * {@link LocaleData.TranslationMap TranslationMap} object.
+     * <p>
+     * The returned object should not be altered as the cache may use it internally.
      */
     @NonNull LocaleData.TranslationMap get();
 
@@ -38,6 +35,9 @@ public interface TxCache {
     /**
      * Update the cache with the provided
      * {@link LocaleData.TranslationMap TranslationMap}.
+     * <p>
+     * The translation map should not be changed after providing it to the cache, because the cache
+     * implementation may use it without making a copy.
      */
     void update(@NonNull LocaleData.TranslationMap translationMap);
 }

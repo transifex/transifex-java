@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class MemoryCacheTest {
+public class TxMemoryCacheTest {
 
     private static LocaleData.TranslationMap getDummyTranslationMap() {
         HashMap<String, LocaleData.StringInfo> dic1 = new HashMap<>();
@@ -38,64 +38,50 @@ public class MemoryCacheTest {
     }
 
     @Test
-    public void testSupportedLocales_emptyCache() {
-        MemoryCache cache = new MemoryCache();
-
-        assertThat(cache.getSupportedLocales()).isEmpty();
-    }
-
-    @Test
-    public void testSupportedLocales_normal() {
-        MemoryCache cache = new MemoryCache();
-        cache.update(getDummyTranslationMap());
-
-        assertThat(cache.getSupportedLocales()).containsExactly("el", "es");
-    }
-
-    @Test
-    public void testGet_emptyCache() {
-        MemoryCache cache = new MemoryCache();
+    public void testGet_emptyCache_returnNullString() {
+        TxMemoryCache cache = new TxMemoryCache();
 
         assertThat(cache.get("key1", "el")).isNull();
     }
 
     @Test
-    public void testGet_localeNotSupported() {
-        MemoryCache cache = new MemoryCache();
+    public void testGet_localeNotSupported_returnNullString() {
+        TxMemoryCache cache = new TxMemoryCache();
         cache.update(getDummyTranslationMap());
 
         assertThat(cache.get("key1", "de")).isNull();
     }
 
     @Test
-    public void testGet_normal() {
-        MemoryCache cache = new MemoryCache();
+    public void testGet_normal_returnString() {
+        TxMemoryCache cache = new TxMemoryCache();
         cache.update(getDummyTranslationMap());
 
         assertThat(cache.get("key1", "el")).isEqualTo("val1");
     }
 
     @Test
-    public void testGet_updateCalledMultipleTimes() {
-        MemoryCache cache = new MemoryCache();
+    public void testGet_updateCalledMultipleTimes_returnStringFromLatestUpdate() {
+        TxMemoryCache cache = new TxMemoryCache();
         cache.update(getDummyTranslationMap());
 
         cache.update(getDummyTranslationMap2());
 
         assertThat(cache.get("key1", "el")).isNull();
+        assertThat(cache.get("key1", "de")).isEqualTo("val1 de");
     }
 
     @Test
     public void testGetAll_normal() {
-        MemoryCache cache = new MemoryCache();
+        TxMemoryCache cache = new TxMemoryCache();
         cache.update(getDummyTranslationMap());
 
         assertThat(cache.get()).isEqualTo(getDummyTranslationMap());
     }
 
     @Test
-    public void testGetAll_emptyCache() {
-        MemoryCache cache = new MemoryCache();
+    public void testGetAll_emptyCache_returnEmptyMap() {
+        TxMemoryCache cache = new TxMemoryCache();
 
         assertThat(cache.get()).isNotNull();
         assertThat(cache.get().getLocales()).isEmpty();

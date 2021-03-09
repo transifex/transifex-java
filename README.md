@@ -1,7 +1,7 @@
 # Transifex Native Android SDK
 
 Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
-using [Transifex Native](https://www.transifex.com/native/). The tool can fetch translations 
+using [Transifex Native](https://www.transifex.com/native/). The library can fetch translations 
 over the air (OTA) to your apps.
 
 The library's minimum supported SDK is `18` (Android 4.3) and uses [appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) `1.2.0`.
@@ -134,16 +134,47 @@ As soon as `fetchTranslations` is called, the SDK will attempt to download the
 translations for all locales - except for the source locale - that are defined in the 
 initialization of `TxNative`. 
 
-For the moment, the translations are stored only in memory and are available for the 
-current app session. In later versions of the SDK, the translations will also be stored on 
-the device and will be available for subsequent app sessions.
-
+The fetchTranslations method in the above examples is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
 
 ### Invalidating CDS cache
 
 The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex 
 and you need to see them on your app immediately, you need to make an HTTP request 
 to the [invalidation endpoint](https://github.com/transifex/transifex-delivery/#invalidate-cache) of CDS.
+
+### Standard Cache
+
+The default cache strategy used by the SDK, if no other cache is provided by the developer, is the `TxStandardCache.getCache()`. The standard cache operates by making use of the publicly exposed classes and interfaces from the `com.transifex.txnative.cache` package of the SDK, so it's easy to construct another cache strategy if that's desired.
+
+The standard cache is initialized with a memory cache that manages all cached entries in memory. When the memory cache gets initialized, it tries to look up if there are any already stored translations in the file system:
+
+* First, it looks for translations saved in the app's [Assets directory](https://developer.android.com/reference/android/content/res/AssetManager) that may have been offered by the developer, using the command-line tool when building the app.
+* Secondly, it looks for translations in the app's [internal cache directory](https://developer.android.com/training/data-storage/app-specific#internal-create-cache), in case the app had already downloaded the translations from the server from a previous launch. These translations take precedence over the previous ones, if found.
+
+Whenever new translations are fetched from the server using the `fetchTranslations()` method, the standard cache is updated and those translations are stored as-is in the app's cache directory, in the same directory used previsouly during initialization. The in-memory cache though is not affected by the update. An app restart is required to read the newly saved translations.
+
+#### Alternative cache strategy
+
+The SDK allows you to implement your own cache from scratch by implementing the `TxCache` interface. Alternatively, you may change the standard cache strategy by implementing your own using the SDK's publicly exposed classes.
+
+In order to achieve that, you can create a a method that returns a `TxCache` instance, just like in the `TxStandardCache.getCache()` case. For example, the standard cache is created as follows:
+
+```
+return new TxFileOutputCacheDecorator(
+                <cached Translations Directory>,
+                new TXReadonlyCacheDecorator(
+                        new TxProviderBasedCache(
+                                <providers array>,
+                                new TxUpdateFilterCache(
+                                        <update policy>,
+                                        new TxMemoryCache()
+                                )
+                        )
+                )
+        );
+```
+
+If you want to have your memory cache updated with the new translations when `fetchTranslations()` is called, you can remove the `TXReadonlyCacheDecorator`.
 
 ## Sample app
 

@@ -42,6 +42,18 @@ import androidx.annotation.Nullable;
  */
 public class TranslationMapStorage {
 
+    /**
+     * The default name for the translations files. It is used by the command line tool's pull
+     * command and by the cache providers that read translations from disk or write translations
+     * on disk.
+     */
+    public static final String DEFAULT_TRANSLATION_FILENAME = "txstrings.json";
+    /**
+     * The default directory that contains the translation files. It is used by the command line
+     * tool's pull command and by the standard cache implementation.
+     */
+    public static final String DEFAULT_TRANSLATIONS_DIR_NAME = "txnative";
+
     public static final String TAG = TranslationMapStorage.class.getSimpleName();
     private static final Logger LOGGER = Logger.getLogger(TAG);
 
@@ -99,6 +111,7 @@ public class TranslationMapStorage {
      * @param dstDirectory The directory to save the translations to. Existing translation files
      *                     will be overwritten by the supported locale translations. If the directory
      *                     does not exist, it will be created.
+     *
      * @return A map with the saved files. If there was an error saving one or more locales, they
      * won't be included in the returned map. An empty map can be returned if everything failed.
      */
@@ -119,19 +132,22 @@ public class TranslationMapStorage {
             if (!localeDir.isDirectory()) {
                 boolean dirCreated = localeDir.mkdir();
                 if (!dirCreated) {
-                    LOGGER.log(Level.SEVERE, "Could not create directory: " +
-                            localeDir.getAbsolutePath());
+                    LOGGER.log(Level.SEVERE,
+                            "Could not create directory: " + localeDir.getAbsolutePath());
                     continue;
                 }
             }
 
             // Write locale file
+            LocaleData.LocaleStrings localeStrings = translationMap.get(locale);
+            if (localeStrings == null) {
+                continue; // Can't happen. Just to suppress lint
+            }
             File localeFile = new File(localeDir.getPath() + File.separator + mFilename);
             try {
                 FileOutputStream fileOutputStream = new FileOutputStream(localeFile, false);
                 Writer writer = new BufferedWriter(new OutputStreamWriter(fileOutputStream, "UTF-8"));
                 // Create a TxPullResponseData object from LocaleStrings
-                LocaleData.LocaleStrings localeStrings = translationMap.get(locale);
                 LocaleData.TxPullResponseData data = new LocaleData.TxPullResponseData(localeStrings.getMap());
                 mGson.toJson(data, writer);
                 writer.close();
@@ -152,8 +168,8 @@ public class TranslationMapStorage {
      *
      * @param srcDirectory The directory containing translations in the expected format.
      *
-     * @return The translation map or <code>null</code> if everything failed. If some locales fail
-     * to load, they won't be added in the returned map.
+     * @return The translation map or <code>null</code> if the directory isn't found or it's empty.
+     * If some locales fail to load, they won't be added in the returned map.
      */
     public @Nullable LocaleData.TranslationMap fromDisk(@NonNull File srcDirectory) {
         return fromDisk(mFileProvider, mFileProvider.getFile(srcDirectory.getPath()));
@@ -212,6 +228,10 @@ public class TranslationMapStorage {
                 } catch (IOException ignored) {}
             }
 
+        }
+
+        if (translationMap.isEmpty()) {
+            return  null;
         }
 
         return translationMap;

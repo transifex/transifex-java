@@ -1,11 +1,12 @@
 package com.transifex.txnative;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.transifex.common.CDSHandler;
 import com.transifex.common.LocaleData;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
 import androidx.annotation.NonNull;
@@ -21,8 +22,10 @@ public class CDSHandlerAndroid extends CDSHandler {
 
     private static final String TAG = CDSHandler.class.getSimpleName();
 
+    private final Executor mExecutor;
+
     /**
-     * A callback that provides the results of {@link #fetchTranslationsAsync(String, FetchTranslationsCallback)} (String, FetchTranslationsCallback)}
+     * A callback that provides the results of {@link #fetchTranslationsAsync(String, FetchTranslationsCallback)}
      * when the operation is complete.
      */
     interface FetchTranslationsCallback {
@@ -50,6 +53,7 @@ public class CDSHandlerAndroid extends CDSHandler {
      */
     public CDSHandlerAndroid(@Nullable String[] localeCodes, @NonNull String token, @Nullable String secret, @NonNull String csdHost) {
         super(localeCodes, token, secret, csdHost);
+        mExecutor = Executors.newCachedThreadPool();
     }
 
     /**
@@ -64,7 +68,7 @@ public class CDSHandlerAndroid extends CDSHandler {
     public void fetchTranslationsAsync(@Nullable final String localeCode,
                                   @NonNull final FetchTranslationsCallback callback) {
         try {
-            AsyncTask.THREAD_POOL_EXECUTOR.execute(new Runnable() {
+            mExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
                     LocaleData.TranslationMap result = fetchTranslations(localeCode);

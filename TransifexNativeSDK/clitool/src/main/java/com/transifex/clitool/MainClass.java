@@ -2,6 +2,7 @@ package com.transifex.clitool;
 
 import com.transifex.common.CDSHandler;
 import com.transifex.common.LocaleData;
+import com.transifex.common.TranslationMapStorage;
 import com.transifex.common.TranslationsDownloader;
 
 import java.io.File;
@@ -42,8 +43,8 @@ public class MainClass {
     private static final String TAG = MainClass.class.getSimpleName();
     private static final Logger LOGGER = Logger.getLogger(TAG);
 
-    static final String OUT_DIR_NAME = "txnative";
-    static final String OUT_FILE_NAME = "txstrings.json";
+    static final String OUT_DIR_NAME = TranslationMapStorage.DEFAULT_TRANSLATIONS_DIR_NAME;
+    static final String OUT_FILE_NAME = TranslationMapStorage.DEFAULT_TRANSLATION_FILENAME;
 
     @Mixin
     private ReusableAttributes reusable;
