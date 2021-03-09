@@ -34,8 +34,9 @@ public class TxNative {
      * @param token The Transifex token that can be used for retrieving translations from CDS.
      * @param cdsHost An optional host for the Content Delivery Service; if set to <code>null</code>,
      *               the production host provided by Transifex is used.
-     * @param cache The translation cache that holds the translations from the CDS; MemoryCache is
-     *             used if set to <code>null</code>.
+     * @param cache The translation cache that holds the translations from the CDS;
+     * {@link com.transifex.txnative.cache.TxStandardCache TxStandardCache} is used if set to
+     *              <code>null</code>.
      * @param missingPolicy Determines how to handle translations that are not available;
      * {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used
      *                     if set to <code>null</code>.
@@ -110,9 +111,15 @@ public class TxNative {
     // to be reloaded after they have been fetched.
 
     /**
-     * Fetches the translations from CDS.
+     * Fetches the translations from CDS and updates the cache.
      * <p>
-     * The call returns instantly and fetches the translations asynchronously.
+     * The call returns instantly and fetches the translations asynchronously. If the translations
+     * are fetched successfully, the cache is updated.
+     * <p>
+     * Note that updating the cache may or may not affect the translations shown in the app's UI.
+     * This depends on the cache's implementation. Read
+     * {@link com.transifex.txnative.cache.TxStandardCache here} for the default cache
+     * implementation used by the TxNative SDK.
      *
      * @param localeCode An optional locale to fetch translations for; if  set to <code>null</code>,
      *                   it will fetch translations for all locales as defined in the SDK
@@ -155,7 +162,7 @@ public class TxNative {
      * Check out the installation guide regarding the usage of this method.
      *
      * @param context The service context to wrap.
-     * @return teh wrapped context.
+     * @return The wrapped context.
      */
     public static Context generalWrap(Context context) {
         if (sNativeCore == null) {

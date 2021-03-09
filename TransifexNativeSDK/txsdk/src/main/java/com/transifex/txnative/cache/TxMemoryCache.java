@@ -10,22 +10,15 @@ import androidx.annotation.Nullable;
 /**
  * A cache that holds translations in memory.
  */
-public class MemoryCache implements TxCache {
+public class TxMemoryCache implements TxCache {
 
     private LocaleData.TranslationMap mTranslationMap = new LocaleData.TranslationMap(0);
-
-    @NonNull
-    @Override
-    public Set<String> getSupportedLocales() {
-        return mTranslationMap.getLocales();
-    }
 
     @NonNull
     @Override
     public LocaleData.TranslationMap get() {
         return mTranslationMap;
     }
-
 
     @Nullable
     @Override
@@ -34,7 +27,6 @@ public class MemoryCache implements TxCache {
         if (localeStrings == null) {
             return  null;
         }
-
         return localeStrings.get(key);
     }
 

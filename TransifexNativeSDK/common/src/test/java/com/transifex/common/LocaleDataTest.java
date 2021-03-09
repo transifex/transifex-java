@@ -78,6 +78,55 @@ public class LocaleDataTest {
     }
 
     @Test
+    public void testLocaleStringsGetMap() {
+        LocaleData.LocaleStrings a = getElLocaleStrings();
+
+        HashMap<String, LocaleData.StringInfo> map = a.getMap();
+
+        assertThat(a.get("test_key")).isEqualTo("Καλημέρα");
+        assertThat(a.get("test_key3")).isEqualTo("");
+    }
+
+    @Test
+    public void testLocaleStringsGetMap_alterMap() {
+        LocaleData.LocaleStrings a = getElLocaleStrings();
+
+        HashMap<String, LocaleData.StringInfo> map = a.getMap();
+        map.put("test_key4", new LocaleData.StringInfo("some text"));
+
+        assertThat(a.get("test_key4")).isEqualTo("some text");
+    }
+
+    @Test
+    public void testLocaleStringsPutGet() {
+        LocaleData.LocaleStrings a = new LocaleData.LocaleStrings(10);
+        a.put("test_key", new LocaleData.StringInfo("some text"));
+
+        assertThat(a.get("test_key")).isEqualTo("some text");
+    }
+
+    @Test
+    public void testLocaleStringsCopyConstructor() {
+        LocaleData.LocaleStrings a = getElLocaleStrings();
+        LocaleData.LocaleStrings sameAsA = getElLocaleStrings();
+
+        LocaleData.LocaleStrings copyOfA = new LocaleData.LocaleStrings(a);
+        a.put("test_key4", new LocaleData.StringInfo("some text"));
+
+        assertThat(copyOfA).isNotEqualTo(a);
+        assertThat(copyOfA).isEqualTo(sameAsA);
+    }
+
+    @Test
+    public void testTranslationMapPutGet() {
+        LocaleData.TranslationMap a = new LocaleData.TranslationMap(10);
+        a.put("el", getElLocaleStrings());
+
+        assertThat(a.getLocales()).containsExactly("el");
+        assertThat(a.get("el")).isEqualTo(getElLocaleStrings());
+    }
+
+    @Test
     public void testTranslationMapHash() {
         LocaleData.TranslationMap a = getElEsTranslationMap();
         LocaleData.TranslationMap a2 = getElEsTranslationMap();
@@ -94,4 +143,17 @@ public class LocaleDataTest {
         assertThat(a).isEqualTo(a2);
         assertThat(a).isNotEqualTo(b);
     }
+
+    @Test
+    public void testTranslationMapCopyConstructor() {
+        LocaleData.TranslationMap a = getElEsTranslationMap();
+        LocaleData.TranslationMap sameAsA = getElEsTranslationMap();
+
+        LocaleData.TranslationMap copyOfA = new LocaleData.TranslationMap(a);
+        a.put("de", getElLocaleStrings());
+
+        assertThat(copyOfA).isNotEqualTo(a);
+        assertThat(copyOfA).isEqualTo(sameAsA);
+    }
+
 }
