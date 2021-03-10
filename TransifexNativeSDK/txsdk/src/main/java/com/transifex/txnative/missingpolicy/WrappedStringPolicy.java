@@ -1,6 +1,9 @@
 package com.transifex.txnative.missingpolicy;
 
 
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.SpannedString;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -48,20 +51,34 @@ public class WrappedStringPolicy implements MissingPolicy{
      * Return a string that wraps the source string.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString) {
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
+                                     @NonNull String resourceName, @NonNull String locale) {
         if (TextUtils.isEmpty(start) && TextUtils.isEmpty(end)) {
             return sourceString;
         }
 
-        StringBuilder sb = new StringBuilder(sourceString.length() + length);
-        if (!TextUtils.isEmpty(start)) {
-            sb.append(start);
+        boolean isSpanned = sourceString instanceof Spanned;
+        if (isSpanned) {
+            SpannableStringBuilder sb = new SpannableStringBuilder();
+            if (!TextUtils.isEmpty(start)) {
+                sb.append(start);
+            }
+            sb.append(sourceString);
+            if (!TextUtils.isEmpty(end)) {
+                sb.append(end);
+            }
+            return new SpannedString(sb);
         }
-        sb.append(sourceString);
-        if (!TextUtils.isEmpty(end)) {
-            sb.append(end);
+        else {
+            StringBuilder sb = new StringBuilder(sourceString.length() + length);
+            if (!TextUtils.isEmpty(start)) {
+                sb.append(start);
+            }
+            sb.append(sourceString);
+            if (!TextUtils.isEmpty(end)) {
+                sb.append(end);
+            }
+            return sb.toString();
         }
-
-        return sb.toString();
     }
 }

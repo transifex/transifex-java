@@ -218,7 +218,8 @@ public class NativeCore {
         // 4. the key was not found in the Cache for the resolved locale
         if (TextUtils.isEmpty(translatedString)) {
             CharSequence sourceString = mDefaultResources.getText(id);
-            return mMissingPolicy.get(sourceString);
+            return mMissingPolicy.get(sourceString, id, txResources.getResourceEntryName(id),
+                    mLocaleState.getResolvedLocale());
         }
 
         if (mSupportSpannableEnabled) {

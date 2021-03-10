@@ -27,10 +27,11 @@ public class CompositeMissingPolicy implements MissingPolicy{
      * Returns a string after it has been fed to all of the provided policies from first to last.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString) {
-        String string = sourceString.toString();
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
+                                     @NonNull String resourceName, @NonNull String locale) {
+        CharSequence string = sourceString;
         for (MissingPolicy policy : mMissingPolicies) {
-            string = policy.get(string).toString();
+            string = policy.get(string, id, resourceName, locale);
         }
 
         return  string;

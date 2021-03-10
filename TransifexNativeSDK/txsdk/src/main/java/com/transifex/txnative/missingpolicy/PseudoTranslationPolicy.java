@@ -94,13 +94,17 @@ public class PseudoTranslationPolicy implements MissingPolicy {
 
     /**
      * Return a string that looks somewhat like the source string.
+     * <p>
+     * Note that {@link android.text.Spanned} objects are converted to simple Strings when
+     * processed and will lose their markup.
      *
      * @param sourceString The source string.
+     *
      * @return A string that looks like the source string.
      */
-
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString) {
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
+                                      @NonNull String resourceName, @NonNull String locale) {
         char[] charArray = sourceString.toString().toCharArray();
         boolean expectingFormatSpecifierChar = false;
         boolean expectingDateFlag = false;
