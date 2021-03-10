@@ -1,6 +1,7 @@
 package com.transifex.txnative.missingpolicy;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import androidx.annotation.NonNull;
 
@@ -19,6 +20,7 @@ import androidx.annotation.NonNull;
 public class PseudoTranslationPolicy implements MissingPolicy {
 
     private static final HashMap<Character, Character> sTable = new HashMap<Character, Character>();
+    private static HashSet<Character> sFormatSpecifierChars = new HashSet<>();
 
     static {
         sTable.put('A', 'Å');
@@ -74,6 +76,20 @@ public class PseudoTranslationPolicy implements MissingPolicy {
         sTable.put('x', 'ẋ');
         sTable.put('y', 'ÿ');
         sTable.put('z', 'ź');
+
+        sFormatSpecifierChars.add('b');
+        sFormatSpecifierChars.add('h');
+        sFormatSpecifierChars.add('s');
+        sFormatSpecifierChars.add('c');
+        sFormatSpecifierChars.add('d');
+        sFormatSpecifierChars.add('o');
+        sFormatSpecifierChars.add('x');
+        sFormatSpecifierChars.add('e');
+        sFormatSpecifierChars.add('f');
+        sFormatSpecifierChars.add('g');
+        sFormatSpecifierChars.add('a');
+        sFormatSpecifierChars.add('t');
+        sFormatSpecifierChars.add('n');
     }
 
     /**
@@ -86,8 +102,36 @@ public class PseudoTranslationPolicy implements MissingPolicy {
     @Override
     @NonNull public CharSequence get(@NonNull CharSequence sourceString) {
         char[] charArray = sourceString.toString().toCharArray();
+        boolean expectingFormatSpecifierChar = false;
+        boolean expectingDateFlag = false;
         for (int i = 0; i < charArray.length; i++) {
             char character = charArray[i];
+            char lowerCaseCharacter = Character.toLowerCase(character);
+
+            // Skip changing format specifiers such as %D, %32.12f, $tM.
+            // When reaching a '%', we skip changing characters until we find one of the
+            // expected specifier characters. If that character is 't', we expect one more
+            // character, which is the date flag.
+            if (expectingFormatSpecifierChar) {
+                if (sFormatSpecifierChars.contains(lowerCaseCharacter)) {
+                    if (lowerCaseCharacter == 't') {
+                        expectingDateFlag = true;
+                    }
+                    expectingFormatSpecifierChar = false;
+                }
+                continue;
+            }
+            else {
+                if (character == '%') {
+                    expectingFormatSpecifierChar = true;
+                    continue;
+                }
+            }
+            if (expectingDateFlag) {
+                expectingDateFlag = false;
+                continue;
+            }
+
             Character replacementCharacter = sTable.get(character);
             if (replacementCharacter != null) {
                 charArray[i] = replacementCharacter;
