@@ -26,3 +26,12 @@ jobs:
     - name: Unit Test
       working-directory: ./TransifexNativeSDK
       run: ./gradlew test
+    - name: Upload test reports
+      if: always()
+      uses: actions/upload-artifact@v2
+      with:
+        name: unitTestReports
+        path: |
+          TransifexNativeSDK/clitool/build/reports/tests/test/
+          TransifexNativeSDK/common/build/reports/tests/test/
+          TransifexNativeSDK/txsdk/build/reports/tests/
