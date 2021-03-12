@@ -1,5 +1,7 @@
 # Transifex Native Android SDK
 
+[![CI](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg)](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml)
+
 Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
 using [Transifex Native](https://www.transifex.com/native/). The library can fetch translations 
 over the air (OTA) to your apps.
