@@ -14,9 +14,9 @@ public class SourceStringPolicy implements MissingPolicy {
      *
      * @return The source string.
      */
-    @NonNull
     @Override
-    public CharSequence get(@NonNull CharSequence sourceString) {
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
+                                     @NonNull String resourceName, @NonNull String locale) {
         return sourceString;
     }
 }

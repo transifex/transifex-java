@@ -228,14 +228,13 @@ public class NativeCoreTest {
 
         CharSequence styledPart = null;
 
-        if (string instanceof Spanned) {
-            Spanned spanned = (Spanned) string;
-            StyleSpan[] spans = spanned.getSpans(0, spanned.length(), StyleSpan.class);
-            StyleSpan span = spans[0];
-            int start = spanned.getSpanStart(span);
-            int end = spanned.getSpanEnd(span);
-            styledPart = spanned.subSequence(start, end);
-        }
+        Spanned spanned = (Spanned) string;
+        StyleSpan[] spans = spanned.getSpans(0, spanned.length(), StyleSpan.class);
+        StyleSpan span = spans[0];
+        int start = spanned.getSpanStart(span);
+        int end = spanned.getSpanEnd(span);
+        styledPart = spanned.subSequence(start, end);
+
 
         assertThat(styledPart).isNotNull();
         assertThat(styledPart.toString()).isEqualTo("bold");
