@@ -141,6 +141,7 @@ public class TxNative {
      * </p>
      *
      * @param context The activity context to wrap.
+     *
      * @return The wrapped context.
      */
     public static Context wrap(Context context) {
@@ -162,6 +163,7 @@ public class TxNative {
      * Check out the installation guide regarding the usage of this method.
      *
      * @param context The service context to wrap.
+     *
      * @return The wrapped context.
      */
     public static Context generalWrap(Context context) {

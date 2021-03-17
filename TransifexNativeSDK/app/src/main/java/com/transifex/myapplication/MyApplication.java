@@ -24,7 +24,13 @@ public class MyApplication extends Application {
                 "en",
                 new String[]{"en", "el", "de", "fr", "ar", "sl"},
                 null);
-        TxNative.init(getApplicationContext(), localeState, token, null, null, null);
+        TxNative.init(
+                getApplicationContext(),   // application context
+                localeState,               // a LocaleState instance
+                token,                     // token
+                null,                      // cdsHost URL
+                null,                      // a TxCache implementation
+                null);                     // a MissingPolicy implementation
 
         //TxNative.setTestMode(true);
 
