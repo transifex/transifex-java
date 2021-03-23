@@ -39,6 +39,22 @@ public class StringXMLConverterTest {
                     "    <string name=\"key1\">This\\n is\n" +
                     "    a test</string>\n" +
                     "</resources>";
+    private static final String stringsXMLPlurals =
+            "<resources>\n" +
+                    "    <plurals name=\"plural_test\">\n" +
+                    "        <item quantity=\"zero\">zero</item>\n" +
+                    "        <item quantity=\"one\">one</item>\n" +
+                    "        <item quantity=\"two\">two</item>\n" +
+                    "        <item quantity=\"few\">few</item>\n" +
+                    "        <item quantity=\"many\">many</item>\n" +
+                    "        <item quantity=\"other\">other</item>\n" +
+                    "    </plurals>\n" +
+                    "\n" +
+                    "    <plurals name=\"plural_test2\">\n" +
+                    "        <item quantity=\"other\">other2</item>\n" +
+                    "        <item quantity=\"one\">one2</item>\n" +
+                    "    </plurals>\n" +
+                    "</resources>";
 
     static Document getXML(String string) {
         SAXBuilder builder = new SAXBuilder();
@@ -62,6 +78,10 @@ public class StringXMLConverterTest {
 
     static Document getXMLNewLine() {
         return getXML(stringsXMLNewline);
+    }
+
+    static Document getPluralsXML() {
+        return getXML(stringsXMLPlurals);
     }
 
     @Before
@@ -127,4 +147,18 @@ public class StringXMLConverterTest {
 //        assertThat(stringMap.keySet()).containsExactly("key1").inOrder();
 //        assertThat(stringMap.get("key1").string).isEqualTo("This\n is a test");
 //    }
+
+    @Test
+    public void testProcess_pluralsXMLNormal() {
+        Document document = getPluralsXML();
+        try {
+            converter.process(document, stringMap);
+        } catch (JDOMException | StringXMLConverter.XMLConverterException e) {
+            e.printStackTrace();
+        }
+
+        assertThat(stringMap.keySet()).containsExactly("plural_test", "plural_test2").inOrder();
+        assertThat(stringMap.get("plural_test").string).isEqualTo("{cnt, plural, zero {zero} one {one} two {two} few {few} many {many} other {other}}");
+        assertThat(stringMap.get("plural_test2").string).isEqualTo("{cnt, plural, one {one2} other {other2}}");
+    }
 }

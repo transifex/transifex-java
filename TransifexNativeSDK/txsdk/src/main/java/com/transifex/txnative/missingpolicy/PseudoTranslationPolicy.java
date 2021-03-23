@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.PluralsRes;
+import androidx.annotation.StringRes;
 
 /**
  * Returns a string that looks like the source string but contains accented characters.
@@ -20,7 +22,7 @@ import androidx.annotation.NonNull;
 public class PseudoTranslationPolicy implements MissingPolicy {
 
     private static final HashMap<Character, Character> sTable = new HashMap<Character, Character>();
-    private static HashSet<Character> sFormatSpecifierChars = new HashSet<>();
+    private static final HashSet<Character> sFormatSpecifierChars = new HashSet<>();
 
     static {
         sTable.put('A', 'Å');
@@ -93,18 +95,14 @@ public class PseudoTranslationPolicy implements MissingPolicy {
     }
 
     /**
-     * Return a string that looks somewhat like the source string.
+     * Replaces each character of the source string with the mapped one found in {@link #sTable}..
      * <p>
-     * Note that {@link android.text.Spanned} objects are converted to simple Strings when
-     * processed and will lose their markup.
-     *
-     * @param sourceString The source string.
-     *
-     * @return A string that looks like the source string.
+     * Format specifiers such as <code>%D, %32.12f, %tM</code> pass-through without being altered.
+     * <p>
+     * If sourceString is {@link android.text.Spanned}, it is converted to {@link String} and thus
+     * any spans are lost.
      */
-    @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
-                                      @NonNull String resourceName, @NonNull String locale) {
+    @NonNull String processString(@NonNull CharSequence sourceString) {
         char[] charArray = sourceString.toString().toCharArray();
         boolean expectingFormatSpecifierChar = false;
         boolean expectingDateFlag = false;
@@ -112,7 +110,7 @@ public class PseudoTranslationPolicy implements MissingPolicy {
             char character = charArray[i];
             char lowerCaseCharacter = Character.toLowerCase(character);
 
-            // Skip changing format specifiers such as %D, %32.12f, $tM.
+            // Skip changing format specifiers such as %D, %32.12f, %tM.
             // When reaching a '%', we skip changing characters until we find one of the
             // expected specifier characters. If that character is 't', we expect one more
             // character, which is the date flag.
@@ -143,5 +141,30 @@ public class PseudoTranslationPolicy implements MissingPolicy {
         }
 
         return new String(charArray);
+    }
+
+    /**
+     * Returns a string that looks somewhat like the source string.
+     * <p>
+     * Note that {@link android.text.Spanned} objects are converted to simple Strings when
+     * processed and will lose their markup.
+     */
+    @Override
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
+                                      @NonNull String resourceName, @NonNull String locale) {
+        return processString(sourceString);
+    }
+
+    /**
+     * Returns a quantity string that looks somewhat like the source string.
+     * <p>
+     * Note that {@link android.text.Spanned} objects are converted to simple Strings when
+     * processed and will lose their markup.
+     */
+    @Override
+    @NonNull public CharSequence getQuantityString(
+            @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
+            @NonNull String resourceName, @NonNull String locale) {
+        return processString(sourceQuantityString);
     }
 }

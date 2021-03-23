@@ -40,11 +40,13 @@ public class CDSHandlerTest {
     }
 
     //region CDS mock methods
+
     //TODO: The following code should be added in a testFixture once implemented: https://issuetracker.google.com/issues/139762443
 
     public static final String elBody = "{\"data\":{\"test_key\":{\"string\":\"Καλημέρα\"},\"another_key\":{\"string\":\"Καλό απόγευμα\"},\"key3\":{\"string\":\"\"}}}";
     public static final String esBody = "{\"data\":{\"test_key\":{\"string\":\"Buenos días\"},\"another_key\":{\"string\":\"Buenas tardes\"},\"key3\":{\"string\":\"\"}}}";
     public static final String elBodyBadFormatting = "not a JSON format";
+    public static final String errorString = "{\"status\":\"409\",\"code\":\"conflict\",\"title\":\"Conflict error\",\"detail\":\"Expected plural rules '['one', 'other']' instead got '['few', 'many', 'one', 'other', 'two', 'zero']' for new resource string on source language 'en'\",\"source\":{\"pointer\":\"/data/0/attributes/strings\"}}";
 
     public static Dispatcher getElEsDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
@@ -134,8 +136,6 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    //endregion
-
     public static Dispatcher getPostDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
 
@@ -155,6 +155,28 @@ public class CDSHandlerTest {
 
         return dispatcher;
     }
+
+    public static Dispatcher getPostWithErrorDispatcher() {
+        Dispatcher dispatcher = new Dispatcher() {
+
+            @NonNull
+            @Override
+            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
+
+                String dummyCDSResponse = "{\"created\":0,\"updated\":0,\"skipped\":0,\"deleted\":0,\"failed\":1,\"errors\":["+ errorString +"]}";
+
+                switch (request.getPath()) {
+                    case "/content":
+                        return new MockResponse().setResponseCode(409).setBody(dummyCDSResponse);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        return dispatcher;
+    }
+
+    //endregion
 
     private static LocaleData.TxPostData getPostData() {
         LinkedHashMap<String, LocaleData.StringInfo> data = new LinkedHashMap<>();
@@ -437,7 +459,7 @@ public class CDSHandlerTest {
     }
 
     @Test
-    public void testPostSourceStrings_badURL() {
+    public void testPushSourceStrings_badURL() {
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", "invalidHostURL");
 
         LocaleData.TxPostData postData = getPostData();
@@ -447,7 +469,7 @@ public class CDSHandlerTest {
     }
 
     @Test
-    public void testPostSourceStrings_normal() {
+    public void testPushSourceStrings_normal() {
         server.setDispatcher(getPostDispatcher());
 
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
@@ -476,5 +498,25 @@ public class CDSHandlerTest {
         assertThat(parsedPostData.data.get("key2").string).isEqualTo("Using special \ncharacters εδώ.");
 
         assertThat(parsedPostData.meta.purge).isTrue();
+    }
+
+    @Test
+    public void testPushSourceStrings_CDSRespondsWithError_returnErrorInResponse() {
+        server.setDispatcher(getPostWithErrorDispatcher());
+
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
+
+        LocaleData.TxPostData postData = getPostData();
+        LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
+
+        assertThat(response).isNotNull();
+
+        assertThat(response.errors).asList().hasSize(1);
+        LocaleData.TxPostResponseData.Error error = response.errors[0];
+
+        assertThat(error.status).isEqualTo(409);
+        assertThat(error.code).isEqualTo("conflict");
+        assertThat(error.title).isEqualTo("Conflict error");
+        assertThat(error.detail).isEqualTo("Expected plural rules '['one', 'other']' instead got '['few', 'many', 'one', 'other', 'two', 'zero']' for new resource string on source language 'en'");
     }
 }

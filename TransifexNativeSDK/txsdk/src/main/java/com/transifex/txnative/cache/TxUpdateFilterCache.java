@@ -69,19 +69,20 @@ public class TxUpdateFilterCache extends TxDecoratorCache {
      * </ul>
      *
      */
-    @IntDef({REPLACE_ALL, UPDATE_USING_TRANSLATED})
+    @IntDef({TxCacheUpdatePolicy.REPLACE_ALL, TxCacheUpdatePolicy.UPDATE_USING_TRANSLATED})
     @Retention(RetentionPolicy.SOURCE)
-    public @interface TxCacheUpdatePolicy {}
+    public @interface TxCacheUpdatePolicy {
+        /**
+         * Discards the existing cache entries completely and populates the cache with the new entries,
+         * even if they contain empty translations.
+         */
+        int REPLACE_ALL = 0;
 
-    /**
-     * Discards the existing cache entries completely and populates the cache with the new entries,
-     * even if they contain empty translations.
-     */
-    public static final int REPLACE_ALL = 0;
-    /**
-     * Updates the existing cache with the new entries that have a non-empty translation.
-     */
-    public static final int UPDATE_USING_TRANSLATED = 1;
+        /**
+         * Updates the existing cache with the new entries that have a non-empty translation.
+         */
+        int UPDATE_USING_TRANSLATED = 1;
+    }
 
     private final @TxCacheUpdatePolicy int mPolicy;
 
@@ -108,10 +109,10 @@ public class TxUpdateFilterCache extends TxDecoratorCache {
      */
     @Override
     public void update(@NonNull LocaleData.TranslationMap translationMap) {
-        if (mPolicy == REPLACE_ALL) {
+        if (mPolicy == TxCacheUpdatePolicy.REPLACE_ALL) {
             super.update(translationMap);
         }
-        else if (mPolicy == UPDATE_USING_TRANSLATED) {
+        else if (mPolicy == TxCacheUpdatePolicy.UPDATE_USING_TRANSLATED) {
             // Make a copy of the internal cache's TranslationMap, in order to apply the updates there
             LocaleData.TranslationMap updatedTranslations = new LocaleData.TranslationMap(get());
 

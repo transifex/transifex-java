@@ -65,7 +65,7 @@ public class TxUpdateFilterCacheTest {
 
     @Test
     public void testUpdate_replaceAllPolicy_getCorrectMap() {
-        int policy = TxUpdateFilterCache.REPLACE_ALL;
+        int policy = TxUpdateFilterCache.TxCacheUpdatePolicy.REPLACE_ALL;
         TxMemoryCache internalCache = new TxMemoryCache();
         internalCache.update(getTranslations1());
         TxUpdateFilterCache updateFilterCache = new TxUpdateFilterCache(policy, internalCache);
@@ -76,7 +76,7 @@ public class TxUpdateFilterCacheTest {
 
     @Test
     public void testUpdate_updateUsingTranslatedPolicy_getCorrectMap() {
-        int policy = TxUpdateFilterCache.UPDATE_USING_TRANSLATED;
+        int policy = TxUpdateFilterCache.TxCacheUpdatePolicy.UPDATE_USING_TRANSLATED;
         TxMemoryCache internalCache = new TxMemoryCache();
         internalCache.update(getTranslations1());
         TxUpdateFilterCache updateFilterCache = new TxUpdateFilterCache(policy, internalCache);
@@ -90,7 +90,7 @@ public class TxUpdateFilterCacheTest {
         // This tests makes sure that TxUpdateFilterCache updates the internal cache by calling
         // its update() method and not by accidentally changing the internal cache's map
 
-        int policy = TxUpdateFilterCache.REPLACE_ALL;
+        int policy = TxUpdateFilterCache.TxCacheUpdatePolicy.REPLACE_ALL;
         TxMemoryCache internalCache = new TxMemoryCache();
         internalCache.update(getTranslations1());
         TxUpdateFilterCache updateFilterCache = new TxUpdateFilterCache(policy, new TxReadonlyCacheDecorator(internalCache));
@@ -104,7 +104,7 @@ public class TxUpdateFilterCacheTest {
         // This tests makes sure that TxUpdateFilterCache updates the internal cache by calling
         // its update() method and not by accidentally changing the internal cache's map
 
-        int policy = TxUpdateFilterCache.UPDATE_USING_TRANSLATED;
+        int policy = TxUpdateFilterCache.TxCacheUpdatePolicy.UPDATE_USING_TRANSLATED;
         TxMemoryCache internalCache = new TxMemoryCache();
         internalCache.update(getTranslations1());
         TxUpdateFilterCache updateFilterCache = new TxUpdateFilterCache(policy, new TxReadonlyCacheDecorator(internalCache));
@@ -117,7 +117,7 @@ public class TxUpdateFilterCacheTest {
     public void testUpdate_updateUsingTranslatedPolicyAndEmptyInternalCache_addNewLocale() {
         // We make sure that a new locale can be added when UPDATE_USING_TRANSLATED is used.
 
-        int policy = TxUpdateFilterCache.UPDATE_USING_TRANSLATED;
+        int policy = TxUpdateFilterCache.TxCacheUpdatePolicy.UPDATE_USING_TRANSLATED;
         TxMemoryCache internalCache = new TxMemoryCache();
         TxUpdateFilterCache updateFilterCache = new TxUpdateFilterCache(policy, internalCache);
         updateFilterCache.update(getTranslations1());

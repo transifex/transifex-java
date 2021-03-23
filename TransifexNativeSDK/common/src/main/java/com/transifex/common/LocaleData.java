@@ -134,7 +134,28 @@ public class LocaleData {
         public int skipped;
         public int deleted;
         public int failed;
-        public String[] errors;
+        public Error[] errors;
+
+        public boolean isSuccessful() {
+            return errors == null || errors.length == 0;
+        }
+
+        public static class Error {
+            public int status;
+            public String code;
+            public String title;
+            public String detail;
+
+            @Override
+            public String toString() {
+                return "Error{" +
+                        "status=" + status +
+                        ", code='" + code + '\'' +
+                        ", title='" + title + '\'' +
+                        ", detail='" + detail + '\'' +
+                        '}';
+            }
+        }
     }
 
     //endregion

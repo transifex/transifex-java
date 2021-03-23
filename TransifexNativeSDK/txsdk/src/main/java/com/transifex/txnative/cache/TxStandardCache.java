@@ -29,7 +29,7 @@ public class TxStandardCache {
      * @param context The app's context.
      * @param updatePolicy The update policy to be used when initializing the internal memory
      *                     cache with the stored contents from disk. If set to <code>null</code>,
-     *                     {@link TxUpdateFilterCache#REPLACE_ALL} is used.
+     *                     {@link TxUpdateFilterCache.TxCacheUpdatePolicy#REPLACE_ALL REPLACE_ALL} is used.
      * @param cachedTranslationsDirectory The directory where the cache will store new translations
      *                                    when available and read translations from when initialized.
      *                                    If set to <code>null</code> it uses a "txnative" folder in
@@ -42,7 +42,7 @@ public class TxStandardCache {
                                    @Nullable File cachedTranslationsDirectory) {
 
         if (updatePolicy == null) {
-            updatePolicy = TxUpdateFilterCache.REPLACE_ALL;
+            updatePolicy = TxUpdateFilterCache.TxCacheUpdatePolicy.REPLACE_ALL;
         }
         if (cachedTranslationsDirectory == null) {
             cachedTranslationsDirectory = new File(context.getCacheDir() + File.separator

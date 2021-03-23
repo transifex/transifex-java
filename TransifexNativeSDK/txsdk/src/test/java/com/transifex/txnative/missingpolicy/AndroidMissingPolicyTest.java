@@ -47,4 +47,19 @@ public class AndroidMissingPolicyTest {
 
         assertThat(translated).isEqualTo("test ελ");
     }
+
+    @Test
+    @Config(qualifiers = "el-rGR")
+    public void testGetQuantityString() {
+        // We test if AndroidMissingPolicy can return the el translation found in the app's
+        // test/res/values-el/strings.xml
+
+        CharSequence sourceString = "dummy source string";
+        String resourceEntryName = mockContext.getResources().getResourceEntryName(R.plurals.tx_plural_test_key);
+
+        AndroidMissingPolicy policy = new AndroidMissingPolicy(mockContext);
+        CharSequence translated = policy.getQuantityString(sourceString, R.plurals.tx_plural_test_key, 1, resourceEntryName, "el");
+
+        assertThat(translated).isEqualTo("αυτοκίνητο");
+    }
 }

@@ -171,7 +171,7 @@ public class TxStandardCacheTest {
         cache.update(getUpdatedTranslationMap());
 
         // Make another cache after having the translations saved on disk by the previous cache
-        TxCache secondRunCache = TxStandardCache.getCache(appContext, TxUpdateFilterCache.UPDATE_USING_TRANSLATED, null);
+        TxCache secondRunCache = TxStandardCache.getCache(appContext, TxUpdateFilterCache.TxCacheUpdatePolicy.UPDATE_USING_TRANSLATED, null);
         assertThat(changeToSameThreadExecutor(secondRunCache)).isTrue();
 
         assertThat(secondRunCache.get()).isEqualTo(getTranslationsForUpdateUsingTranslatedGroundTruth());

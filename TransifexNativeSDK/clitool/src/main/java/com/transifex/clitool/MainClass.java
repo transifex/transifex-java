@@ -166,20 +166,23 @@ public class MainClass {
                     mainClass.hostURL);
             LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
-            if (response != null) {
+            if (response != null && response.isSuccessful()) {
                 System.out.println("Source strings pushed successfully to CDS");
 
                 System.out.println(getDetailsString(response));
-
-                String errorString = getErrorString(response);
-                if (errorString != null) {
-                    System.out.println(errorString);
-                }
 
                 return 0;
             }
             else {
                 System.out.println("Error while pushing source strings to CDS");
+
+                if (response != null) {
+                    String errorString = getErrorString(response);
+                    if (errorString != null) {
+                        System.out.println(errorString);
+                    }
+                }
+
                 return 1;
             }
         }
@@ -205,21 +208,24 @@ public class MainClass {
                     mainClass.hostURL);
             LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
 
-            if (response != null) {
+            if (response != null && response.isSuccessful()) {
                 System.out.println("Source strings cleared from CDS");
 
                 String details = String.format(Locale.US, "%d strings deleted", response.deleted);
                 System.out.println(details);
 
-                String errorString = getErrorString(response);
-                if (errorString != null) {
-                    System.out.println(errorString);
-                }
-
                 return 0;
             }
             else {
                 System.out.println("Error while contacting CDS");
+
+                if (response != null) {
+                    String errorString = getErrorString(response);
+                    if (errorString != null) {
+                        System.out.println(errorString);
+                    }
+                }
+
                 return 1;
             }
         }

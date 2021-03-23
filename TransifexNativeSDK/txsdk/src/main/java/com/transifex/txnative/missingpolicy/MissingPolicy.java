@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import com.transifex.txnative.LocaleState;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 
 /**
@@ -30,4 +31,27 @@ public interface MissingPolicy {
      */
     @NonNull CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
                               @NonNull String resourceName, @NonNull String locale);
+
+    /**
+     * Return a quantity string as a translation based on the given source quantity string and
+     * quantity.
+     * <p>
+     * Classes that implement this interface may choose to return anything relevant to the given
+     * source string or not, based on their custom policy.
+     *
+     * @param sourceQuantityString The source string having grammatically correct pluralization for
+     *                             the given quantity.
+     * @param id The plurals resource identifier as defined by
+     * {@link Resources#getIdentifier(String, String, String)}.
+     * @param quantity The number used to get the correct string for the current language's plural
+     *                 rules.
+     * @param resourceName The entry name of the plurals resource as defined by
+     * {@link Resources#getResourceEntryName(int)}.
+     * @param locale The current locale as returned by {@link LocaleState#getResolvedLocale()}.
+     *
+     * @return The translated string.
+     */
+    @NonNull CharSequence getQuantityString(@NonNull CharSequence sourceQuantityString,
+                                            @PluralsRes int id, int quantity,
+                                            @NonNull String resourceName, @NonNull String locale);
 }

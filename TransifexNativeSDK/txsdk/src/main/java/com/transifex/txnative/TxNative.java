@@ -106,10 +106,6 @@ public class TxNative {
         sNativeCore.setSupportSpannable(enabled);
     }
 
-    //TODO: update the documentation, when local cache is implemented, to explain when these
-    // translations affect the app. Currently, they affect it instantly but the activity has
-    // to be reloaded after they have been fetched.
-
     /**
      * Fetches the translations from CDS and updates the cache.
      * <p>

@@ -8,21 +8,19 @@ import android.text.SpannedString;
 import android.text.TextUtils;
 
 import com.transifex.common.LocaleData;
-import com.transifex.common.TranslationMapStorage;
+import com.transifex.common.Plurals;
+import com.transifex.txnative.cache.TxCache;
 import com.transifex.txnative.cache.TxStandardCache;
-import com.transifex.txnative.cache.TxUpdateFilterCache;
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
 
-import java.io.File;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 import androidx.core.text.HtmlCompat;
-import com.transifex.txnative.cache.TxMemoryCache;
-import com.transifex.txnative.cache.TxCache;
 
 /**
  * The main class of the framework, responsible for orchestrating all functionality.
@@ -39,6 +37,7 @@ public class NativeCore {
     final Handler mMainHandler;
     final CDSHandlerAndroid mCDSHandler;
     final Resources mDefaultResources;      // Non-localized resources
+    final Resources mSourceLocaleResources; // Resources using the source locale
 
     boolean mTestModeEnabled;
     boolean mSupportSpannableEnabled;
@@ -78,7 +77,15 @@ public class NativeCore {
         }
         mCDSHandler = new CDSHandlerAndroid(mLocaleState.getTranslatedLocales(), token, null, cdsHost);
 
-        mDefaultResources = Utils.getDefaultLanguageResources(mContext);
+        mDefaultResources = Utils.getDefaultLocaleResources(mContext);
+        mSourceLocaleResources = Utils.getLocalizedResources(mContext, new Locale(mLocaleState.getSourceLocale()));
+
+        try {
+            mContext.getResources().getResourceEntryName(R.plurals.tx_plurals);
+        }
+        catch (Resources.NotFoundException e) {
+            throw new RuntimeException("The strings resources of txnative are not bundled in the app.");
+        }
     }
 
      private final LocaleState.CurrentLocaleListener mCurrentLocaleListener = new LocaleState.CurrentLocaleListener() {
@@ -136,7 +143,8 @@ public class NativeCore {
      *
      * @throws Resources.NotFoundException Throws NotFoundException if the given ID does not exist
      */
-    @NonNull CharSequence translate(TxResources txResources, @StringRes int id) {
+    @NonNull CharSequence translate(TxResources txResources, @StringRes int id)
+            throws Resources.NotFoundException {
         //noinspection ConstantConditions
         return internalTranslate(txResources, id, null, false);
     }
@@ -166,16 +174,17 @@ public class NativeCore {
      * @param id The resource ID.
      * @param def The default CharSequence to return if ID is not found. It's used if shouldUseDef
      *            is true. Otherwise, it's ignored.
-     * @param shouldUseDef Set to false for {@link #translate(TxResources, int)} semantics. Set to
-     *                     true for {@link #translate(TxResources, int, CharSequence)} semantics.
-     *                     When set to true, <code>def</code> is returned if the <code>id</code> is
-     *                     not found.
+     * @param shouldUseDef This controls whether a <code>NotFoundException</code> is thrown or the
+     *                     <code>def</code> string is returned when the given <code>ID</code> does
+     *                     not exist.
      *
      * @return The string data associated with the resource, plus possibly styled text information,
      * or <code>def</code> if <code>id</code> is 0 or not found and <code>shouldUseDef</code> is true.
      */
-    @Nullable private CharSequence internalTranslate(TxResources txResources, @StringRes int id,
-                                                     @Nullable CharSequence def, boolean shouldUseDef) {
+    @Nullable
+    private CharSequence internalTranslate(
+            TxResources txResources, @StringRes int id, @Nullable CharSequence def, boolean shouldUseDef)
+            throws Resources.NotFoundException {
         try {
             // We don't want to alter string resources, such as
             // "config_inputEventCompatProcessorOverrideClassName", that belong to the android resource
@@ -222,9 +231,104 @@ public class NativeCore {
                     mLocaleState.getResolvedLocale());
         }
 
+        return getSpannedString(translatedString);
+    }
+
+    @NonNull
+    CharSequence translateQuantityString(TxResources txResources, @PluralsRes int id, int quantity)
+            throws Resources.NotFoundException {
+
+        // We don't want to alter plurals resources that belong to the android resource
+        // package
+        if (txResources.isAndroidStringResource(id)) {  // A NotFoundException is thrown if the ID is not found
+            // A NotFoundException is thrown if the ID is not PluralsRes
+            return txResources.getOriginalQuantityText(id, quantity);
+        }
+
+        if (mTestModeEnabled) {
+            return TextUtils.concat("test: ", txResources.getOriginalQuantityText(id, quantity));
+        }
+
+        if (mLocaleState.isSourceLocale()) {
+            return txResources.getOriginalQuantityText(id, quantity);
+        }
+
+        // Get ICU string from Cache
+        String icuString = null;
+        if (mLocaleState.getResolvedLocale() != null) {
+            icuString = mCache.get(txResources.getResourceEntryName(id),
+                    mLocaleState.getResolvedLocale());
+        }
+
+        // Get quantity String from ICU string
+        String quantityString = null;
+        if (icuString != null) {
+            quantityString = getLocalizedQuantityString(txResources, icuString, quantity);
+        }
+
+        // No ICU string found in cache or no quantity string was rendered
+        if (quantityString == null) {
+            // Get source string using source locale's plural rules
+            CharSequence sourceString = mSourceLocaleResources.getQuantityText(id, quantity);
+            return mMissingPolicy.getQuantityString(sourceString, id, quantity,
+                    txResources.getResourceEntryName(id), mLocaleState.getResolvedLocale());
+        }
+
+        return getSpannedString(quantityString);
+    }
+
+    /**
+     * Uses the given ICU string to return a quantity string for the given quantity that follows
+     * the current locale's plural rules.
+     *
+     * @param txResources A TxResources instance.
+     * @param icuString An ICU string.
+     * @param quantity The number used to get the correct string for the current language's plural
+     *                 rules.
+     *
+     * @return A quantity string; <code>null</code> if no matching quantity string was found in the
+     * provided <code>icuString</code>
+     */
+    @Nullable String getLocalizedQuantityString(@NonNull TxResources txResources,
+                                                        @NonNull String icuString, int quantity) {
+        if (TextUtils.isEmpty(icuString)) {
+            return null;
+        }
+
+        // Parse ICU string to Plurals
+        Plurals plurals = Plurals.fromICUString(icuString);
+
+        // Use Android's localization system to get the correct plural type for the given quantity
+        String pluralType = txResources.getOriginalQuantityText(R.plurals.tx_plurals, quantity).toString();
+
+        // Get plural string from Plurals
+        String plural = plurals.getPlural(pluralType);
+
+        // Fallback to "other" plural type if the requested plural type is not available
+        if (plural == null) {
+            plural = plurals.other;
+        }
+
+        return plural;
+    }
+
+    /**
+     * Parses the provided string's tags into spans and returns a {@link SpannedString} object
+     * if {@link #setSupportSpannable(boolean)} is set to <code>true</code>. If it's set to
+     * <code>false</code> or no tags exist, it returns a {@link String}.
+     * <p>
+     * If {@link #setSupportSpannable(boolean)} is set to <code>false</code>, the returned
+     * String will keep any found tags.
+     *
+     * @param string A string that may contain markup that can be parsed using
+     *               <code>HtmlCompat.fromHtml</code> to return a SpannedString containing spans.
+     *
+     * @return A {@link Spanned} or String object.
+     */
+    @NonNull CharSequence getSpannedString(@NonNull String string) {
         if (mSupportSpannableEnabled) {
             // If a span was found, return a "Spanned" object. Otherwise, return "String".
-            Spanned spanned = HtmlCompat.fromHtml(translatedString, HtmlCompat.FROM_HTML_MODE_LEGACY);
+            Spanned spanned = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
             if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
                 return new SpannedString(spanned);
             }
@@ -234,7 +338,7 @@ public class NativeCore {
         }
         else {
             // This is faster than "fromHTML()" and is enough for most cases
-            return translatedString.replaceAll("&lt;", "<");
+            return string.replace("&lt;", "<");
         }
     }
 }

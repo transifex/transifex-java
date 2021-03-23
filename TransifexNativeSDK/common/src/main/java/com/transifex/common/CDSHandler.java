@@ -309,8 +309,9 @@ public class CDSHandler {
      *
      * @param postData The data containing the source strings and the purge value.
      *
-     * @return a {@link LocaleData.TxPostResponseData} object if data were pushed successfully,
-     * <code>null</code> otherwise.
+     * @return A {@link LocaleData.TxPostResponseData} object containing the server's response. The
+     * caller should check if the response contains errors or not. If everything fails,
+     * <code>null</code> is returned.
      */
     public @Nullable
     LocaleData.TxPostResponseData pushSourceStrings(@NonNull LocaleData.TxPostData postData) {
@@ -348,10 +349,12 @@ public class CDSHandler {
             switch (code) {
                 case 200: {
                     String result = Utils.readInputStream(connection.getInputStream());
-                    LocaleData.TxPostResponseData responseData =
-                            mGson.fromJson(result, LocaleData.TxPostResponseData.class);
-
-                    return responseData;
+                    return mGson.fromJson(result, LocaleData.TxPostResponseData.class);
+                }
+                case 409: {
+                    LOGGER.log(Level.SEVERE, "Server responded with code " + code);
+                    String result = Utils.readInputStream(connection.getErrorStream());
+                    return mGson.fromJson(result, LocaleData.TxPostResponseData.class);
                 }
                 default:
                     LOGGER.log(Level.SEVERE, "Server responded with code " + code);
@@ -362,7 +365,7 @@ public class CDSHandler {
 
             // https://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
             try {
-                String errorResponse = Utils.readInputStream(connection.getErrorStream());
+                Utils.readInputStream(connection.getErrorStream());
                 connection.getErrorStream().close();
             } catch (IOException ignored) {}
 
