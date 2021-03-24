@@ -285,7 +285,7 @@ public class NativeCore {
         }
 
         // No ICU string found in cache or no quantity string was rendered
-        if (quantityString == null) {
+        if (TextUtils.isEmpty(quantityString)) {
             // Get source string using source locale's plural rules
             CharSequence sourceString = mSourceLocaleResources.getQuantityText(id, quantity);
             return mMissingPolicy.getQuantityString(sourceString, id, quantity,
