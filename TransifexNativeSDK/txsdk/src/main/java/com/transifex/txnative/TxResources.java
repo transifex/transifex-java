@@ -77,25 +77,13 @@ public class TxResources extends Resources {
     @NonNull
     @Override
     public CharSequence[] getTextArray(@StringRes int id) throws NotFoundException {
-        CharSequence[] originalTextArray = mResources.getTextArray(id);
-
-        if (isAndroidStringResource(id)) {
-            return originalTextArray;
-        }
-
-        return new CharSequence[]{"test1", "test2"};
+        return mResources.getTextArray(id);
     }
 
     @NonNull
     @Override
     public String[] getStringArray(@StringRes int id) throws NotFoundException {
-        String[] originalStringArray = mResources.getStringArray(id);
-
-        if (isAndroidStringResource(id)) {
-            return originalStringArray;
-        }
-
-        return new String[]{"test1", "test2"};
+        return mResources.getStringArray(id);
     }
 
     //endregion Overrides
