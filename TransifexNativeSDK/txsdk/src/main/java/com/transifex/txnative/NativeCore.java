@@ -83,7 +83,7 @@ public class NativeCore {
         // Check that the "R.plurals.tx_plurals" plurals resource declared in the lib's "strings.xml"
         // file is accessible.
         try {
-            mContext.getResources().getResourceEntryName(R.plurals.tx_plurals);
+            mContext.getResources().getResourceEntryName(R.plurals.__tx_plurals);
         }
         catch (Resources.NotFoundException e) {
             throw new RuntimeException("The strings resources of txnative are not bundled in the app.");
@@ -324,7 +324,7 @@ public class NativeCore {
         }
 
         // Use Android's localization system to get the correct plural type for the given quantity
-        String pluralType = txResources.getOriginalQuantityText(R.plurals.tx_plurals, quantity).toString();
+        String pluralType = txResources.getOriginalQuantityText(R.plurals.__tx_plurals, quantity).toString();
 
         // Get plural string from Plurals
         String plural = plurals.getPlural(pluralType);
