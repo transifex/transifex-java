@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Plurals resource used by txnative to get the correct plural rule for a locale -->
     <plurals name="tx_plurals">
         <item quantity="zero">zero</item>
         <item quantity="one">one</item>

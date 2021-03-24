@@ -16,6 +16,22 @@ import androidx.annotation.StringDef;
  */
 public class Plurals {
 
+    public static class NonSupportedPluralTypeException extends RuntimeException{
+        public NonSupportedPluralTypeException() {
+            super();
+        }
+
+        public NonSupportedPluralTypeException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidPluralsConfiguration extends RuntimeException {
+        public InvalidPluralsConfiguration(String message) {
+            super(message);
+        }
+    }
+
     /**
      * A tag that represents the plural type. Can be  {@link #ZERO}, {@link #ONE}, {@link #TWO},
      * {@link #FEW}, {@link #MANY}, {@link #OTHER}.
@@ -40,14 +56,23 @@ public class Plurals {
     public final String many;
     public final String other;
 
-    Plurals(@Nullable String zero, @Nullable String one, @Nullable String two,
-            @Nullable String few, @Nullable String many, @Nullable String other) {
+    /**
+     * Creates a new instance.
+     *
+     * @throws InvalidPluralsConfiguration if <code>other</code> is <code>null</code>.
+     */
+    public Plurals(@Nullable String zero, @Nullable String one, @Nullable String two,
+            @Nullable String few, @Nullable String many, @NonNull String other) throws InvalidPluralsConfiguration {
         this.zero = zero;
         this.one = one;
         this.two = two;
         this.few = few;
         this.many = many;
         this.other = other;
+
+        if (other == null) {
+            throw new InvalidPluralsConfiguration("\"other\" can't be null");
+        }
     }
 
     /**
@@ -73,7 +98,7 @@ public class Plurals {
             case PluralType.OTHER:
                 return other;
             default:
-                throw new Builder.NonSupportedPluralTypeException("Plural type '" + pluralType + "' is not supported");
+                throw new NonSupportedPluralTypeException("Plural type '" + pluralType + "' is not supported");
         }
     }
 
@@ -113,8 +138,7 @@ public class Plurals {
      * @return Returns a {@link Plurals} object if parsing was successful; <code>null</code>
      * otherwise
      */
-    public static @Nullable
-    Plurals fromICUString(@NonNull String icuString) {
+    public static @Nullable Plurals fromICUString(@NonNull String icuString) {
         Matcher matcher = pattern.matcher(icuString);
         Builder sb = new Builder();
 
@@ -124,12 +148,20 @@ public class Plurals {
             try {
                 sb.setPlural(pluralType, string);
             }
-            catch (Builder.NonSupportedPluralTypeException e) {
-                return null;
+            catch (NonSupportedPluralTypeException ignored) {
+                // Due to the pattern, we can't actually enter here
             }
         }
 
-        return sb.buildString();
+        Plurals plurals;
+        try  {
+            plurals = sb.buildString();
+        }
+        catch (Plurals.InvalidPluralsConfiguration e){
+            return null;
+        }
+
+        return plurals;
     }
 
     private static void appendPlural(@NonNull StringBuilder sb, @NonNull @PluralType String pluralType, @NonNull String string) {
@@ -152,16 +184,6 @@ public class Plurals {
      * A class for building a {@link Plurals} object.
      */
     public static class Builder {
-
-        public static class NonSupportedPluralTypeException extends RuntimeException{
-            public NonSupportedPluralTypeException() {
-                super();
-            }
-
-            public NonSupportedPluralTypeException(String message) {
-                super(message);
-            }
-        }
 
         private String zero;
         private String one;
@@ -238,9 +260,14 @@ public class Plurals {
 
         /**
          * Builds a <code>Plurals</code> object with the current configuration.
+         *
+         * @throws InvalidPluralsConfiguration if the string for {@link PluralType#OTHER}
+         * is <code>null</code>.
          */
-        public @NonNull
-        Plurals buildString() {
+        public @NonNull Plurals buildString() throws InvalidPluralsConfiguration {
+            if (other == null) {
+                throw new InvalidPluralsConfiguration("\"other\" can't be null");
+            }
             return new Plurals(zero, one, two, few, many, other);
         }
     }

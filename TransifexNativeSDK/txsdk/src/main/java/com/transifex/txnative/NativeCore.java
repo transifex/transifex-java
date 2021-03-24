@@ -80,6 +80,8 @@ public class NativeCore {
         mDefaultResources = Utils.getDefaultLocaleResources(mContext);
         mSourceLocaleResources = Utils.getLocalizedResources(mContext, new Locale(mLocaleState.getSourceLocale()));
 
+        // Check that the "R.plurals.tx_plurals" plurals resource declared in the lib's "strings.xml"
+        // file is accessible.
         try {
             mContext.getResources().getResourceEntryName(R.plurals.tx_plurals);
         }
@@ -141,7 +143,7 @@ public class NativeCore {
      *
      * @return The string data associated with the resource, plus possibly styled text information.
      *
-     * @throws Resources.NotFoundException Throws NotFoundException if the given ID does not exist
+     * @throws android.content.res.Resources.NotFoundException if the given ID does not exist.
      */
     @NonNull CharSequence translate(TxResources txResources, @StringRes int id)
             throws Resources.NotFoundException {
@@ -180,6 +182,9 @@ public class NativeCore {
      *
      * @return The string data associated with the resource, plus possibly styled text information,
      * or <code>def</code> if <code>id</code> is 0 or not found and <code>shouldUseDef</code> is true.
+     *
+     * @throws android.content.res.Resources.NotFoundException if the given ID does not exist and
+     * <code>shouldUseDef</code> is <code>false</code>.
      */
     @Nullable
     private CharSequence internalTranslate(
@@ -234,6 +239,19 @@ public class NativeCore {
         return getSpannedString(translatedString);
     }
 
+    /**
+     * Returns the quantity text of the provided plurals resource ID under the current locale and
+     * provided quantity.
+     *
+     * @param txResources TxResources instance.
+     * @param id The resource ID.
+     * @param quantity The number used to get the correct string for the current language's plural
+     *                 rules.
+     *
+     * @return The string data associated with the resource, plus possibly styled text information.
+     *
+     * @throws android.content.res.Resources.NotFoundException if the given ID does not exist.
+     */
     @NonNull
     CharSequence translateQuantityString(TxResources txResources, @PluralsRes int id, int quantity)
             throws Resources.NotFoundException {
@@ -281,13 +299,17 @@ public class NativeCore {
      * Uses the given ICU string to return a quantity string for the given quantity that follows
      * the current locale's plural rules.
      *
+     * <p>
+     * For example, if the icu string is "{cnt, plural, one {%d car} other {%d cars}}", the quantity
+     * is 2 and the current locale is "en", this method will return "%d cars".
+     *
      * @param txResources A TxResources instance.
      * @param icuString An ICU string.
      * @param quantity The number used to get the correct string for the current language's plural
      *                 rules.
      *
      * @return A quantity string; <code>null</code> if no matching quantity string was found in the
-     * provided <code>icuString</code>
+     * provided <code>icuString</code> or an error occurred
      */
     @Nullable String getLocalizedQuantityString(@NonNull TxResources txResources,
                                                         @NonNull String icuString, int quantity) {
@@ -297,6 +319,9 @@ public class NativeCore {
 
         // Parse ICU string to Plurals
         Plurals plurals = Plurals.fromICUString(icuString);
+        if (plurals == null) {
+            return null;
+        }
 
         // Use Android's localization system to get the correct plural type for the given quantity
         String pluralType = txResources.getOriginalQuantityText(R.plurals.tx_plurals, quantity).toString();
@@ -338,7 +363,7 @@ public class NativeCore {
         }
         else {
             // This is faster than "fromHTML()" and is enough for most cases
-            return string.replace("&lt;", "<");
+            return string.replace("&lt;", "<").replace("&gt;", ">");
         }
     }
 }

@@ -73,7 +73,7 @@ public class NativeCoreTest {
 
     private static final String ICU_STRING = "{cnt, plural, zero {zero} one {this is one} two {just two} few {just a few} many {a lot!} other {others!}}";
     private static final String ICU_STRING_SIMPLE = "{cnt, plural, one {this is one} other {others!}}";
-    private static final String ICU_STRING_NOOTHERs = "{cnt, plural, one {this is one}}";
+    private static final String ICU_STRING_OTHER_NOT_SPECIFIED = "{cnt, plural, one {this is one}}";
     private static final String ICU_STRING_EMPTY = "{cnt, plural, }";
 
     // region translate
@@ -439,8 +439,8 @@ public class NativeCoreTest {
     public void testGetLocalizedQuantityString_androidUsesSLAndICUStringWithoutOthersPlural_returnNull() {
         // https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html#sl
 
-        // In this test, the ICU only has only "ONE" plural. Since the "OTHERS" plural does not exist, we
-        // expect "null" to be returned
+        // In this test, the ICU only has the "ONE" plural. Since the "OTHERS" plural does not exist,
+        // we expect "null" to be returned for any given quantity.
 
         LocaleState localeState = new LocaleState(mockContext,
                 "en",
@@ -450,14 +450,14 @@ public class NativeCoreTest {
         NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_NOOTHERs, 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_NOOTHERs, 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_NOOTHERs, 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_NOOTHERs, 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_NOOTHERs, 20);
+        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 0);
+        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 1);
+        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 2);
+        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 3);
+        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 20);
 
         assertThat(quantityStringForZero).isNull();
-        assertThat(quantityStringForOne).isEqualTo("this is one");
+        assertThat(quantityStringForOne).isNull();
         assertThat(quantityStringForTwo).isNull();
         assertThat(quantityStringForThree).isNull();
         assertThat(quantityStringForALot).isNull();
@@ -465,7 +465,7 @@ public class NativeCoreTest {
 
     @Test
     @Config(qualifiers = "en")
-    public void testGetLocalizedQuantityString_ICUStringHasNoPlurals_returnNull() {
+    public void testGetLocalizedQuantityString_ICUStringWithOtherNotSpecified_returnNull() {
         LocaleState localeState = new LocaleState(mockContext,
                 "en",
                 new String[]{"en", "el"},

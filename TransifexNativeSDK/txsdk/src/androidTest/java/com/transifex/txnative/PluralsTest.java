@@ -15,6 +15,9 @@ import static com.google.common.truth.Truth.assertThat;
 @SmallTest
 public class PluralsTest {
 
+    // The following test is copied from the respective unit test. We just want to make sure the
+    // internal regex patter compiles correctly on a device.
+
     @Test
     public void testFromICUString_oneIncorrectPluralStyle_parseRestOfThem() {
         String icuString = "{???, plural, WRONG {task} other {tasks}}";

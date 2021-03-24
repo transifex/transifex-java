@@ -1,18 +1,21 @@
 package com.transifex.clitool;
 
 import com.transifex.common.LocaleData;
+import com.transifex.common.Plurals;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.LinkedHashMap;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 public class StringXMLConverterTest {
 
@@ -55,6 +58,13 @@ public class StringXMLConverterTest {
                     "        <item quantity=\"one\">one2</item>\n" +
                     "    </plurals>\n" +
                     "</resources>";
+    private static final String stringsXMLPluralsOtherNotSpecified =
+            "<resources>\n" +
+                    "    <plurals name=\"plural_test\">\n" +
+                    "        <item quantity=\"one\">one</item>\n" +
+                    "    </plurals>\n" +
+                    "\n" +
+                    "</resources>";
 
     static Document getXML(String string) {
         SAXBuilder builder = new SAXBuilder();
@@ -82,6 +92,10 @@ public class StringXMLConverterTest {
 
     static Document getPluralsXML() {
         return getXML(stringsXMLPlurals);
+    }
+
+    static Document getPluralsXMLOtherNotSpecified() {
+        return getXML(stringsXMLPluralsOtherNotSpecified);
     }
 
     @Before
@@ -160,5 +174,18 @@ public class StringXMLConverterTest {
         assertThat(stringMap.keySet()).containsExactly("plural_test", "plural_test2").inOrder();
         assertThat(stringMap.get("plural_test").string).isEqualTo("{cnt, plural, zero {zero} one {one} two {two} few {few} many {many} other {other}}");
         assertThat(stringMap.get("plural_test2").string).isEqualTo("{cnt, plural, one {one2} other {other2}}");
+    }
+
+    @Test
+    public void testProcess_pluralsXMLOtherNotSpecified_throwException() {
+        Document document = getPluralsXMLOtherNotSpecified();
+
+        assertThrows(StringXMLConverter.XMLConverterException.class, new ThrowingRunnable() {
+                    @Override
+                    public void run() throws Throwable {
+                        converter.process(document, stringMap);
+                    }
+                }
+        );
     }
 }

@@ -37,17 +37,11 @@ public class PluralsTest {
     }
 
     @Test
-    public void testFromICUString_emptyString_returnEmptyPlurals() {
+    public void testFromICUString_emptyString_returnNull() {
         String icuString = "";
         Plurals plurals = Plurals.fromICUString(icuString);
 
-        assertThat(plurals).isNotNull();
-        assertThat(plurals.zero).isNull();
-        assertThat(plurals.one).isNull();
-        assertThat(plurals.two).isNull();
-        assertThat(plurals.few).isNull();
-        assertThat(plurals.many).isNull();
-        assertThat(plurals.other).isNull();
+        assertThat(plurals).isNull();
     }
 
     @Test
@@ -70,26 +64,38 @@ public class PluralsTest {
     }
 
     @Test
+    public void testBuilder_otherNotSpecified_throwException() {
+        Plurals.Builder sb = new Plurals.Builder();
+
+        assertThrows(Plurals.InvalidPluralsConfiguration.class, new ThrowingRunnable() {
+            @Override
+            public void run() throws Throwable {
+                sb.buildString();
+            }
+        });
+    }
+
+    @Test
     public void testBuilderSetPlural_normal() {
         Plurals.Builder sb = new Plurals.Builder();
-        sb.setPlural(Plurals.PluralType.FEW, "test");
+        sb.setPlural(Plurals.PluralType.OTHER, "other!");
         Plurals plurals = sb.buildString();
 
         assertThat(plurals.zero).isNull();
         assertThat(plurals.one).isNull();
         assertThat(plurals.two).isNull();
-        assertThat(plurals.few).isEqualTo("test");
+        assertThat(plurals.few).isNull();
         assertThat(plurals.many).isNull();
-        assertThat(plurals.other).isNull();
+        assertThat(plurals.other).isEqualTo("other!");
     }
 
     @Test
     public void testBuilderSetPlural_nonSupportedPluralType_throwException() {
         Plurals.Builder sb = new Plurals.Builder();
 
-        assertThrows(Plurals.Builder.NonSupportedPluralTypeException.class, new ThrowingRunnable() {
+        assertThrows(Plurals.NonSupportedPluralTypeException.class, new ThrowingRunnable() {
             @Override
-            public void run() {
+            public void run() throws Throwable {
                 sb.setPlural("Invalid plural type", "test");
             }
         });
@@ -109,16 +115,6 @@ public class PluralsTest {
         String icuString = plurals.toICUString();
 
         assertThat(icuString).isEqualTo("{cnt, plural, zero {none} one {just one} two {just two} few {a few} many {many} other {other!}}");
-    }
-
-    @Test
-    public void testToICUString_empty() {
-        Plurals.Builder sb = new Plurals.Builder();
-        Plurals plurals = sb.buildString();
-
-        String icuString = plurals.toICUString();
-
-        assertThat(icuString).isEqualTo("{cnt, plural,}");
     }
 
     @Test
@@ -151,9 +147,9 @@ public class PluralsTest {
                 .setOther("other!");
         Plurals plurals = sb.buildString();
 
-        assertThrows(Plurals.Builder.NonSupportedPluralTypeException.class, new ThrowingRunnable() {
+        assertThrows(Plurals.NonSupportedPluralTypeException.class, new ThrowingRunnable() {
             @Override
-            public void run() {
+            public void run() throws Throwable {
                 plurals.getPlural("Invalid plural type");
             }
         });

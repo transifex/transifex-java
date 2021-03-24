@@ -115,7 +115,13 @@ class StringXMLConverter {
                     String itemString = getXMLText(item);
                     sb.setPlural(quantity, itemString);
                 }
-                Plurals plurals = sb.buildString();
+                Plurals plurals;
+                try {
+                    plurals = sb.buildString();
+                }
+                catch (Plurals.InvalidPluralsConfiguration e) {
+                    throw new XMLConverterException("\"other\" is not specified for Plurals resource \"" + key + "\"");
+                }
                 stringMap.put(key, new LocaleData.StringInfo(plurals.toICUString()));
             }
         }
