@@ -8,6 +8,8 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.PluralsRes;
+import androidx.annotation.StringRes;
 
 /**
  * Wraps the source string with a custom format.
@@ -48,11 +50,12 @@ public class WrappedStringPolicy implements MissingPolicy{
     }
 
     /**
-     * Return a string that wraps the source string.
+     * Wraps the provided sourceString with the <code>start</code> and <code>end</code> strings.
+     * <p>
+     * If sourceString is {@link Spanned}, a {@link SpannedString} containing the same spans is
+     * returned.
      */
-    @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
-                                     @NonNull String resourceName, @NonNull String locale) {
+    @NonNull CharSequence wrapString(@NonNull CharSequence sourceString) {
         if (TextUtils.isEmpty(start) && TextUtils.isEmpty(end)) {
             return sourceString;
         }
@@ -80,5 +83,24 @@ public class WrappedStringPolicy implements MissingPolicy{
             }
             return sb.toString();
         }
+    }
+
+    /**
+     * Returns a wrapped string.
+     */
+    @Override
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
+                                     @NonNull String resourceName, @NonNull String locale) {
+        return wrapString(sourceString);
+    }
+
+    /**
+     * Returns a wrapped quantity string.
+     */
+    @Override
+    @NonNull public CharSequence getQuantityString(
+            @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
+            @NonNull String resourceName, @NonNull String locale) {
+        return wrapString(sourceQuantityString);
     }
 }

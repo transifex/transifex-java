@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tx_test_key">test</string>
+    <plurals name="tx_plural_test_key">
+        <item quantity="other">cars</item>
+        <item quantity="one">car</item>
+        <!-- "two" is not needed for EN, but it's useful for testing -->
+        <item quantity="two">car 2</item>
+    </plurals>
 </resources>

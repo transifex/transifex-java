@@ -21,6 +21,7 @@ import java.lang.annotation.Native;
 import androidx.annotation.AnyRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.PluralsRes;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.StringRes;
 
@@ -70,42 +71,19 @@ public class TxResources extends Resources {
     @NonNull
     @Override
     public CharSequence getQuantityText(@StringRes int id, int quantity) throws NotFoundException {
-        CharSequence originalString = mResources.getQuantityText(id, quantity);
-
-        if (isAndroidStringResource(id)) {
-            return originalString;
-        }
-
-        if (quantity == 1) {
-            return "test: " + originalString;
-        }
-        else {
-            return  "tests " + originalString;
-        }
+        return mNativeCore.translateQuantityString(this, id, quantity);
     }
 
     @NonNull
     @Override
     public CharSequence[] getTextArray(@StringRes int id) throws NotFoundException {
-        CharSequence[] originalTextArray = mResources.getTextArray(id);
-
-        if (isAndroidStringResource(id)) {
-            return originalTextArray;
-        }
-
-        return new CharSequence[]{"test1", "test2"};
+        return mResources.getTextArray(id);
     }
 
     @NonNull
     @Override
     public String[] getStringArray(@StringRes int id) throws NotFoundException {
-        String[] originalStringArray = mResources.getStringArray(id);
-
-        if (isAndroidStringResource(id)) {
-            return originalStringArray;
-        }
-
-        return new String[]{"test1", "test2"};
+        return mResources.getStringArray(id);
     }
 
     //endregion Overrides
@@ -113,7 +91,7 @@ public class TxResources extends Resources {
     //region Interface
 
     /**
-     * Checks if the provided string resource id belongs to Android's resource package.
+     * Checks if the provided string or plurals resource id belongs to Android's resource package.
      *
      * @param id The string resource ID to check.
      *
@@ -121,17 +99,22 @@ public class TxResources extends Resources {
      *
      * @throws NotFoundException Throws NotFoundException if the given ID does not exist.
      */
-    boolean isAndroidStringResource(@StringRes int id) {
+    boolean isAndroidStringResource(@StringRes @PluralsRes int id) throws NotFoundException {
         String resourcePackageName = mResources.getResourcePackageName(id);
         return resourcePackageName.equals("android");
     }
 
-    @NonNull CharSequence getOriginalText(@StringRes int id) {
+    @NonNull CharSequence getOriginalText(@StringRes int id) throws NotFoundException {
         return mResources.getText(id);
     }
 
     @Nullable CharSequence getOriginalText(@StringRes int id, @Nullable CharSequence def) {
         return mResources.getText(id, def);
+    }
+
+    @NonNull CharSequence getOriginalQuantityText(@PluralsRes int id, int quantity)
+            throws NotFoundException {
+        return mResources.getQuantityText(id, quantity);
     }
 
     //endregion Interface

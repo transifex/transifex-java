@@ -1,6 +1,7 @@
 package com.transifex.clitool;
 
 import com.transifex.common.LocaleData;
+import com.transifex.common.Plurals;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -74,7 +75,7 @@ class StringXMLConverter {
      * The strings are inserted in the order found in the XML.
      *
      * @param document The XML representation of an Android XML resource file containing strings.
-     * @param stringMap The map to update with the strings extracted from the string file.
+     * @param stringMap The map to update with the strings extracted from the document.
      *
      * @throws JDOMException when the file is not in a valid XML format.
      * @throws XMLConverterException when the XML file does not have the expected format.
@@ -95,12 +96,33 @@ class StringXMLConverter {
                 continue;
             }
 
-            // TODO: support string-array and plurals
+            // TODO: support string-array
 
             if (child.getName().equals("string")) {
                 String key = child.getAttribute("name").getValue();
                 String string = getXMLText(child);
                 stringMap.put(key, new LocaleData.StringInfo(string));
+            }
+            else if (child.getName().equals("plurals")) {
+                String key = child.getAttribute("name").getValue();
+                List<Element> pluralItems = child.getChildren("item");
+                if (pluralItems.isEmpty()) {
+                    continue;
+                }
+                Plurals.Builder sb = new Plurals.Builder();
+                for (Element item : pluralItems) {
+                    String quantity = item.getAttribute("quantity").getValue();
+                    String itemString = getXMLText(item);
+                    sb.setPlural(quantity, itemString);
+                }
+                Plurals plurals;
+                try {
+                    plurals = sb.buildString();
+                }
+                catch (Plurals.InvalidPluralsConfiguration e) {
+                    throw new XMLConverterException("\"other\" is not specified for Plurals resource \"" + key + "\"");
+                }
+                stringMap.put(key, new LocaleData.StringInfo(plurals.toICUString()));
             }
         }
     }

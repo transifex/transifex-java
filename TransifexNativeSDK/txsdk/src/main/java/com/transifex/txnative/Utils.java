@@ -119,7 +119,7 @@ public class Utils {
      * <code>`strings.xml`</code> file.
      */
     @NonNull
-    public static Resources getDefaultLanguageResources(@NonNull Context context) {
+    public static Resources getDefaultLocaleResources(@NonNull Context context) {
         return getLocalizedResources(context, new Locale(""));
     }
 

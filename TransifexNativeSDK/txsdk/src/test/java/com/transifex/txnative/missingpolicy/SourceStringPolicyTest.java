@@ -18,4 +18,11 @@ public class SourceStringPolicyTest {
                 .isEqualTo("test");
     }
 
+    @Test
+    public void testGetQuantityString() {
+        SourceStringPolicy sourceStringPolicy = new SourceStringPolicy();
+
+        assertThat(sourceStringPolicy.getQuantityString("test", stringId, 1, stringResourceName, locale))
+                .isEqualTo("test");
+    }
 }

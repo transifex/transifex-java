@@ -1,6 +1,8 @@
 package com.transifex.txnative.missingpolicy;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.PluralsRes;
+import androidx.annotation.StringRes;
 
 /**
  * Returns the source string when the translation string is missing.
@@ -9,14 +11,20 @@ public class SourceStringPolicy implements MissingPolicy {
 
     /**
      * Return the source string as the translation string.
-     *
-     * @param sourceString The source string.
-     *
-     * @return The source string.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, int id,
+    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
                                      @NonNull String resourceName, @NonNull String locale) {
         return sourceString;
+    }
+
+    /**
+     * Returns the source quantity string as the translation quantity string.
+     */
+    @Override
+    @NonNull public CharSequence getQuantityString(
+            @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
+            @NonNull String resourceName, @NonNull String locale) {
+        return sourceQuantityString;
     }
 }

@@ -161,8 +161,9 @@ public class MainClassTest {
         String postBody = recordedRequest.getBody().readUtf8();
         Gson gson = new Gson();
         LocaleData.TxPostData parsedPostData = gson.fromJson(postBody, LocaleData.TxPostData.class);
-        assertThat(parsedPostData.data.keySet()).containsExactly("tx_test_key");
+        assertThat(parsedPostData.data.keySet()).containsExactly("tx_test_key", "tx_plural_test_key").inOrder();
         assertThat(parsedPostData.data.get("tx_test_key").string).isEqualTo("test");
+        assertThat(parsedPostData.data.get("tx_plural_test_key").string).isEqualTo("{cnt, plural, one {car} two {car 2} other {cars}}");
     }
 
     @Test
@@ -170,6 +171,9 @@ public class MainClassTest {
         // This test relies on having the following files:
         // txsdk/src/test/res/values/strings.xml
         // txsdk/src/test/res/values-el/strings.xml"
+
+        // The second file contains the same keys as the first file but with a different values. We
+        // expect to see the last file's value in the pushed strings.
 
         server.setDispatcher(getPostDispatcher());
 
@@ -190,8 +194,9 @@ public class MainClassTest {
         String postBody = recordedRequest.getBody().readUtf8();
         Gson gson = new Gson();
         LocaleData.TxPostData parsedPostData = gson.fromJson(postBody, LocaleData.TxPostData.class);
-        assertThat(parsedPostData.data.keySet()).containsExactly("tx_test_key");
+        assertThat(parsedPostData.data.keySet()).containsExactly("tx_test_key", "tx_plural_test_key").inOrder();
         assertThat(parsedPostData.data.get("tx_test_key").string).isEqualTo("test ελ");
+        assertThat(parsedPostData.data.get("tx_plural_test_key").string).isEqualTo("{cnt, plural, one {αυτοκίνητο} other {αυτοκίνητα}}");
     }
 
     @Test

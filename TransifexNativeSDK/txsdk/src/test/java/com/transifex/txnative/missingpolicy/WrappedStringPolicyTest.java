@@ -23,57 +23,57 @@ public class WrappedStringPolicyTest {
     final String locale = "el";
 
     @Test
-    public void testGet_normal() {
+    public void testWrapString_normal() {
         WrappedStringPolicy policy = new WrappedStringPolicy("<", " !end");
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isEqualTo("<The quick\n brown fox !end");
     }
 
     @Test
-    public void testGet_startIsNull_justEndIsAppended() {
+    public void testWrapString_startIsNull_justEndIsAppended() {
         WrappedStringPolicy policy = new WrappedStringPolicy(null, " !end");
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isEqualTo("The quick\n brown fox !end");
     }
 
     @Test
-    public void testGet_startIsEmpty_justEndIsAppended() {
+    public void testWrapString_startIsEmpty_justEndIsAppended() {
         WrappedStringPolicy policy = new WrappedStringPolicy("", " !end");
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isEqualTo("The quick\n brown fox !end");
     }
 
     @Test
-    public void testGet_endIsNull_justStartIsPrefixed() {
+    public void testWrapString_endIsNull_justStartIsPrefixed() {
         WrappedStringPolicy policy = new WrappedStringPolicy("<", null);
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isEqualTo("<The quick\n brown fox");
     }
 
     @Test
-    public void testGet_endIsEmpty_justStartIsPrefixed() {
+    public void testWrapString_endIsEmpty_justStartIsPrefixed() {
         WrappedStringPolicy policy = new WrappedStringPolicy("<", "");
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isEqualTo("<The quick\n brown fox");
     }
 
     @Test
-    public void testGet_spannedString() {
+    public void testWrapString_spannedString() {
         // Test that a spanned source string keeps its spans after being processed
 
         WrappedStringPolicy policy = new WrappedStringPolicy("start! ", " !end");
         CharSequence sourceString = HtmlCompat.fromHtml("The quick <b>brown</b> fox", HtmlCompat.FROM_HTML_MODE_LEGACY);
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isInstanceOf(Spanned.class);
         Spanned spanned = (Spanned) translated;
@@ -87,5 +87,23 @@ public class WrappedStringPolicyTest {
         assertThat(styledPart.toString()).isEqualTo("brown");
 
         assertThat(translated.toString()).isEqualTo("start! The quick brown fox !end");
+    }
+
+    @Test
+    public void testGet_normal() {
+        WrappedStringPolicy policy = new WrappedStringPolicy("<", " !end");
+        String sourceString = "The quick\n brown fox";
+        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+
+        assertThat(translated).isEqualTo("<The quick\n brown fox !end");
+    }
+
+    @Test
+    public void testGetQuantityString_normal() {
+        WrappedStringPolicy policy = new WrappedStringPolicy("<", " !end");
+        String sourceString = "The quick\n brown fox";
+        CharSequence translated = policy.getQuantityString(sourceString, stringId, 1, stringResourceName, locale);
+
+        assertThat(translated).isEqualTo("<The quick\n brown fox !end");
     }
 }

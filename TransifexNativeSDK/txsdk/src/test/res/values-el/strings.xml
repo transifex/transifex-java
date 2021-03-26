@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tx_test_key">test ελ</string>
+    <plurals name="tx_plural_test_key">
+        <item quantity="other">αυτοκίνητα</item>
+        <item quantity="one">αυτοκίνητο</item>
+    </plurals>
 </resources>

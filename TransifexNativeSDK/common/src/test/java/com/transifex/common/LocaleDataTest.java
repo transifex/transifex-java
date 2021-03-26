@@ -156,4 +156,27 @@ public class LocaleDataTest {
         assertThat(copyOfA).isEqualTo(sameAsA);
     }
 
+    @Test
+    public void testTxPostResponseDataIsSuccessful_noErrors_successful() {
+        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+
+        assertThat(responseData.isSuccessful()).isTrue();
+    }
+
+    @Test
+    public void testTxPostResponseDataIsSuccessful_emptyErrorArray_successful() {
+        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+        responseData.errors = new LocaleData.TxPostResponseData.Error[0];
+
+        assertThat(responseData.isSuccessful()).isTrue();
+    }
+
+    @Test
+    public void testTxPostResponseDataIsSuccessful_errors_notSuccessful() {
+        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+        responseData.errors = new LocaleData.TxPostResponseData.Error[]{new LocaleData.TxPostResponseData.Error()};
+
+        assertThat(responseData.isSuccessful()).isFalse();
+    }
+
 }
