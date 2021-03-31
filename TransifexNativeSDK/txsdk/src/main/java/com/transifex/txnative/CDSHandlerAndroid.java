@@ -14,7 +14,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 /**
- * A class that extends {@link CDSHandler} by adding an async method that uses Android's AsyncTask.
+ * A class that extends {@link CDSHandler} by adding a method that can fetch translations
+ * asynchronously.
  *
  * @see CDSHandler
  */
@@ -53,7 +54,7 @@ public class CDSHandlerAndroid extends CDSHandler {
      */
     public CDSHandlerAndroid(@Nullable String[] localeCodes, @NonNull String token, @Nullable String secret, @NonNull String csdHost) {
         super(localeCodes, token, secret, csdHost);
-        mExecutor = Executors.newCachedThreadPool();
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     /**

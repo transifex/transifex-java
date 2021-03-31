@@ -5,7 +5,9 @@ plugins {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.transifex.clitool.MainClass'
+                'Main-Class': 'com.transifex.clitool.MainClass',
+                "Implementation-Title": "Transifex command-line tool for Android",
+                "Implementation-Version": rootProject.ext.cliVersion
         )
     }
 
@@ -35,12 +37,12 @@ tasks.withType(Test) {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.1.0'
+    implementation 'androidx.annotation:annotation:1.2.0'
     implementation 'org.jdom:jdom:2.0.2'
     implementation 'info.picocli:picocli:4.6.1'
     implementation project(':common')
 
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.truth:truth:1.1'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
     testImplementation 'com.google.code.gson:gson:2.8.6'

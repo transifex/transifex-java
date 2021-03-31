@@ -82,8 +82,8 @@ public class TxNative {
      * if tags exist in the source string. If disabled, a plain String is always returned. It's
      * disabled by default.
      * <p>
-     * Enable it, if your strings contain HTML tags using "<" and ">" characters. Leave it disabled
-     * if your strings are HTML-escaped such as the following:
+     * Enable it, if your strings contain HTML tags using {@code "<"} and  {@code ">"} characters.
+     * Leave it disabled if your strings are HTML-escaped such as the following:
      * <pre>{@code
      * <resources>
      *   <string name="welcome_messages">Hello, %1$s! You have &lt;b>%2$d new messages&lt;/b>.</string>
@@ -140,7 +140,7 @@ public class TxNative {
      *
      * @return The wrapped context.
      */
-    public static Context wrap(Context context) {
+    public static Context wrap(@NonNull Context context) {
         if (sNativeCore == null) {
             Log.e(TAG, "Wrapping failed because TxNative has not been initialized yet");
             return context;
@@ -162,7 +162,7 @@ public class TxNative {
      *
      * @return The wrapped context.
      */
-    public static Context generalWrap(Context context) {
+    public static Context generalWrap(@NonNull Context context) {
         if (sNativeCore == null) {
             Log.e(TAG, "Wrapping failed because TxNative has not been initialized yet");
             return context;

@@ -3,7 +3,6 @@ package com.transifex.common;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;

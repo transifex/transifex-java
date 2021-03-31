@@ -33,12 +33,21 @@ import static picocli.CommandLine.ParentCommand;
  * The execution and argument parsing is handled by picocli. Each subcommand is implemented in its
  * own class.
  */
-@Command(name = "transifex", version = "transifex 0.1", mixinStandardHelpOptions = true,
+@Command(name = "transifex", versionProvider  = MainClass.VersionProvider.class, mixinStandardHelpOptions = true,
         subcommands = {MainClass.PushCommand.class, MainClass.ClearCommand.class,
                 MainClass.PullCommand.class, CommandLine.HelpCommand.class},
         description = "Transifex command-line tool for Android",
         synopsisSubcommandLabel = "(push | pull | clear)", sortOptions = false)
 public class MainClass {
+
+    public static class VersionProvider implements CommandLine.IVersionProvider {
+
+        @Override
+        public String[] getVersion() throws Exception {
+            // Get the version that was specified in the jar gradle task
+            return new String[]{VersionProvider.class.getPackage().getImplementationVersion()};
+        }
+    }
 
     private static final String TAG = MainClass.class.getSimpleName();
     private static final Logger LOGGER = Logger.getLogger(TAG);

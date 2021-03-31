@@ -8,7 +8,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.1'
+        classpath 'com.android.tools.build:gradle:4.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -16,10 +16,47 @@ buildscript {
     }
 }
 
+ext {
+    sdkVersionCode = 1                      // version code for txsdk
+    sdkVersion = '0.1.0'                    // version for txsdk and common
+    pomGroupID = "com.transifex.txnative"   // pom group id for txsdk and common
+
+    cliVersion = '0.1.0'                    // clitool version
+}
+
 allprojects {
     repositories {
         google()
         jcenter()
+    }
+}
+
+gradle.projectsEvaluated {
+
+    task aggregatedJavadoc(type: Javadoc, description: 'Generate javadocs from "common" and "txsdk" modules',
+            group: JavaBasePlugin.DOCUMENTATION_GROUP) {
+        options.encoding 'utf-8'
+        options {
+            addStringOption 'docencoding', 'utf-8'
+            addStringOption 'charset', 'utf-8'
+            addStringOption 'overview', 'doc/readme.html'
+            links 'https://docs.oracle.com/javase/7/docs/api/'
+            links 'https://d.android.com/reference'
+            links 'https://developer.android.com/reference/androidx/'
+        }
+        title = "Transifex Native SDK $sdkVersion"
+
+        destinationDir project.file("$project.buildDir/docs/javadoc")
+
+        Set<Project> projectSet = subprojects.findAll{ subproject ->
+            subproject.name == 'txsdk' || subproject.name == 'common'
+        }
+
+        // Merge properties of androidJavadoc tasks (which is supported by both subprojects)
+        source = projectSet.androidJavadoc.source
+        classpath = project.files(projectSet.androidJavadoc.classpath)
+        excludes = projectSet.androidJavadoc.excludes.flatten().unique()
+        includes = projectSet.androidJavadoc.includes.flatten().unique()
     }
 }
 

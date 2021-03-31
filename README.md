@@ -1,17 +1,15 @@
 # Transifex Native Android SDK
 
 [![CI](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg)](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
 using [Transifex Native](https://www.transifex.com/native/). The Android library can fetch translations 
 over the air (OTA) to your apps and the command line tool can upload your app's source strings to Transifex.
 
-The library's minimum supported SDK is `18` (Android 4.3) and uses [appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) `1.2.0`.
-
 Learn more about [Transifex Native](https://docs.transifex.com/transifex-native-sdk-overview/introduction).
 
-//TODO:
-You can find the SDK's documentation here.
+The full documentation is available at https://transifex.github.io/transifex-java/
 
 ## Usage
 
@@ -21,7 +19,16 @@ advantage of the features that Transifex Native offers, such as OTA translations
 
 ### SDK installation
 
-//TODO: write about gradle dependency
+Include the dependency:
+
+```groovy
+implementation 'com.transifex.txnative:txsdk:0.x.y'
+```
+
+Please replace `x` and `y` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
+
+
+The library's minimum supported SDK is 18 (Android 4.3) and uses [appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.2.0.
 
 ### SDK configuration 
 
@@ -185,7 +192,7 @@ return new TxFileOutputCacheDecorator(
 
 If you want to have your memory cache updated with the new translations when `fetchTranslations()` is called, you can remove the `TXReadonlyCacheDecorator`.
 
-## Sample app
+### Sample app
 
 You can see the SDK used and configured in more advanced ways in the provided sample app.
 
@@ -225,28 +232,36 @@ To use the tool on your app's Android Studio project, enter the root directory o
 #### Help
 
 `transifex`, `transifex -h`, `transifex --help`
+
 Displays a help dialog with all the options and commands.
 
 `transifex help <command>`
+
 Get help for a particular command.
 
 #### Pushing
 
 `transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`
+
 Pushes the source strings of your app found in a module named "app_module_name". The tool reads the `strings.xml` resource file found in the main source set of the specified module: `app_module_name/src/main/res/values/strings.xml`. It processes it and pushes the result to the Transifex CDS. 
 
 `transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml`
+
 If your app has a more complex string setup, you can specify one or more string resource files.
 
 `transifex clear -t <transifex_token> -s <transifex_secret>`
+
 Clears all existing resource content from CDS. This action will also remove existing localizations.
 
 #### Pulling
 
 `transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`
+
 Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the "assets" directory of the main source set of the specified app module: `app_module_name/src/main/assets/txnative`. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.
 
+
 `transifex pull -t <transifex_token> -d <directory> -l <locale>...`
+
 If you have a different setup, you can enter the path to your app's `assets` directory.
 
 ## Advanced topics

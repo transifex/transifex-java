@@ -2,4 +2,3 @@ include ':common'
 include ':clitool'
 include ':txsdk'
 include ':app'
-rootProject.name = "Transifex Application"

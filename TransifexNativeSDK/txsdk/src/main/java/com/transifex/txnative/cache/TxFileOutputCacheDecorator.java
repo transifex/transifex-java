@@ -41,7 +41,17 @@ public class TxFileOutputCacheDecorator extends TxDecoratorCache {
         this(null, dstDirectory, internalCache);
     }
 
-    // for unit tests
+
+    /**
+     * Creates a new instance with a specific directory for storing the translations to the disk
+     * and an internal cache.
+     *
+     * @param executor The executor that will run the IO operations; if <code>null</code> is
+     *                 provided, {@link Executors#newSingleThreadExecutor()} is used.
+     * @param dstDirectory  The destination directory to write the translations to when the
+     *                      {@link #update(LocaleData.TranslationMap)} is called.
+     * @param internalCache The internal cache.
+     */
     protected TxFileOutputCacheDecorator(@Nullable Executor executor, @NonNull File dstDirectory,
                                          @NonNull TxCache internalCache) {
         super(internalCache);
