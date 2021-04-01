@@ -9,7 +9,7 @@ over the air (OTA) to your apps and the command line tool can upload your app's 
 
 Learn more about [Transifex Native](https://docs.transifex.com/transifex-native-sdk-overview/introduction).
 
-The full documentation is available at https://transifex.github.io/transifex-java/
+The full documentation is available at [https://transifex.github.io/transifex-java/](https://transifex.github.io/transifex-java/)
 
 ## Usage
 
@@ -209,6 +209,8 @@ gradlew :clitool:assemble
 ```
 
 You can find the generated ".jar" file at `clitool/build/libs/transifex.jar`. You can copy it wherever you want.
+
+Alternatively you can get it pre-built from [https://github.com/transifex/transifex-java/tree/devel/Cli](https://github.com/transifex/transifex-java/tree/devel/Cli)
 
 ### Running
 
