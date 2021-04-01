@@ -46,6 +46,8 @@ task androidJavadoc(type: Javadoc) {
 task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
     archiveClassifier.set('javadoc')
     from androidJavadoc.destinationDir
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
 task javaSourcesJar(type: Jar) {
@@ -56,6 +58,8 @@ task javaSourcesJar(type: Jar) {
     else {
         from sourceSets.main.allSource
     }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
 afterEvaluate {
@@ -68,6 +72,8 @@ afterEvaluate {
                 }
                 else if (plugins.hasPlugin('java')) {
                     from components.java
+                    jar.preserveFileTimestamps = false
+                    jar.reproducibleFileOrder = true
                 }
 
                 artifact androidJavadocJar

@@ -18,6 +18,8 @@ jar {
     from {
         configurations.runtimeClasspath.filter{ it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }
 
 java {
