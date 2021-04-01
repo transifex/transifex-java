@@ -3,8 +3,8 @@
 [![CI](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg)](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml)
 
 Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
-using [Transifex Native](https://www.transifex.com/native/). The library can fetch translations 
-over the air (OTA) to your apps.
+using [Transifex Native](https://www.transifex.com/native/). The Android library can fetch translations 
+over the air (OTA) to your apps and the command line tool can upload your app's source strings to Transifex.
 
 The library's minimum supported SDK is `18` (Android 4.3) and uses [appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) `1.2.0`.
 
@@ -246,7 +246,7 @@ Clears all existing resource content from CDS. This action will also remove exis
 `transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`
 Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the "assets" directory of the main source set of the specified app module: `app_module_name/src/main/assets/txnative`. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.
 
-`transifex pull -t <transifex_token> -d <directory>`
+`transifex pull -t <transifex_token> -d <directory> -l <locale>...`
 If you have a different setup, you can enter the path to your app's `assets` directory.
 
 ## Advanced topics
@@ -267,7 +267,7 @@ Some libs may containt their own localized strings, views or activities. In such
     SomeSDK.init(getApplicationContext());
 ```
 
-Note however that if a `View` provided by the library is used inside your app's activity, `TxNative` will be used during that view's inflation (if your activity is set up correctly). In that case, any library strings will not be found in TxNative translations and the result will depend on the missing policy used. `SourceStringPolicy` will return the source string provided by the library, which will probably be in english. Using, `AndroidMissingPolicy` will return the localized string using the library's localized string resources, as expected.
+Note however that if a `View` provided by the library is used inside your app's activity, `TxNative` will be used during that view's inflation (if your activity is set up correctly). In that case, any library strings will not be found in TxNative translations and the result will depend on the missing policy used. `SourceStringPolicy` will return the source string provided by the library, which will probably be in English. Using, `AndroidMissingPolicy` will return the localized string using the library's localized string resources, as expected.
 
 ### Multiple private libraries
 
@@ -291,6 +291,14 @@ Note that if the main app starts any activity provided by the lib, string render
 1. Use TxNative as a dependency in your library.
 2. Implement TxNative in the lib's activities.
 3. Note that TxNative should not be initialized inside the lib. The main app is responsible for this.
+
+## Limitations
+
+Currently, the SDK does not support [String arrays](https://developer.android.com/guide/topics/resources/string-resource#StringArray). The command line tool will not upload them to Transifex and the SDK will not override the respective methods. String arrays presentation will work as normal using Android's localization system, which will require that you have them translated in the respective `strings.xml` files.
+
+Strings that are referenced in [menu](https://developer.android.com/guide/topics/ui/menus) layout files will not be handled by the SDK. They will use Android's localization system as normal.
+
+Even though the SDK handles the strings referenced in a [`Toolbar`](https://developer.android.com/reference/androidx/appcompat/widget/Toolbar), it won't handle strings referenced in an [`ActionBar`](https://developer.android.com/reference/android/app/ActionBar). You will have to set them programmatically (e.g. by calling [`setTitle()`](https://developer.android.com/reference/android/app/ActionBar#setTitle(java.lang.CharSequence))) to take advantage of the SDK. Otherwise, Android's localization system will be used.
 
 ## License
 Licensed under Apache License 2.0, see [LICENSE](LICENSE) file.
