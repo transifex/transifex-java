@@ -42,27 +42,27 @@ public class TxUpdateFilterCache extends TxDecoratorCache {
      * </pre>
      * Here's an example on how to read the table above:
      * <ul>
-     *     <li>given a string with <code>key="c"</code></li>
-     *     <li>and a cache that has <code>"c"</code> as the stored value for this key (<code>"c" -> "c"</code>)</li>
-     *     <li>if an empty translation arrives for this string (<code>""</code>)
+     *     <li>given a string with {@code key="c"}</li>
+     *     <li>and a cache that has {@code "c"} as the stored value for this key ({@code "c" -> "c"})</li>
+     *     <li>if an empty translation arrives for this string ({@code ""})
      *     <ul>
-     *         <li>if policy is <code>REPLACE_ALL</code>, then the cache will be updated so that
-     *         (<code>"c" -> ""</code>)</li>
-     *         <li>in contrast to that, if policy is <code>UPDATE_USING_TRANSLATED</code>, then the
-     *         cache will stay as is (<code>"c" -> "c"</code>), because the new translation is
+     *         <li>if policy is {@code REPLACE_ALL}, then the cache will be updated so that
+     *         ({@code "c" -> ""})</li>
+     *         <li>in contrast to that, if policy is {@code UPDATE_USING_TRANSLATED}, then the
+     *         cache will stay as is ({@code "c" -> "c"}), because the new translation is
      *         empty</li>
      *     </ul>
      *     </li>
      * </ul>
-     * A <code>"-"</code> value means that the respective key does not exist. For example:
+     * A {@code "-"} value means that the respective key does not exist. For example:
      * <ul>
-     *     <li>given a string with <code>key="f"</code></li>
-     *     <li>and a cache that has no entry with <code>"f"</code> as a key</li>
-     *     <li>if a translation arrives for this string (<code>"f" -> "F"</code>)
+     *     <li>given a string with {@code key="f"}</li>
+     *     <li>and a cache that has no entry with {@code "f"} as a key</li>
+     *     <li>if a translation arrives for this string ({@code "f" -> "F"})
      *     <ul>
-     *         <li>if policy is <code>REPLACE_ALL</code>, then the cache will be updated by adding a
-     *         new entry so that (<code>"f" -> "F"</code>)</li>
-     *         <li>if policy is <code>UPDATE_USING_TRANSLATED</code>, then the same will happen,
+     *         <li>if policy is {@code REPLACE_ALL}, then the cache will be updated by adding a
+     *         new entry so that ({@code "f" -> "F"})</li>
+     *         <li>if policy is {@code UPDATE_USING_TRANSLATED}, then the same will happen,
      *         since the new translation is not empty</li>
      *     </ul>
      *     </li>

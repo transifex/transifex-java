@@ -2,8 +2,6 @@ package com.transifex.txnative.cache;
 
 import com.transifex.common.LocaleData;
 
-import java.util.Set;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

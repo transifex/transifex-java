@@ -16,12 +16,11 @@ import androidx.annotation.StringRes;
  * <p>
  * Example:
  * <p>
- * <code>new WrappedStringPolicy(">>", "<<").get("Click here");</code>
+ * {@code new WrappedStringPolicy(">>", "<<").get("Click here");}
  * <p>
  * Returns:
  * <p>
- * ">>Click here<<"
- * </pre>
+ * {@code ">>Click here<<"}
  */
 public class WrappedStringPolicy implements MissingPolicy{
 

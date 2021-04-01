@@ -14,10 +14,9 @@ import androidx.annotation.StringRes;
  * <p>
  * <code>get("The quick brown fox");</code>
  * <p>
- * Returns:
+ * returns:
  * <p>
  * "Ťȟê ʠüıċǩ ƀȓøẁñ ƒøẋ"
- * </pre>
  */
 public class PseudoTranslationPolicy implements MissingPolicy {
 

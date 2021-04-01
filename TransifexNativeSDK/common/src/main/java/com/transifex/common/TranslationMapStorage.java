@@ -23,7 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * A class that allows storing and loading a {@link LocaleData.TranslationMap} to / from disk.
+ * A class that allows storing and loading a {@link LocaleData.TranslationMap} to/from disk.
  * <p>
  * The {@link LocaleData.TranslationMap} is represented in disk in the following format:
  * <pre>{@code
