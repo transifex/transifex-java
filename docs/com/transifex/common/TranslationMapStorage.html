@@ -352,9 +352,9 @@ extends <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Object.html
 <h4>toDisk</h4>
 <pre><a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
 public&nbsp;<a href="https://docs.oracle.com/javase/7/docs/api/java/util/HashMap.html?is-external=true" title="class or interface in java.util">HashMap</a>&lt;<a href="https://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>,<a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&gt;&nbsp;toDisk(<a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
-                                             <a href="../../../com/transifex/common/LocaleData.TranslationMap.html" title="class in com.transifex.common">LocaleData.TranslationMap</a>&nbsp;translationMap,
-                                             <a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
-                                             <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;dstDirectory)</pre>
+                                            <a href="../../../com/transifex/common/LocaleData.TranslationMap.html" title="class in com.transifex.common">LocaleData.TranslationMap</a>&nbsp;translationMap,
+                                            <a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
+                                            <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;dstDirectory)</pre>
 <div class="block">Saves the provided translation map to the provided destination directory.
  <p>
  The method is synchronous and returns a map where each locale points to a translation file.
@@ -383,7 +383,7 @@ public&nbsp;<a href="https://docs.oracle.com/javase/7/docs/api/java/util/HashMap
 <h4>fromDisk</h4>
 <pre><a href="https://developer.android.com/reference/androidx/androidx/annotation/Nullable.html?is-external=true" title="class or interface in androidx.annotation">@Nullable</a>
 public&nbsp;<a href="../../../com/transifex/common/LocaleData.TranslationMap.html" title="class in com.transifex.common">LocaleData.TranslationMap</a>&nbsp;fromDisk(<a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
-                                                     <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;srcDirectory)</pre>
+                                                    <a href="https://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;srcDirectory)</pre>
 <div class="block">Loads a <a href="../../../com/transifex/common/LocaleData.TranslationMap.html" title="class in com.transifex.common"><code>LocaleData.TranslationMap</code></a> from the provided source directory.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -402,9 +402,9 @@ public&nbsp;<a href="../../../com/transifex/common/LocaleData.TranslationMap.htm
 <h4>fromDisk</h4>
 <pre><a href="https://developer.android.com/reference/androidx/androidx/annotation/Nullable.html?is-external=true" title="class or interface in androidx.annotation">@Nullable</a>
 protected&nbsp;<a href="../../../com/transifex/common/LocaleData.TranslationMap.html" title="class in com.transifex.common">LocaleData.TranslationMap</a>&nbsp;fromDisk(<a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
-                                                        <a href="../../../com/transifex/common/TranslationMapStorage.AbstractFileProvider.html" title="interface in com.transifex.common">TranslationMapStorage.AbstractFileProvider</a>&nbsp;fileProvider,
-                                                        <a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
-                                                        <a href="../../../com/transifex/common/TranslationMapStorage.AbstractFile.html" title="interface in com.transifex.common">TranslationMapStorage.AbstractFile</a>&nbsp;srcDirectory)</pre>
+                                                       <a href="../../../com/transifex/common/TranslationMapStorage.AbstractFileProvider.html" title="interface in com.transifex.common">TranslationMapStorage.AbstractFileProvider</a>&nbsp;fileProvider,
+                                                       <a href="https://developer.android.com/reference/androidx/androidx/annotation/NonNull.html?is-external=true" title="class or interface in androidx.annotation">@NonNull</a>
+                                                       <a href="../../../com/transifex/common/TranslationMapStorage.AbstractFile.html" title="interface in com.transifex.common">TranslationMapStorage.AbstractFile</a>&nbsp;srcDirectory)</pre>
 <div class="block">Loads a <a href="../../../com/transifex/common/LocaleData.TranslationMap.html" title="class in com.transifex.common"><code>LocaleData.TranslationMap</code></a> from the provided source directory.
  <p>
  This is a more general version of <a href="../../../com/transifex/common/TranslationMapStorage.html#fromDisk-java.io.File-"><code>fromDisk(File)</code></a>, which can use different file
