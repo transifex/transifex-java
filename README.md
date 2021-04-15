@@ -208,9 +208,9 @@ To build the tool, enter the `TransifexNativeSDK` directory and run from the com
 gradlew :clitool:assemble
 ```
 
-You can find the generated ".jar" file at `clitool/build/libs/transifex.jar`. You can copy it wherever you want.
+You will find the built `.jar` file at `clitool/build/libs/transifex.jar`. You can copy it wherever you want.
 
-Alternatively you can get it pre-built from [https://github.com/transifex/transifex-java/tree/devel/Cli](https://github.com/transifex/transifex-java/tree/devel/Cli)
+Alternatively you can get it pre-built from the [release page](https://github.com/transifex/transifex-java/releases).
 
 ### Running
 
