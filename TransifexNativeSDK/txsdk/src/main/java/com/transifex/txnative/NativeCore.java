@@ -20,7 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
-import androidx.core.text.HtmlCompat;
+
+import static android.text.Html.FROM_HTML_MODE_LEGACY;
 
 /**
  * The main class of the framework, responsible for orchestrating all functionality.
@@ -353,7 +354,7 @@ public class NativeCore {
     @NonNull CharSequence getSpannedString(@NonNull String string) {
         if (mSupportSpannableEnabled) {
             // If a span was found, return a "Spanned" object. Otherwise, return "String".
-            Spanned spanned = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
+            Spanned spanned = Utils.fromHtml(string, FROM_HTML_MODE_LEGACY);
             if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
                 return new SpannedString(spanned);
             }

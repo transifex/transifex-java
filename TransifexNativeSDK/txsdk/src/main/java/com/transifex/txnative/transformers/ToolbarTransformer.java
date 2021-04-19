@@ -24,7 +24,10 @@ public class ToolbarTransformer extends ViewTransformer {
         CharSequence xa = toolbar.getTitle();
 
         int titleResourceId = Utils.getStringResourceId(context, attrs, android.R.attr.title);
-        int titleCompatResourceId = Utils.getStringResourceId(context, attrs, androidx.appcompat.R.attr.title);
+        int titleCompatResourceId = 0;
+        if (Utils.isAppcompatPresent()) {
+            titleCompatResourceId = Utils.getStringResourceId(context, attrs, androidx.appcompat.R.attr.title);
+        }
         if (titleResourceId != 0) {
             toolbar.setTitle(titleResourceId);
         }
@@ -34,7 +37,10 @@ public class ToolbarTransformer extends ViewTransformer {
 
 
         int subtitleResourceId = Utils.getStringResourceId(context, attrs, android.R.attr.subtitle);
-        int subtitleCompatResourceId = Utils.getStringResourceId(context, attrs, androidx.appcompat.R.attr.subtitle);
+        int subtitleCompatResourceId = 0;
+        if (Utils.isAppcompatPresent()) {
+            subtitleCompatResourceId = Utils.getStringResourceId(context, attrs, androidx.appcompat.R.attr.subtitle);
+        }
         if (subtitleResourceId != 0) {
             toolbar.setSubtitle(subtitleResourceId);
         }

@@ -28,7 +28,9 @@ implementation 'com.transifex.txnative:txsdk:0.x.y'
 Please replace `x` and `y` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
-The library's minimum supported SDK is 18 (Android 4.3) and uses [appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.2.0.
+The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.2.0. 
+
+The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat 1.2.0.
 
 ### SDK configuration 
 
@@ -64,7 +66,7 @@ The language codes supported by Transifex can be found [here](https://www.transi
 
 In this example, the SDK uses its default cache, `TxStandardCache`, and missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
 
-If you want to enable [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html) starting from Android N, place the supported app languages in your app's gradle file:
+Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, it suffices to place the supported app languages in your app’s gradle file:
 
 ```gradle
 android {
@@ -75,6 +77,17 @@ android {
 
     }
 ```
+
+If your app doesn't use `Appcompat`, you should define a dummy string in your default, unlocalized `strings.xml` file and place a `strings.xml` file for each supported locale and define the same string there. For example:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dummy">dummy</string>
+</resources>
+```
+
+This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don't do that, Android will always pick the first locale selected by the user.
 
 ### Context Wrapping 
 
@@ -194,7 +207,7 @@ If you want to have your memory cache updated with the new translations when `fe
 
 ### Sample app
 
-You can see the SDK used and configured in more advanced ways in the provided sample app.
+You can see the SDK used and configured in more advanced ways in the provided sample app of this repo. You can also check out a simpler app at the [Transifex Native repo](https://github.com/transifex/transifex-native-sandbox).
 
 ## Transifex Command Line Tool
 
@@ -270,7 +283,7 @@ If you have a different setup, you can enter the path to your app's `assets` dir
 
 ### Disable TxNative for specific strings
 
-There are cases where you don't want TxNative to interfere with string loading. For example, many apps have API keys or some configuration saved in non-translatable strings in their `strings.xml` file. A method like `getString()` is used to retreive the strings. If you are using the SDK's default missing policy, `SourceStringPolicy`, the expected string will be returned. If, however, you are using some other policy, the string may be altered and your app will not behave as expected. In such a case, make sure that you are using a non-wrapped context when loading such a string:
+There are cases where you don't want TxNative to interfere with string loading. For example, many apps have API keys or some configuration saved in non-translatable strings in their `strings.xml` file. A method like `getString()` is used to retrieve the strings. If you are using the SDK's default missing policy, `SourceStringPolicy`, the expected string will be returned. If, however, you are using some other policy, the string may be altered and your app will not behave as expected. In such a case, make sure that you are using a non-wrapped context when loading such a string:
 
 ```java
     getApplicationContext().getString(<string_ID>);
@@ -278,7 +291,7 @@ There are cases where you don't want TxNative to interfere with string loading. 
 
 ### TxNative and 3rd party libraries
 
-Some libs may containt their own localized strings, views or activities. In such as case, you don't want TxNative to interfere with string loading. To accomplish that, make sure that you pass a non-wrapped context to the library's initialization method:
+Some libs may contain their own localized strings, views or activities. In such as case, you don't want TxNative to interfere with string loading. To accomplish that, make sure that you pass a non-wrapped context to the library's initialization method:
 
 ```java
     SomeSDK.init(getApplicationContext());

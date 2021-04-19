@@ -14,6 +14,7 @@ task androidJavadoc(type: Javadoc) {
     else {
         source = sourceSets.main.allJava
         classpath += configurations.runtimeClasspath
+        classpath += configurations.compileClasspath
     }
     exclude '**/R.html', '**/R.*.html', '**/index.html', '**/*.kt'
     options.encoding 'utf-8'

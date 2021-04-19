@@ -34,20 +34,29 @@ tasks.withType(Test) {
     systemProperty "file.encoding", "UTF-8"
 }
 
+configurations.all  {
+    resolutionStrategy {
+        force "androidx.annotation:annotation:$versions.androidXAnnotation"
+    }
+}
+
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
+    compileOnly 'androidx.appcompat:appcompat:1.2.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation 'io.github.inflationx:viewpump:2.0.3'
     api project(':common')
 
-    testImplementation 'junit:junit:4.13.1'
+    testCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
+    testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.truth:truth:1.1'
     testImplementation 'androidx.test:core:1.3.0'
     testImplementation 'org.robolectric:robolectric:4.4'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
     testImplementation 'org.mockito:mockito-core:3.8.0'
 
+    androidTestCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     androidTestImplementation 'com.google.truth:truth:1.1'

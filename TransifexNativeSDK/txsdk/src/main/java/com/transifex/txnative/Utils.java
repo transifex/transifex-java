@@ -5,13 +5,11 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.AttributeSet;
 import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Locale;
 
 import androidx.annotation.AttrRes;
@@ -21,6 +19,12 @@ import androidx.annotation.StringRes;
 public class Utils {
 
     private static final String TAG = Utils.class.getSimpleName();
+
+    private static final boolean sIsAppcompatPresent;
+
+    static {
+        sIsAppcompatPresent = isClassPresent("androidx.appcompat.widget.Toolbar");
+    }
 
     /**
      * Returns the string resource id that this attributeId is resolving to under the provided
@@ -125,5 +129,39 @@ public class Utils {
 
     public static boolean equals(Object a, Object b) {
         return (a == b) || (a != null && a.equals(b));
+    }
+
+    /**
+     * Invokes {@link Html#fromHtml(String, int)} on API 24 and newer, otherwise {@code flags} are
+     * ignored and {@link Html#fromHtml(String)} is used.
+     */
+    @SuppressWarnings("deprecation")
+    @NonNull
+    public static Spanned fromHtml(@NonNull String source, int flags) {
+        // taken from androidx.core.text
+        if (Build.VERSION.SDK_INT >= 24) {
+            return Html.fromHtml(source, flags);
+        }
+        return Html.fromHtml(source);
+    }
+
+    /**
+     * Checks, using reflection, if the provided class is available at runtime.
+     */
+    public static boolean isClassPresent(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (Throwable ex) {
+            // Class or one of its dependencies is not present...
+            return false;
+        }
+    }
+
+    /**
+     * Checks if <code>Androidx.appcompat</code> classes are available at runtime.
+     */
+    public static boolean isAppcompatPresent() {
+        return sIsAppcompatPresent;
     }
 }

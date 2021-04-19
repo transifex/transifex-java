@@ -18,9 +18,9 @@ import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
 
-import androidx.core.text.HtmlCompat;
 import androidx.test.core.app.ApplicationProvider;
 
+import static android.text.Html.FROM_HTML_MODE_LEGACY;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
@@ -246,7 +246,7 @@ public class NativeCoreTest {
 
         assertThat(string).isInstanceOf(String.class);
 
-        string = HtmlCompat.fromHtml(string.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+        string = Utils.fromHtml(string.toString(), FROM_HTML_MODE_LEGACY);
 
         CharSequence styledPart = null;
 
@@ -298,7 +298,7 @@ public class NativeCoreTest {
 
         assertThat(string).isInstanceOf(String.class);
 
-        string = HtmlCompat.fromHtml(string.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+        string = Utils.fromHtml(string.toString(), FROM_HTML_MODE_LEGACY);
 
         CharSequence styledPart = null;
 
@@ -332,7 +332,7 @@ public class NativeCoreTest {
 
         assertThat(string).isInstanceOf(String.class);
 
-        string = HtmlCompat.fromHtml(string.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY);
+        string = Utils.fromHtml(string.toString(), FROM_HTML_MODE_LEGACY);
 
         CharSequence styledPart = null;
 
