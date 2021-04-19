@@ -5,13 +5,14 @@ import android.text.Spanned;
 import android.text.SpannedString;
 import android.text.style.StyleSpan;
 
+import com.transifex.txnative.Utils;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
-import androidx.core.text.HtmlCompat;
-
+import static android.text.Html.FROM_HTML_MODE_LEGACY;
 import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(RobolectricTestRunner.class)
@@ -72,7 +73,7 @@ public class WrappedStringPolicyTest {
         // Test that a spanned source string keeps its spans after being processed
 
         WrappedStringPolicy policy = new WrappedStringPolicy("start! ", " !end");
-        CharSequence sourceString = HtmlCompat.fromHtml("The quick <b>brown</b> fox", HtmlCompat.FROM_HTML_MODE_LEGACY);
+        CharSequence sourceString = Utils.fromHtml("The quick <b>brown</b> fox", FROM_HTML_MODE_LEGACY);
         CharSequence translated = policy.wrapString(sourceString);
 
         assertThat(translated).isInstanceOf(Spanned.class);

@@ -59,7 +59,7 @@ class TxInterceptor implements Interceptor {
             if (view instanceof TextView) {
                 mTextViewTransformer.transform(context, view, attrs);
             }
-            else if (view instanceof androidx.appcompat.widget.Toolbar) {
+            else if (Utils.isAppcompatPresent() && view instanceof androidx.appcompat.widget.Toolbar) {
                 mSupportToolbarTransformer.transform(context, view, attrs);
             }
             else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && view instanceof Toolbar) {
