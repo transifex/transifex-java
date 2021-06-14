@@ -400,6 +400,8 @@ public class CDSHandler {
             connection.addRequestProperty("Authorization", "Bearer " + mToken);
         }
 
+        connection.addRequestProperty("x-native-sdk", "mobile/android/" + BuildProperties.getSDKVersion());
+
         if (etag != null) {
             connection.addRequestProperty("If-None-Match", etag);
         }

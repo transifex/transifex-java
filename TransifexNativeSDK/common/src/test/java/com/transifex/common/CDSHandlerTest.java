@@ -274,6 +274,7 @@ public class CDSHandlerTest {
         assertThat(recordedRequest.getMethod()).isEqualTo("GET");
         assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
         assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+        assertThat(recordedRequest.getHeader("x-native-sdk")).isEqualTo("mobile/android/" + BuildProperties.getSDKVersion());
     }
 
     @Test
@@ -327,6 +328,7 @@ public class CDSHandlerTest {
         assertThat(recordedRequest.getMethod()).isEqualTo("GET");
         assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
         assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+        assertThat(recordedRequest.getHeader("x-native-sdk")).isEqualTo("mobile/android/" + BuildProperties.getSDKVersion());
     }
 
     @Test
@@ -357,6 +359,7 @@ public class CDSHandlerTest {
         assertThat(recordedRequest.getMethod()).isEqualTo("GET");
         assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
         assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+        assertThat(recordedRequest.getHeader("x-native-sdk")).isEqualTo("mobile/android/" + BuildProperties.getSDKVersion());
 
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el", "es");
@@ -489,6 +492,7 @@ public class CDSHandlerTest {
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
         assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token:secret");
         assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
+        assertThat(recordedRequest.getHeader("x-native-sdk")).isEqualTo("mobile/android/" + BuildProperties.getSDKVersion());
 
         String postBody = recordedRequest.getBody().readUtf8();
         Gson gson = new Gson();

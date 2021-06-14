@@ -1,5 +1,6 @@
 package com.transifex.clitool;
 
+import com.transifex.common.BuildProperties;
 import com.transifex.common.CDSHandler;
 import com.transifex.common.LocaleData;
 import com.transifex.common.TranslationMapStorage;
@@ -43,9 +44,8 @@ public class MainClass {
     public static class VersionProvider implements CommandLine.IVersionProvider {
 
         @Override
-        public String[] getVersion() throws Exception {
-            // Get the version that was specified in the jar gradle task
-            return new String[]{VersionProvider.class.getPackage().getImplementationVersion()};
+        public String[] getVersion() {
+            return new String[]{BuildProperties.getCLIVersion()};
         }
     }
 

@@ -80,7 +80,7 @@ android {
 
 If your app doesn't use `Appcompat`, you should define a dummy string in your default, unlocalized `strings.xml` file and place a `strings.xml` file for each supported locale and define the same string there. For example:
 
-```
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="dummy">dummy</string>
@@ -188,7 +188,7 @@ The SDK allows you to implement your own cache from scratch by implementing the 
 
 In order to achieve that, you can create a a method that returns a `TxCache` instance, just like in the `TxStandardCache.getCache()` case. For example, the standard cache is created as follows:
 
-```
+```java
 return new TxFileOutputCacheDecorator(
                 <cached Translations Directory>,
                 new TXReadonlyCacheDecorator(
