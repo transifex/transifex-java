@@ -27,4 +27,20 @@ dependencies {
     testImplementation 'commons-io:commons-io:2.6'
 }
 
+// Generate a BuildProperties Java class
+task generateJava {
+    ext.outputDir = "$buildDir/generated/java"
+    doLast {
+        mkdir "$outputDir/com/transifex/common"
+        file("$outputDir/com/transifex/common/BuildProperties.java").text =
+                """|package com.transifex.common;
+               |public class BuildProperties {
+               |    public static String getSDKVersion() { return "${rootProject.ext.sdkVersion}"; }
+               |    public static String getCLIVersion() { return "${rootProject.ext.cliVersion}"; }
+               |}""".stripMargin()
+    }
+}
+compileJava.dependsOn generateJava
+sourceSets.main.java.srcDir generateJava.outputDir
+
 apply from: '../publish-helper.gradle'
