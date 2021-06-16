@@ -145,8 +145,8 @@ public class MainClassTest {
 
         server.setDispatcher(getPostDispatcher());
 
-        String args = String.format("-u %s push -t token -s secret -f %s", baseUrl,
-                "../txsdk/src/test/res/values/strings.xml");
+        String args = String.format("-u %s push -t token -s secret -f %s -a %s -a %s", baseUrl,
+                "../txsdk/src/test/res/values/strings.xml", "some_tag", "another_tag");
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);
@@ -164,6 +164,11 @@ public class MainClassTest {
         assertThat(parsedPostData.data.keySet()).containsExactly("tx_test_key", "tx_plural_test_key").inOrder();
         assertThat(parsedPostData.data.get("tx_test_key").string).isEqualTo("test");
         assertThat(parsedPostData.data.get("tx_plural_test_key").string).isEqualTo("{cnt, plural, one {car} two {car 2} other {cars}}");
+
+        // Check appended tags
+        assertThat(parsedPostData.data.get("tx_test_key").meta.tags).isNotNull();
+        assertThat(parsedPostData.data.get("tx_test_key").meta.tags).containsExactly("some_tag", "another_tag");
+        assertThat(parsedPostData.data.get("tx_plural_test_key").meta.tags).containsExactly("some_tag", "another_tag");
     }
 
     @Test
