@@ -116,6 +116,11 @@ public class MainClass {
             File[] files;
         }
 
+        @Option(names = {"-a", "--append-tags"}, arity = "0..",
+                description = "Append custom tags to the pushed source strings.",
+                paramLabel = "<tag>")
+        String[] tags;
+
         @Option(names = {"-p", "--purge"},
                 description = "If set, the entire resource content is replaced by the pushed content " +
                         "of this request. Otherwise, source content of this request is appended to " +
@@ -162,6 +167,13 @@ public class MainClass {
                 } catch (Exception e) {
                     System.out.println("Error parsing string file: " + e.getMessage());
                     return 1;
+                }
+            }
+
+            // Append custom tags
+            if (tags != null && tags.length != 0) {
+                for (LocaleData.StringInfo stringInfo : sourceStringMap.values()) {
+                    stringInfo.appendTags(tags);
                 }
             }
 

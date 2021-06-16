@@ -2,7 +2,9 @@ package com.transifex.common;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -47,6 +49,13 @@ public class LocaleDataTest {
         LocaleData.StringInfo a2 = new LocaleData.StringInfo("a");
 
         assertThat(a.hashCode()).isEqualTo(a2.hashCode());
+
+        // Meta should not affect the hash code
+        LocaleData.StringInfo.Meta meta = new LocaleData.StringInfo.Meta();
+        meta.tags = new HashSet<>(Arrays.asList("tag1", "tag2"));
+        LocaleData.StringInfo c = new LocaleData.StringInfo("a", meta);
+
+        assertThat(c.hashCode()).isEqualTo(a.hashCode());
     }
 
     @Test
@@ -57,6 +66,27 @@ public class LocaleDataTest {
 
         assertThat(a).isEqualTo(a2);
         assertThat(a).isNotEqualTo(b);
+
+        LocaleData.StringInfo.Meta meta = new LocaleData.StringInfo.Meta();
+        meta.tags = new HashSet<>(Arrays.asList("tag1", "tag2"));
+        LocaleData.StringInfo c = new LocaleData.StringInfo("a", meta);
+        LocaleData.StringInfo c2 = new LocaleData.StringInfo("a", meta);
+
+        assertThat(c).isEqualTo(c2);
+        assertThat(c).isNotEqualTo(a);
+    }
+
+    @Test
+    public void testStringInfoAppendTags() {
+        LocaleData.StringInfo a = new LocaleData.StringInfo("a");
+        a.appendTags(new String[]{"tag1", "tag2"});
+
+        assertThat(a.meta).isNotNull();
+        assertThat(a.meta.tags).containsExactly("tag1", "tag2");
+
+        // Check that new tags are added and that each tag is listed once
+        a.appendTags(new String[]{"tag2", "tag3"});
+        assertThat(a.meta.tags).containsExactly("tag1", "tag2", "tag3");
     }
 
     @Test

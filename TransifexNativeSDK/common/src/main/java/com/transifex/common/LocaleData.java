@@ -2,8 +2,10 @@ package com.transifex.common;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,12 +28,64 @@ public class LocaleData {
             this.string = string;
         }
 
+        public StringInfo(@NonNull String string, @Nullable Meta meta) {
+            this.string = string;
+            this.meta = meta;
+        }
+
         public final String string;
+
+        public static class Meta {
+            public Set<String> tags;
+
+            @Override
+            @NonNull
+            public String toString() {
+                return "{tags=" + tags + "}";
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                if (this == o) return true;
+                if (o == null || getClass() != o.getClass()) return false;
+
+                Meta meta = (Meta) o;
+
+                return tags != null ? tags.equals(meta.tags) : meta.tags == null;
+            }
+
+            @Override
+            public int hashCode() {
+                return tags != null ? tags.hashCode() : 0;
+            }
+        }
+
+        public Meta meta;
+
+        public void appendTags(@NonNull String[] tags) {
+            if (tags == null || tags.length == 0) {
+                return;
+            }
+            if (meta == null) {
+                meta = new Meta();
+            }
+            if (meta.tags == null) {
+                meta.tags = new LinkedHashSet<>(Arrays.asList(tags));
+            }
+            else {
+                meta.tags.addAll(Arrays.asList(tags));
+            }
+        }
 
         @Override
         @NonNull
         public String toString() {
-            return "{" + "string='" + string + '\'' + '}';
+            if (meta == null) {
+                return "{" + "string='" + string + '\'' + '}';
+            }
+            else {
+                return "{" + "string='" + string + '\'' + ", meta=" + meta + '}';
+            }
         }
 
         @Override
@@ -39,13 +93,16 @@ public class LocaleData {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             StringInfo that = (StringInfo) o;
-            return (string == that.string) || (string != null && string.equals(that.string));
+
+            if (string != null ? !string.equals(that.string) : that.string != null) return false;
+            return meta != null ? meta.equals(that.meta) : that.meta == null;
         }
 
         @Override
         public int hashCode() {
             if (string == null)
                 return 0;
+            // We don't care about meta
             return string.hashCode();
         }
     }
