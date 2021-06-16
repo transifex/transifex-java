@@ -58,6 +58,48 @@ public class NativeCoreTest {
         return memoryCache;
     }
 
+    private TxMemoryCache getEnElMemoryCache() {
+        HashMap<String, LocaleData.StringInfo> dic1 = new HashMap<>();
+        dic1.put("tx_test_key", new LocaleData.StringInfo("test updated"));
+        dic1.put("tx_plural_test_key", new LocaleData.StringInfo("{cnt, plural, one {car updated} other {cars updated} two {car 2 updated}}"));
+        LocaleData.LocaleStrings enStrings = new LocaleData.LocaleStrings(dic1);
+
+        HashMap<String, LocaleData.StringInfo> dic2 = new HashMap<>();
+        dic2.put("tx_test_key", new LocaleData.StringInfo("test ελ tx"));
+        dic2.put("tx_plural_test_key", new LocaleData.StringInfo("{cnt, plural, one {αυτοκίνητο tx} other {αυτοκίνητα tx}}"));
+        LocaleData.LocaleStrings elStrings = new LocaleData.LocaleStrings(dic2);
+
+        LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(2);
+        translationMap.put("en", enStrings);
+        translationMap.put("el", elStrings);
+
+        TxMemoryCache memoryCache = new TxMemoryCache();
+        memoryCache.update(translationMap);
+
+        return memoryCache;
+    }
+
+    private TxMemoryCache getSLElMemoryCache() {
+        HashMap<String, LocaleData.StringInfo> dic1 = new HashMap<>();
+        dic1.put("tx_test_key", new LocaleData.StringInfo("test updated"));
+        dic1.put("tx_plural_test_key", new LocaleData.StringInfo("{cnt, plural, one {car updated} other {cars updated} two {car 2 updated}}"));
+        LocaleData.LocaleStrings slStrings = new LocaleData.LocaleStrings(dic1);
+
+        HashMap<String, LocaleData.StringInfo> dic2 = new HashMap<>();
+        dic2.put("tx_test_key", new LocaleData.StringInfo("test ελ tx"));
+        dic2.put("tx_plural_test_key", new LocaleData.StringInfo("{cnt, plural, one {αυτοκίνητο tx} other {αυτοκίνητα tx}}"));
+        LocaleData.LocaleStrings elStrings = new LocaleData.LocaleStrings(dic2);
+
+        LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(2);
+        translationMap.put("sl", slStrings);
+        translationMap.put("el", elStrings);
+
+        TxMemoryCache memoryCache = new TxMemoryCache();
+        memoryCache.update(translationMap);
+
+        return memoryCache;
+    }
+
     private TxMemoryCache getEmptyMemoryCache() {
         LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(2);
 
@@ -95,6 +137,23 @@ public class NativeCoreTest {
     }
 
     @Test
+    @Config(qualifiers = "en")
+    public void testTranslate_androidUsesSourceLocale_sourceStringsProvided_returnSourceStringFromCache() {
+        LocaleState localeState = new LocaleState(mockContext,
+                "en",
+                new String[]{"en", "el"},
+                null);
+        TxMemoryCache memoryCache = getEnElMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+
+        CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
+
+        // We expect to get the source string from the cache, not from strings.xml
+        assertThat(string).isEqualTo("test updated");
+    }
+
+    @Test
     @Config(qualifiers = "el-rGR")
     public void testTranslate_androidUsesSupportedLocale() {
         LocaleState localeState = new LocaleState(mockContext,
@@ -124,6 +183,22 @@ public class NativeCoreTest {
         CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
 
         assertThat(string).isEqualTo("test");
+    }
+
+    @Test
+    @Config(qualifiers = "es-rES")
+    public void testTranslateWithDefaultMissingPolicy_androidUsesUnsupportedLocale_sourceStringsProvided_returnSourceStringFromCache() {
+        LocaleState localeState = new LocaleState(mockContext,
+                "en",
+                new String[]{"en", "el"},
+                null);
+        TxMemoryCache memoryCache = getEnElMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+
+        CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
+
+        assertThat(string).isEqualTo("test updated");
     }
 
     @Test
@@ -351,26 +426,20 @@ public class NativeCoreTest {
 
     // endregion spanned string
 
-    // region translate quantity string
+    // region get localized quantity string
 
     @Test
     @Config(qualifiers = "en")
     public void testGetLocalizedQuantityString_androidUsesEN() {
         // https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html#en
 
-        LocaleState localeState = new LocaleState(mockContext,
-                "en",
-                new String[]{"en", "el"},
-                null);
-        TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
-        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+        Resources resources = mockContext.getResources();
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 20);
+        String quantityStringForZero = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 0);
+        String quantityStringForOne = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 1);
+        String quantityStringForTwo = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 2);
+        String quantityStringForThree = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 3);
+        String quantityStringForALot = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 20);
 
         assertThat(quantityStringForZero).isEqualTo("others!");
         assertThat(quantityStringForOne).isEqualTo("this is one");
@@ -384,19 +453,13 @@ public class NativeCoreTest {
     public void testGetLocalizedQuantityString_androidUsesSL() {
         // https://unicode-org.github.io/cldr-staging/charts/37/supplemental/language_plural_rules.html#sl
 
-        LocaleState localeState = new LocaleState(mockContext,
-                "en",
-                new String[]{"en", "el"},
-                null);
-        TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
-        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+        Resources resources = mockContext.getResources();
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING, 20);
+        String quantityStringForZero = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 0);
+        String quantityStringForOne = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 1);
+        String quantityStringForTwo = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 2);
+        String quantityStringForThree = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 3);
+        String quantityStringForALot = NativeCore.getLocalizedQuantityString(resources, ICU_STRING, 20);
 
         assertThat(quantityStringForZero).isEqualTo("others!");
         assertThat(quantityStringForOne).isEqualTo("this is one");
@@ -413,19 +476,13 @@ public class NativeCoreTest {
         // In this test, the ICU does not have "TWO" and "FEW" plurals. We expect the "OTHERS" plural
         // to be used as fallback
 
-        LocaleState localeState = new LocaleState(mockContext,
-                "en",
-                new String[]{"en", "el"},
-                null);
-        TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
-        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+        Resources resources = mockContext.getResources();
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_SIMPLE, 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_SIMPLE, 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_SIMPLE, 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_SIMPLE, 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_SIMPLE, 20);
+        String quantityStringForZero = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_SIMPLE, 0);
+        String quantityStringForOne = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_SIMPLE, 1);
+        String quantityStringForTwo = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_SIMPLE, 2);
+        String quantityStringForThree = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_SIMPLE, 3);
+        String quantityStringForALot = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_SIMPLE, 20);
 
         assertThat(quantityStringForZero).isEqualTo("others!");
         assertThat(quantityStringForOne).isEqualTo("this is one");
@@ -442,19 +499,13 @@ public class NativeCoreTest {
         // In this test, the ICU only has the "ONE" plural. Since the "OTHERS" plural does not exist,
         // we expect "null" to be returned for any given quantity.
 
-        LocaleState localeState = new LocaleState(mockContext,
-                "en",
-                new String[]{"en", "el"},
-                null);
-        TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
-        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+        Resources resources = mockContext.getResources();
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_OTHER_NOT_SPECIFIED, 20);
+        String quantityStringForZero = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_OTHER_NOT_SPECIFIED, 0);
+        String quantityStringForOne = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_OTHER_NOT_SPECIFIED, 1);
+        String quantityStringForTwo = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_OTHER_NOT_SPECIFIED, 2);
+        String quantityStringForThree = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_OTHER_NOT_SPECIFIED, 3);
+        String quantityStringForALot = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_OTHER_NOT_SPECIFIED, 20);
 
         assertThat(quantityStringForZero).isNull();
         assertThat(quantityStringForOne).isNull();
@@ -466,19 +517,13 @@ public class NativeCoreTest {
     @Test
     @Config(qualifiers = "en")
     public void testGetLocalizedQuantityString_ICUStringWithOtherNotSpecified_returnNull() {
-        LocaleState localeState = new LocaleState(mockContext,
-                "en",
-                new String[]{"en", "el"},
-                null);
-        TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
-        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+        Resources resources = mockContext.getResources();
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_EMPTY, 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_EMPTY, 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_EMPTY, 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_EMPTY, 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, ICU_STRING_EMPTY, 20);
+        String quantityStringForZero = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_EMPTY, 0);
+        String quantityStringForOne = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_EMPTY, 1);
+        String quantityStringForTwo = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_EMPTY, 2);
+        String quantityStringForThree = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_EMPTY, 3);
+        String quantityStringForALot = NativeCore.getLocalizedQuantityString(resources, ICU_STRING_EMPTY, 20);
 
         assertThat(quantityStringForZero).isNull();
         assertThat(quantityStringForOne).isNull();
@@ -490,19 +535,13 @@ public class NativeCoreTest {
     @Test
     @Config(qualifiers = "en")
     public void testGetLocalizedQuantityString_ICUStringIsEmpty_returnNull() {
-        LocaleState localeState = new LocaleState(mockContext,
-                "en",
-                new String[]{"en", "el"},
-                null);
-        TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
-        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+        Resources resources = mockContext.getResources();
 
-        String quantityStringForZero = nativeCore.getLocalizedQuantityString(txResources, "", 0);
-        String quantityStringForOne = nativeCore.getLocalizedQuantityString(txResources, "", 1);
-        String quantityStringForTwo = nativeCore.getLocalizedQuantityString(txResources, "", 2);
-        String quantityStringForThree = nativeCore.getLocalizedQuantityString(txResources, "", 3);
-        String quantityStringForALot = nativeCore.getLocalizedQuantityString(txResources, "", 20);
+        String quantityStringForZero = NativeCore.getLocalizedQuantityString(resources, "", 0);
+        String quantityStringForOne = NativeCore.getLocalizedQuantityString(resources, "", 1);
+        String quantityStringForTwo = NativeCore.getLocalizedQuantityString(resources, "", 2);
+        String quantityStringForThree = NativeCore.getLocalizedQuantityString(resources, "", 3);
+        String quantityStringForALot = NativeCore.getLocalizedQuantityString(resources, "", 20);
 
         assertThat(quantityStringForZero).isNull();
         assertThat(quantityStringForOne).isNull();
@@ -510,6 +549,10 @@ public class NativeCoreTest {
         assertThat(quantityStringForThree).isNull();
         assertThat(quantityStringForALot).isNull();
     }
+
+    // endregion get localized quantity string
+
+    // region translate quantity string
 
     @Test
     @Config(qualifiers = "en")
@@ -527,6 +570,24 @@ public class NativeCoreTest {
 
         assertThat(stringOne).isEqualTo("car");
         assertThat(stringTwo).isEqualTo("cars");
+    }
+
+    @Test
+    @Config(qualifiers = "en")
+    public void testTranslateQuantityString_androidUsesSourceLocale_sourceStringsProvided_returnSourceStringFromCache() {
+        LocaleState localeState = new LocaleState(mockContext,
+                "en",
+                new String[]{"en", "el"},
+                null);
+        TxMemoryCache memoryCache = getEnElMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+
+        CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
+        CharSequence stringTwo = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 2);
+
+        assertThat(stringOne).isEqualTo("car updated");
+        assertThat(stringTwo).isEqualTo("cars updated");
     }
 
     @Test
@@ -590,6 +651,48 @@ public class NativeCoreTest {
     }
 
     @Test
+    @Config(qualifiers = "es-rES")
+    public void testTranslateQuantityStringWithDefaultMissingPolicy_ENSourceLocaleAndAndroidUsesUnsupportedLocale_sourceStringsProvided_returnSourceStringFromCache() {
+        // The quantity string will be rendered using the source locale plural rules, which in this
+        // case is "en" and the source strings provided by the cache
+
+        LocaleState localeState = new LocaleState(mockContext,
+                "en",
+                new String[]{"en", "el"},
+                null);
+        TxMemoryCache memoryCache = getEnElMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+
+        CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
+        CharSequence stringTwo = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 2);
+
+        assertThat(stringOne).isEqualTo("car updated");
+        assertThat(stringTwo).isEqualTo("cars updated");
+    }
+
+    @Test
+    @Config(qualifiers = "es-rES")
+    public void testTranslateQuantityStringWithDefaultMissingPolicy_SLSourceLocaleAndAndroidUsesUnsupportedLocale_sourceStringsProvided_returnSourceStringFromCache() {
+        // The quantity string will be rendered using the source locale plural rules, which in this
+        // case is "sl" and the source strings provided by the cache
+
+        LocaleState localeState = new LocaleState(mockContext,
+                "sl",
+                new String[]{"sl", "el"},
+                null);
+        TxMemoryCache memoryCache = getSLElMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
+
+        CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
+        CharSequence stringTwo = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 2);
+
+        assertThat(stringOne).isEqualTo("car updated");
+        assertThat(stringTwo).isEqualTo("car 2 updated");
+    }
+
+    @Test
     public void testTranslateQuantityString_idDoesNotExist_exceptionIsThrown() {
         LocaleState localeState = new LocaleState(mockContext,
                 "sl",
@@ -626,5 +729,5 @@ public class NativeCoreTest {
         assertThat(stringTwo).isEqualTo("test: αυτοκίνητα");
     }
 
-    // endregion quantity string
+    // endregion translate quantity string
 }

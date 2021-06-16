@@ -120,7 +120,8 @@ public class Utils {
      * Returns a {@link Resources} object configured for the default (non localized) resources.
      * <p>
      * Getting a string from this object, will return the string found in the default
-     * <code>`strings.xml`</code> file.
+     * <code>`strings.xml`</code> file. Note though that quantity strings will not follow any
+     * locale's plural rules.
      */
     @NonNull
     public static Resources getDefaultLocaleResources(@NonNull Context context) {

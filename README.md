@@ -160,8 +160,8 @@ If you want to disable the SDK functionality, don't initialize it and don't call
 ### Fetching translations
 
 As soon as `fetchTranslations()` is called, the SDK will attempt to download the 
-translations for all locales - except for the source locale - that are defined in the 
-initialization of `TxNative`. 
+translations for the locales that are defined in the initialization of `TxNative` and 
+the source locale strings.
 
 The `fetchTranslations()` method in the previous example is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
 

@@ -276,7 +276,7 @@ public class MainClass {
 
         @Option(names = {"-l", "--locales"}, arity = "1..", required = true,
                 description = "A list of the target locales to download from CDS. The " +
-                        "source locale should not be included.", paramLabel = "<locale>")
+                        "source locale can also be included.", paramLabel = "<locale>")
         String[] translatedLocales;
 
         @Override

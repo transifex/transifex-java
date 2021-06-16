@@ -104,6 +104,16 @@ public class TxResources extends Resources {
         return resourcePackageName.equals("android");
     }
 
+    /**
+     * Returns the {@link Resources} object that is being wrapped.
+     *
+     * @return The {@link Resources} object that is being wrapped.
+     */
+    @NonNull
+    public Resources getWrappedResources() {
+        return mResources;
+    }
+
     @NonNull CharSequence getOriginalText(@StringRes int id) throws NotFoundException {
         return mResources.getText(id);
     }
