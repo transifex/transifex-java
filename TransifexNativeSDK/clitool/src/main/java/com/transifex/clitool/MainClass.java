@@ -127,6 +127,10 @@ public class MainClass {
                         "the existing resource content.")
         boolean purge;
 
+        @Option(names = {"--dry-run"},
+                description = "Do not push to CDS.")
+        boolean dryRun;
+
         @Override
         public Integer call() throws Exception {
             // Get String file(s)
@@ -181,6 +185,10 @@ public class MainClass {
             LocaleData.TxPostData.Meta meta = new LocaleData.TxPostData.Meta();
             meta.purge = purge;
             LocaleData.TxPostData postData = new LocaleData.TxPostData(sourceStringMap, meta);
+
+            if (dryRun) {
+                return 0;
+            }
 
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, token, secret,
