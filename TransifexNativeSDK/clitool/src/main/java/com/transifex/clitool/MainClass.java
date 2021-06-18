@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -127,6 +128,14 @@ public class MainClass {
                         "the existing resource content.")
         boolean purge;
 
+        @Option(names = {"--dry-run"},
+                description = "Do not push to CDS.")
+        boolean dryRun;
+
+        @Option(names = {"-v", "--verbose"},
+                description = "Verbose output.")
+        boolean verbose;
+
         @Override
         public Integer call() throws Exception {
             // Get String file(s)
@@ -181,6 +190,22 @@ public class MainClass {
             LocaleData.TxPostData.Meta meta = new LocaleData.TxPostData.Meta();
             meta.purge = purge;
             LocaleData.TxPostData postData = new LocaleData.TxPostData(sourceStringMap, meta);
+
+            if (verbose) {
+                StringBuilder sb = new StringBuilder("The following strings are about to be pushed:")
+                        .append(System.lineSeparator());
+                for (Map.Entry<String, LocaleData.StringInfo> entry : postData.data.entrySet()) {
+                    sb.append(entry.getKey()).append(" -> ").append(entry.getValue().toString()).append(System.lineSeparator());
+                }
+                sb.append(System.lineSeparator());
+                sb.append("The following meta will be pushed along the strings: ").append(postData.meta.toString());
+                System.out.println();
+                System.out.println(sb.toString());
+            }
+
+            if (dryRun) {
+                return 0;
+            }
 
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, token, secret,
