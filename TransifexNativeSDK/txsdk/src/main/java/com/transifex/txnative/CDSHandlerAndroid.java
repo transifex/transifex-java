@@ -46,8 +46,8 @@ public class CDSHandlerAndroid extends CDSHandler {
     /**
      * Creates a CDSHandler instance.
      *
-     * @param localeCodes An array of locale codes that can be downloaded from CDS. It should not
-     *                    include the source language.
+     * @param localeCodes An array of locale codes that can be downloaded from CDS. The source
+     *                    locale can also be included.
      * @param token       The API token to use for connecting to the CDS.
      * @param secret      The API secret to use for connecting to the CDS.
      * @param csdHost     The host of the Content Delivery Service.

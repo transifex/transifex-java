@@ -58,11 +58,12 @@ advantage of the features that Transifex Native offers, such as OTA translations
     }
 </code></pre>
 <p>If your app doesn&#39;t use <code>Appcompat</code>, you should define a dummy string in your default, unlocalized <code>strings.xml</code> file and place a <code>strings.xml</code> file for each supported locale and define the same string there. For example:</p>
-<pre><code><span class="php"><span class="hljs-meta">&lt;?</span>xml version=<span class="hljs-string">"1.0"</span> encoding=<span class="hljs-string">"utf-8"</span><span class="hljs-meta">?&gt;</span></span>
+<pre><code class="lang-xml"><span class="php"><span class="hljs-meta">&lt;?</span>xml version=<span class="hljs-string">"1.0"</span> encoding=<span class="hljs-string">"utf-8"</span><span class="hljs-meta">?&gt;</span></span>
 <span class="hljs-tag">&lt;<span class="hljs-name">resources</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">string</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"dummy"</span>&gt;</span>dummy<span class="hljs-tag">&lt;/<span class="hljs-name">string</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">resources</span>&gt;</span>
-</code></pre><p>This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don&#39;t do that, Android will always pick the first locale selected by the user.</p>
+</code></pre>
+<p>This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don&#39;t do that, Android will always pick the first locale selected by the user.</p>
 <h3 id="context-wrapping">Context Wrapping</h3>
 <p>The SDK&#39;s functionality is enabled by wrapping the context, so that all string resource related methods, such a <a href="https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object..."><code>getString()</code></a>), <a href="https://developer.android.com/reference/android/content/res/Resources#getText(int"><code>getText()</code></a>), flow through the SDK.</p>
 <p>To enable context wrapping in your activity, use the following code or have your activity extend a base class:</p>
@@ -119,8 +120,8 @@ advantage of the features that Transifex Native offers, such as OTA translations
 <p>If you want to disable the SDK functionality, don&#39;t initialize it and don&#39;t call any <code>TxNative</code> methods. <code>TxNative.wrap()</code> and <code>TxNative.generalWrap()</code> will be a no-op and the context will not be wrapped. Thus, all <code>getString()</code> etc methods, won&#39;t flow through the SDK.</p>
 <h3 id="fetching-translations">Fetching translations</h3>
 <p>As soon as <code>fetchTranslations()</code> is called, the SDK will attempt to download the 
-translations for all locales - except for the source locale - that are defined in the 
-initialization of <code>TxNative</code>. </p>
+translations for the locales that are defined in the initialization of <code>TxNative</code> and 
+the source locale strings.</p>
 <p>The <code>fetchTranslations()</code> method in the previous example is called as soon as the application launches, but that&#39;s not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).</p>
 <h3 id="invalidating-cds-cache">Invalidating CDS cache</h3>
 <p>The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex 
@@ -137,7 +138,7 @@ to the <a href="https://github.com/transifex/transifex-delivery/#invalidate-cach
 <h4 id="alternative-cache-strategy">Alternative cache strategy</h4>
 <p>The SDK allows you to implement your own cache from scratch by implementing the <code>TxCache</code> interface. Alternatively, you may change the standard cache strategy by implementing your own using the SDK&#39;s publicly exposed classes.</p>
 <p>In order to achieve that, you can create a a method that returns a <code>TxCache</code> instance, just like in the <code>TxStandardCache.getCache()</code> case. For example, the standard cache is created as follows:</p>
-<pre><code><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-type">TxFileOutputCacheDecorator</span>(
+<pre><code class="lang-java"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-type">TxFileOutputCacheDecorator</span>(
                 &lt;cached Translations Directory&gt;,
                 <span class="hljs-keyword">new</span> <span class="hljs-type">TXReadonlyCacheDecorator</span>(
                         <span class="hljs-keyword">new</span> <span class="hljs-type">TxProviderBasedCache</span>(
@@ -149,7 +150,8 @@ to the <a href="https://github.com/transifex/transifex-delivery/#invalidate-cach
                         )
                 )
         );
-</code></pre><p>If you want to have your memory cache updated with the new translations when <code>fetchTranslations()</code> is called, you can remove the <code>TXReadonlyCacheDecorator</code>.</p>
+</code></pre>
+<p>If you want to have your memory cache updated with the new translations when <code>fetchTranslations()</code> is called, you can remove the <code>TXReadonlyCacheDecorator</code>.</p>
 <h3 id="sample-app">Sample app</h3>
 <p>You can see the SDK used and configured in more advanced ways in the provided sample app of this repo. You can also check out a simpler app at the <a href="https://github.com/transifex/transifex-native-sandbox">Transifex Native repo</a>.</p>
 <h2 id="transifex-command-line-tool">Transifex Command Line Tool</h2>

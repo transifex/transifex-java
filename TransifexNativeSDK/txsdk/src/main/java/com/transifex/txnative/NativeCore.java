@@ -37,7 +37,6 @@ public class NativeCore {
 
     final Handler mMainHandler;
     final CDSHandlerAndroid mCDSHandler;
-    final Resources mDefaultResources;      // Non-localized resources
     final Resources mSourceLocaleResources; // Resources using the source locale
 
     boolean mTestModeEnabled;
@@ -76,9 +75,8 @@ public class NativeCore {
         if (cdsHost == null) {
             cdsHost = CDSHandlerAndroid.CDS_HOST;
         }
-        mCDSHandler = new CDSHandlerAndroid(mLocaleState.getTranslatedLocales(), token, null, cdsHost);
+        mCDSHandler = new CDSHandlerAndroid(mLocaleState.getAppLocales(), token, null, cdsHost);
 
-        mDefaultResources = Utils.getDefaultLocaleResources(mContext);
         mSourceLocaleResources = Utils.getLocalizedResources(mContext, new Locale(mLocaleState.getSourceLocale()));
 
         // Check that the "R.plurals.tx_plurals" plurals resource declared in the lib's "strings.xml"
@@ -217,7 +215,7 @@ public class NativeCore {
         }
 
         if (mLocaleState.isSourceLocale()) {
-            return txResources.getOriginalText(id);
+            return getSourceString(txResources, id);
         }
 
         String translatedString = null;
@@ -232,7 +230,7 @@ public class NativeCore {
         // 3. our Cache does not have translations for the resolved locale (this shouldn't happen)
         // 4. the key was not found in the Cache for the resolved locale
         if (TextUtils.isEmpty(translatedString)) {
-            CharSequence sourceString = mDefaultResources.getText(id);
+            CharSequence sourceString = getSourceString(txResources, id);
             return mMissingPolicy.get(sourceString, id, txResources.getResourceEntryName(id),
                     mLocaleState.getResolvedLocale());
         }
@@ -269,7 +267,7 @@ public class NativeCore {
         }
 
         if (mLocaleState.isSourceLocale()) {
-            return txResources.getOriginalQuantityText(id, quantity);
+            return getSourceQuantityString(txResources, id, quantity);
         }
 
         // Get ICU string from Cache
@@ -282,13 +280,12 @@ public class NativeCore {
         // Get quantity String from ICU string
         String quantityString = null;
         if (icuString != null) {
-            quantityString = getLocalizedQuantityString(txResources, icuString, quantity);
+            quantityString = getLocalizedQuantityString(txResources.getWrappedResources(), icuString, quantity);
         }
 
         // No ICU string found in cache or no quantity string was rendered
         if (TextUtils.isEmpty(quantityString)) {
-            // Get source string using source locale's plural rules
-            CharSequence sourceString = mSourceLocaleResources.getQuantityText(id, quantity);
+            CharSequence sourceString = getSourceQuantityString(txResources, id, quantity);
             return mMissingPolicy.getQuantityString(sourceString, id, quantity,
                     txResources.getResourceEntryName(id), mLocaleState.getResolvedLocale());
         }
@@ -297,14 +294,60 @@ public class NativeCore {
     }
 
     /**
-     * Uses the given ICU string to return a quantity string for the given quantity that follows
-     * the current locale's plural rules.
-     *
-     * <p>
-     * For example, if the icu string is "{cnt, plural, one {%d car} other {%d cars}}", the quantity
-     * is 2 and the current locale is "en", this method will return "%d cars".
+     * Helper method that returns the source string using the cache. Falls back to the Android
+     * provided string.
      *
      * @param txResources A TxResources instance.
+     * @param id The string resource identifier.
+     *
+     * @return The source string, plus possibly styled text information as spans.
+     */
+    @NonNull CharSequence getSourceString(@NonNull TxResources txResources, @StringRes int id) {
+        String sourceString = mCache.get(txResources.getResourceEntryName(id),
+                mLocaleState.getSourceLocale());
+        return (!TextUtils.isEmpty(sourceString)) ?
+                getSpannedString(sourceString) : mSourceLocaleResources.getText(id);
+    }
+
+    /**
+     * Helper method that returns the source quantity string using the cache.
+     * Falls back to the Android provided quantity string.
+     * <p>
+     * The source locale's plural rules are used in both cases.
+     *
+     * @param txResources A TxResources instance.
+     * @param id The plurals resource identifier.
+     * @param quantity The number used to get the correct string for the current language's plural
+     *                 rules.
+     *
+     * @return The quantity string under the source locale's plural rules, plus possibly styled text
+     * information as spans.
+     */
+    @NonNull CharSequence getSourceQuantityString(@NonNull TxResources txResources, @PluralsRes int id, int quantity) {
+        // Get ICU string from Cache
+        String sourceIcuString = mCache.get(txResources.getResourceEntryName(id),
+                mLocaleState.getSourceLocale());
+
+        // Get quantity String from ICU string
+        String sourceQuantityString = null;
+        if (sourceIcuString != null) {
+            sourceQuantityString = getLocalizedQuantityString(mSourceLocaleResources,
+                    sourceIcuString, quantity);
+        }
+
+        return (!TextUtils.isEmpty(sourceQuantityString))
+                ? sourceQuantityString : mSourceLocaleResources.getQuantityText(id, quantity);
+    }
+
+    /**
+     * Uses the given ICU string to return a quantity string for the given quantity that follows
+     * the plural rules of the given resources locale.
+     * <p>
+     * For example, if the icu string is "{cnt, plural, one {%d car} other {%d cars}}", the quantity
+     * is 2 and the resource's locale is "en", this method will return "%d cars".
+     *
+     * @param resources A {@link Resources} instance. The locale of the resources will determine the
+     *                  plural rules used.
      * @param icuString An ICU string.
      * @param quantity The number used to get the correct string for the current language's plural
      *                 rules.
@@ -312,7 +355,7 @@ public class NativeCore {
      * @return A quantity string; <code>null</code> if no matching quantity string was found in the
      * provided <code>icuString</code> or an error occurred
      */
-    @Nullable String getLocalizedQuantityString(@NonNull TxResources txResources,
+    @Nullable static String getLocalizedQuantityString(@NonNull Resources resources,
                                                         @NonNull String icuString, int quantity) {
         if (TextUtils.isEmpty(icuString)) {
             return null;
@@ -324,8 +367,9 @@ public class NativeCore {
             return null;
         }
 
-        // Use Android's localization system to get the correct plural type for the given quantity
-        String pluralType = txResources.getOriginalQuantityText(R.plurals.__tx_plurals, quantity).toString();
+        // Use Android's localization system to get the correct plural type for the given quantity.
+        // The locale of the resources object will determine the plural rules.
+        String pluralType = resources.getQuantityText(R.plurals.__tx_plurals, quantity).toString();
 
         // Get plural string from Plurals
         String plural = plurals.getPlural(pluralType);
