@@ -62,18 +62,18 @@ public class LocaleData {
 
         public Meta meta;
 
-        public void appendTags(@NonNull String[] tags) {
-            if (tags == null || tags.length == 0) {
+        public void appendTags(@NonNull Set<String> tags) {
+            if (tags == null || tags.isEmpty()) {
                 return;
             }
             if (meta == null) {
                 meta = new Meta();
             }
             if (meta.tags == null) {
-                meta.tags = new LinkedHashSet<>(Arrays.asList(tags));
+                meta.tags = new LinkedHashSet<>(tags);
             }
             else {
-                meta.tags.addAll(Arrays.asList(tags));
+                meta.tags.addAll(tags);
             }
         }
 

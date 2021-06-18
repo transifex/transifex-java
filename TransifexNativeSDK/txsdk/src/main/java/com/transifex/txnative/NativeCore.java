@@ -15,6 +15,7 @@ import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.missingpolicy.SourceStringPolicy;
 
 import java.util.Locale;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -115,9 +116,11 @@ public class NativeCore {
      *
      * @param localeCode If set to <code>null</code>, it will fetch translations for all locales
      *                   as defined in the SDK configuration.
+     * @param tags An optional set of tags. If defined, only strings that have all of the given tags
+     *             will be fetched.
      */
-    void fetchTranslations(@Nullable String localeCode) {
-        mCDSHandler.fetchTranslationsAsync(localeCode, new CDSHandlerAndroid.FetchTranslationsCallback() {
+    void fetchTranslations(@Nullable String localeCode, @Nullable Set<String> tags) {
+        mCDSHandler.fetchTranslationsAsync(localeCode, tags, new CDSHandlerAndroid.FetchTranslationsCallback() {
             @Override
             public void onComplete(final @Nullable LocaleData.TranslationMap translationMap) {
                 if (translationMap != null && !translationMap.isEmpty()) {

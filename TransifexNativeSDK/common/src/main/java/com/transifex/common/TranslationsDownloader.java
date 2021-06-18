@@ -9,6 +9,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,7 +94,10 @@ public class TranslationsDownloader {
      * translation file already exists, it's overwritten.
      *
      * @param localeCode An optional locale to fetch translations from; if  set to <code>null</code>,
-     *                   it will fetch translations for the locale codes provided in the constructor.
+     *                   it will fetch translations for the locale codes configured in the
+     *                   {@link CDSHandler} instance provided in the constructor.
+     * @param tags An optional set of tags. If defined, only strings that have all of the given tags
+     *             will be fetched.
      * @param directory  The directory on which to save the translations. The directory should
      *                   already exist.
      * @param filename   The name of the translation file for a locale.
@@ -102,7 +106,9 @@ public class TranslationsDownloader {
      * translations. If an error occurs, some or all locale codes will be missing from the map.
      */
     @NonNull
-    public HashMap<String, File> downloadTranslations(@Nullable String localeCode, @NonNull File directory,
+    public HashMap<String, File> downloadTranslations(@Nullable String localeCode,
+                                                      @Nullable Set<String> tags,
+                                                      @NonNull File directory,
                                                       @NonNull String filename) {
         if (!directory.isDirectory()) {
             LOGGER.log(Level.SEVERE, "The provided directory does not exist: " + directory.getAbsolutePath());
@@ -114,7 +120,7 @@ public class TranslationsDownloader {
         }
 
         DownloadTranslationsCallback callback = new DownloadTranslationsCallback(directory, filename);
-        mCDSHandler.fetchTranslations(localeCode, callback);
+        mCDSHandler.fetchTranslations(localeCode, tags, callback);
 
         return  callback.filesMap;
     }

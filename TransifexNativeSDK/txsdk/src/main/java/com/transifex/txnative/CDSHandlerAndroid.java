@@ -5,6 +5,7 @@ import android.util.Log;
 import com.transifex.common.CDSHandler;
 import com.transifex.common.LocaleData;
 
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -64,15 +65,18 @@ public class CDSHandlerAndroid extends CDSHandler {
      *
      * @param localeCode  An optional locale to fetch translations from; if  set to <code>null</code>,
      *                    it will fetch translations for the locale codes provided in the constructor.
+     * @param tags An optional set of tags. If defined, only strings that have all of the given tags
+     *             will be fetched.
      * @param callback A callback function to call when the operation is complete.
      */
     public void fetchTranslationsAsync(@Nullable final String localeCode,
+                                       @Nullable final Set<String> tags,
                                   @NonNull final FetchTranslationsCallback callback) {
         try {
             mExecutor.execute(new Runnable() {
                 @Override
                 public void run() {
-                    LocaleData.TranslationMap result = fetchTranslations(localeCode);
+                    LocaleData.TranslationMap result = fetchTranslations(localeCode, tags);
                     callback.onComplete(result);
                 }
             });

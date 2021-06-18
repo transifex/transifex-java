@@ -60,11 +60,13 @@ The language codes supported by Transifex can be found [here](https://www.transi
                 null);                     // a MissingPolicy implementation
 
         // Fetch all translations from CDS
-        TxNative.fetchTranslations(null);
+        TxNative.fetchTranslations(null, null);
      }
 ```
 
 In this example, the SDK uses its default cache, `TxStandardCache`, and missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
+
+Besides downloading translations for all locales, you can also target specific locales or strings that have specific tags.
 
 Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, it suffices to place the supported app languages in your app’s gradle file:
 

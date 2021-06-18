@@ -10,6 +10,9 @@ import com.transifex.txnative.wrappers.TxContextWrapper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.transifex.txnative.cache.TxCache;
+
+import java.util.Set;
+
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 
@@ -120,13 +123,28 @@ public class TxNative {
      * @param localeCode An optional locale to fetch translations for; if  set to <code>null</code>,
      *                   it will fetch translations for all locales as defined in the SDK
      *                   configuration.
+     * @param tags An optional set of tags. If defined, only strings that have all of the given tags
+     *             will be fetched.
+     */
+    public static void fetchTranslations(@Nullable String localeCode, @Nullable Set<String> tags) {
+        if (sNativeCore == null) {
+            throw new RuntimeException("TxNative has not been initialized");
+        }
+
+        sNativeCore.fetchTranslations(localeCode, tags);
+    }
+
+    /**
+     * Fetches the translations from CDS and updates the cache.
+     * 
+     * @see #fetchTranslations(String, Set) 
      */
     public static void fetchTranslations(@Nullable String localeCode) {
         if (sNativeCore == null) {
             throw new RuntimeException("TxNative has not been initialized");
         }
 
-        sNativeCore.fetchTranslations(localeCode);
+        sNativeCore.fetchTranslations(localeCode, null);
     }
 
     /**

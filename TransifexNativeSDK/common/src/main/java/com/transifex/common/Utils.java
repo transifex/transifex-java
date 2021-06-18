@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import androidx.annotation.NonNull;
 
@@ -13,7 +15,8 @@ public class Utils {
     /**
      * Reads an input stream to a string.
      */
-    public @NonNull static String readInputStream(@NonNull InputStream inputStream) throws IOException {
+    public @NonNull
+    static String readInputStream(@NonNull InputStream inputStream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         StringBuilder result = new StringBuilder();
         String line;
@@ -58,6 +61,14 @@ public class Utils {
                 success &= deleteDirectory(file);
             }
         }
-        return  success;
+        return success;
+    }
+
+    /**
+     * URL encodes the provided string.
+     */
+    public static String urlEncode(String string) throws UnsupportedEncodingException {
+        // Fixes URLEncoder's escaping of " " with "+" so that it works with URLs
+        return URLEncoder.encode(string, "UTF-8").replace("+", "%20");
     }
 }

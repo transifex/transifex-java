@@ -44,10 +44,11 @@ advantage of the features that Transifex Native offers, such as OTA translations
                 <span class="hljs-keyword">null</span>);                     <span class="hljs-comment">// a MissingPolicy implementation</span>
 
         <span class="hljs-comment">// Fetch all translations from CDS</span>
-        TxNative.fetchTranslations(<span class="hljs-keyword">null</span>);
+        TxNative.fetchTranslations(<span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>);
      }
 </code></pre>
 <p>In this example, the SDK uses its default cache, <code>TxStandardCache</code>, and missing policy, <code>SourceStringPolicy</code>. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.</p>
+<p>Besides downloading translations for all locales, you can also target specific locales or strings that have specific tags.</p>
 <p>Starting from Android N, Android has <a href="https://developer.android.com/guide/topics/resources/multilingual-support.html">multilingual support</a>: users can select more that one locale in Android&#39;s settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of <code>Appcompat</code>, it suffices to place the supported app languages in your app’s gradle file:</p>
 <pre><code class="lang-gradle"><span class="hljs-class">android </span>{
     ...
