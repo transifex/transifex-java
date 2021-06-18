@@ -9,7 +9,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -54,7 +57,7 @@ public class TranslationsDownloaderTest {
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
 
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles).isEmpty();
@@ -71,7 +74,7 @@ public class TranslationsDownloaderTest {
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
 
         RecordedRequest recordedRequest = null;
         try {
@@ -116,7 +119,7 @@ public class TranslationsDownloaderTest {
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el");
 
@@ -140,7 +143,7 @@ public class TranslationsDownloaderTest {
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations("el", tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations("el", null, tempDir, "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el");
 
@@ -151,6 +154,39 @@ public class TranslationsDownloaderTest {
 
         assertThat(elString).isNotNull();
         assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+    }
+
+    @Test
+    public void testSaveTranslations_specifyTags_normalResponse() {
+        server.setDispatcher(CDSHandlerTest.getElEsWithTagsDispatcher());
+
+        boolean tempDirCreated =  tempDir.mkdirs();
+        assertThat(tempDirCreated).isTrue();
+
+        String[] localeCodes = new String[]{"el", "es"};
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
+
+        Set<String> tags = new HashSet<>(Arrays.asList("tag a", "tag b"));
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tags, tempDir, "strings.txt");
+        assertThat(translationFiles).isNotNull();
+        assertThat(translationFiles.keySet()).containsExactly("el", "es");
+
+        String elString = null;
+        try {
+            elString = Utils.readInputStream(new FileInputStream(translationFiles.get("el")));
+        } catch (IOException ignored) {}
+
+        assertThat(elString).isNotNull();
+        assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+
+        String esString = null;
+        try {
+            esString = Utils.readInputStream(new FileInputStream(translationFiles.get("es")));
+        } catch (IOException ignored) {}
+
+        assertThat(esString).isNotNull();
+        assertThat(esString).isEqualTo(CDSHandlerTest.esBody);
     }
 
     @Test
@@ -173,7 +209,7 @@ public class TranslationsDownloaderTest {
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el");
 
@@ -206,7 +242,7 @@ public class TranslationsDownloaderTest {
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
         assertThat(translationFiles).isEmpty();
 
         String esString = null;

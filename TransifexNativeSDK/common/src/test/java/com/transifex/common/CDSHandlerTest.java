@@ -8,6 +8,8 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 
 import androidx.annotation.NonNull;
@@ -78,6 +80,28 @@ public class CDSHandlerTest {
                 switch (request.getPath()) {
                     case "/content/el":
                         return new MockResponse().setResponseCode(200).setBody(elBody);
+                }
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        return dispatcher;
+    }
+
+    public static Dispatcher getElEsWithTagsDispatcher() {
+        Dispatcher dispatcher = new Dispatcher() {
+
+            @NonNull
+            @Override
+            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
+
+                String la = request.getPath();
+                switch (request.getPath()) {
+                    // "/content/el?filter[tags]=tag a,tag b"
+                    case "/content/el?filter%5Btags%5D=tag%20a%2Ctag%20b":
+                        return new MockResponse().setResponseCode(200).setBody(elBody);
+                    case "/content/es?filter%5Btags%5D=tag%20a%2Ctag%20b":
+                        return new MockResponse().setResponseCode(200).setBody(esBody);
                 }
                 return new MockResponse().setResponseCode(404);
             }
@@ -218,7 +242,7 @@ public class CDSHandlerTest {
 
         DummyFetchCallback callback = new DummyFetchCallback();
 
-        cdsHandler.fetchTranslations(null, callback);
+        cdsHandler.fetchTranslations(null, null, callback);
 
         assertThat(callback.onFetchingTranslationsCalled).isFalse();
         assertThat(callback.onFetchingTranslationsCalled).isFalse();
@@ -259,7 +283,7 @@ public class CDSHandlerTest {
             }
         };
 
-        cdsHandler.fetchTranslations(null, callback);
+        cdsHandler.fetchTranslations(null, null, callback);
 
         assertThat(callback.onFetchingTranslationsCalled).isTrue();
         assertThat(callback.onFetchingTranslationsCalled).isTrue();
@@ -313,7 +337,7 @@ public class CDSHandlerTest {
             }
         };
 
-        cdsHandler.fetchTranslations(null, callback);
+        cdsHandler.fetchTranslations(null, null, callback);
 
         assertThat(callback.onFetchingTranslationsCalled).isTrue();
         assertThat(callback.onFetchingTranslationsCalled).isTrue();
@@ -336,7 +360,7 @@ public class CDSHandlerTest {
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL");
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).isEmpty();
     }
@@ -348,7 +372,7 @@ public class CDSHandlerTest {
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -384,7 +408,7 @@ public class CDSHandlerTest {
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el");
 
@@ -402,7 +426,7 @@ public class CDSHandlerTest {
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations("el");
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations("el", null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el");
 
@@ -414,13 +438,38 @@ public class CDSHandlerTest {
     }
 
     @Test
+    public void testFetchTranslations_specifyTags_normalResponse() {
+        server.setDispatcher(getElEsWithTagsDispatcher());
+
+        String[] localeCodes = new String[]{"el", "es"};
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+
+        HashSet<String> tags = new HashSet<>(Arrays.asList("tag a", "tag b"));
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, tags);
+        assertThat(map).isNotNull();
+        assertThat(map.getLocales()).containsExactly("el", "es");
+
+        LocaleData.LocaleStrings elStrings = map.get("el");
+        assertThat(elStrings).isNotNull();
+        assertThat(elStrings.get("test_key")).isEqualTo("Καλημέρα");
+        assertThat(elStrings.get("another_key")).isEqualTo("Καλό απόγευμα");
+        assertThat(elStrings.get("key3")).isEqualTo("");
+
+        LocaleData.LocaleStrings esStrings = map.get("es");
+        assertThat(esStrings).isNotNull();
+        assertThat(esStrings.get("test_key")).isEqualTo("Buenos días");
+        assertThat(esStrings.get("another_key")).isEqualTo("Buenas tardes");
+        assertThat(esStrings.get("key3")).isEqualTo("");
+    }
+
+    @Test
     public void testFetchTranslations_first202_thenNormalResponse() {
         server.setDispatcher(getElEs202OnceDispatcher(10));
 
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).containsExactly("el", "es");
 
@@ -444,7 +493,7 @@ public class CDSHandlerTest {
         String[] localeCodes = new String[]{"el", "es"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).isEmpty();
     }
@@ -456,7 +505,7 @@ public class CDSHandlerTest {
         String[] localeCodes = new String[]{"el"};
         CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
 
-        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null);
+        LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
         assertThat(map.getLocales()).isEmpty();
     }

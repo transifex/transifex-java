@@ -79,13 +79,13 @@ public class LocaleDataTest {
     @Test
     public void testStringInfoAppendTags() {
         LocaleData.StringInfo a = new LocaleData.StringInfo("a");
-        a.appendTags(new String[]{"tag1", "tag2"});
+        a.appendTags(new HashSet<>(Arrays.asList("tag1", "tag2")));
 
         assertThat(a.meta).isNotNull();
         assertThat(a.meta.tags).containsExactly("tag1", "tag2");
 
         // Check that new tags are added and that each tag is listed once
-        a.appendTags(new String[]{"tag2", "tag3"});
+        a.appendTags(new HashSet<>(Arrays.asList("tag2", "tag3")));
         assertThat(a.meta.tags).containsExactly("tag1", "tag2", "tag3");
     }
 

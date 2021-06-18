@@ -35,7 +35,7 @@ public class MyApplication extends Application {
         //TxNative.setTestMode(true);
 
         // Fetch all translations from CDS
-        TxNative.fetchTranslations(null);
+        TxNative.fetchTranslations(null, null);
 
         // Start a service just for testing purposes
         Intent serviceIntent = new Intent(this, SimpleIntentService.class);

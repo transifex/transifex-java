@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
@@ -120,7 +121,7 @@ public class MainClass {
         @Option(names = {"-a", "--append-tags"}, arity = "0..",
                 description = "Append custom tags to the pushed source strings.",
                 paramLabel = "<tag>")
-        String[] tags;
+        Set<String> tags;
 
         @Option(names = {"-p", "--purge"},
                 description = "If set, the entire resource content is replaced by the pushed content " +
@@ -180,7 +181,7 @@ public class MainClass {
             }
 
             // Append custom tags
-            if (tags != null && tags.length != 0) {
+            if (tags != null && !tags.isEmpty()) {
                 for (LocaleData.StringInfo stringInfo : sourceStringMap.values()) {
                     stringInfo.appendTags(tags);
                 }
@@ -304,6 +305,12 @@ public class MainClass {
                         "source locale can also be included.", paramLabel = "<locale>")
         String[] translatedLocales;
 
+        @Option(names = {"--with-tags-only"}, arity = "0..",
+                description = "If set, only the strings that have all of the given tags will be " +
+                        "downloaded.",
+                paramLabel = "<tag>")
+        Set<String> tags;
+
         @Override
         public Integer call() throws Exception {
             // Create output directory
@@ -328,7 +335,7 @@ public class MainClass {
             CDSHandler cdsHandler = new CDSHandler(translatedLocales, token, null,
                     mainClass.hostURL);
             TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
-            HashMap<String, File> downloadedFiles = downloader.downloadTranslations(null, outDir, OUT_FILE_NAME);
+            HashMap<String, File> downloadedFiles = downloader.downloadTranslations(null, tags, outDir, OUT_FILE_NAME);
 
             if (downloadedFiles.keySet().containsAll(Arrays.asList(translatedLocales))) {
                 System.out.println("Translations have been pulled successfully from CDS to: " +

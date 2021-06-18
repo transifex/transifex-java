@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,7 +54,7 @@ public class CDSHandler {
     private final Gson mGson;
 
     /**
-     * Class that contains the result of {@link #getConnectionForLocale(URI, String)}
+     * Class that contains the result of {@link #getConnectionForLocale(URI, String, Set)}
      */
     private static class ConnectionData {
         HttpURLConnection connection;
@@ -68,7 +69,7 @@ public class CDSHandler {
     }
 
     /**
-     * The callback to get the results of {@link #fetchTranslations(String, FetchCallback)}
+     * The callback to get the results of {@link #fetchTranslations(String, Set, FetchCallback)}
      */
     public interface FetchCallback {
 
@@ -127,13 +128,32 @@ public class CDSHandler {
      * stream.
      */
     private @NonNull
-    ConnectionData getConnectionForLocale(URI cdsContentURI, String localeCode) {
+    ConnectionData getConnectionForLocale(@NonNull URI cdsContentURI, @NonNull String localeCode,
+                                          @Nullable Set<String> tags) {
         URL url = null;
         try {
-            URI uri  = new URIBuilderTiny(cdsContentURI).appendPaths(localeCode).build();
+            URIBuilderTiny uriBuilder  = new URIBuilderTiny(cdsContentURI).appendPaths(localeCode);
+            if (tags != null && !tags.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (String tag : tags) {
+                    sb.append(tag).append(",");
+                }
+                sb.deleteCharAt(sb.length() - 1);
+                uriBuilder.addRawQueryParameter(Utils.urlEncode("filter[tags]"),
+                        Utils.urlEncode(sb.toString()));
+            }
+            URI uri = uriBuilder.build();
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
             LOGGER.log(Level.SEVERE, "Invalid CDS host URL: " + cdsContentURI);
+            return new ConnectionData(null, null, e);
+        } catch ( IllegalArgumentException e) {
+            LOGGER.log(Level.SEVERE, "Illegal argument exception for URL: " + cdsContentURI
+                    + " with locale: " + localeCode + " , tags: " + tags);
+            return new ConnectionData(null, null, e);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.log(Level.SEVERE, "Unsupported encoding exception for URL: " + cdsContentURI
+                    + " with locale: " + localeCode + " , tags: " + tags);
             return new ConnectionData(null, null, e);
         }
 
@@ -188,10 +208,13 @@ public class CDSHandler {
      *
      * @param localeCode An optional locale to fetch translations from; if  set to <code>null</code>,
      *                   it will fetch translations for the locale codes provided in the constructor.
+     * @param tags An optional set of tags. If defined, only strings that have all of the given tags
+     *             will be fetched.
      *
      * @see FetchCallback
      */
-    public void fetchTranslations(@Nullable String localeCode, @NonNull FetchCallback callback) {
+    public void fetchTranslations(@Nullable String localeCode, @Nullable Set<String> tags,
+                                  @NonNull FetchCallback callback) {
         String[] fetchLocalCodes = (localeCode != null) ? new String[]{localeCode} : mLocaleCodes;
         if (fetchLocalCodes == null) {
             return;
@@ -214,7 +237,7 @@ public class CDSHandler {
         // For each locale
         HttpURLConnection lastConnection = null;
         for (String fetchLocalCode : fetchLocalCodes) {
-            ConnectionData connectionData = getConnectionForLocale(cdsContentURI, fetchLocalCode);
+            ConnectionData connectionData = getConnectionForLocale(cdsContentURI, fetchLocalCode, tags);
             callback.onTranslationFetched(connectionData.inputStream, fetchLocalCode, connectionData.exception);
 
             if (connectionData.connection != null) {
@@ -290,14 +313,16 @@ public class CDSHandler {
      *
      * @param localeCode  An optional locale to fetch translations from; if  set to <code>null</code>,
      *                    it will fetch translations for the locale codes provided in the constructor.
+     * @param tags An optional set of tags. If defined, only strings that have all of the given tags
+     *             will be fetched.
      *
      * @return A {@link LocaleData.TranslationMap} object that contains the translations for each
      * locale. If an error occurs, some or all locales will be missing from the translation map.
      */
     @NonNull
-    public LocaleData.TranslationMap fetchTranslations(@Nullable String localeCode) {
+    public LocaleData.TranslationMap fetchTranslations(@Nullable String localeCode, @Nullable Set<String> tags) {
         ParseFetchedTranslationsCallback fetchTranslationsCallback = new ParseFetchedTranslationsCallback();
-        fetchTranslations(localeCode, fetchTranslationsCallback);
+        fetchTranslations(localeCode, tags, fetchTranslationsCallback);
 
         return fetchTranslationsCallback.translationMap;
     }
