@@ -1,7 +1,7 @@
 # Transifex Native Android SDK
 
 [![CI](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg)](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
+[![Maven Central](https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
 using [Transifex Native](https://www.transifex.com/native/). The Android library can fetch translations 
