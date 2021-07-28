@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.logging.Logger;
 
+import javax.naming.TimeLimitExceededException;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import picocli.CommandLine;
@@ -211,20 +213,32 @@ public class MainClass {
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, token, secret,
                     mainClass.hostURL);
-            LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
+            LocaleData.TxJobStatus jobStatus = null;
+            try {
+                jobStatus = cdsHandler.pushSourceStrings(postData);
+            } catch (TimeLimitExceededException e) {
+                System.out.println("Strings are queued for processing");
+                return 0;
+            }
 
-            if (response != null && response.isSuccessful()) {
+            if (jobStatus != null && jobStatus.isCompleted()) {
                 System.out.println("Source strings pushed successfully to CDS");
 
-                System.out.println(getDetailsString(response));
+                System.out.println(getDetailsString(jobStatus));
+
+                if (jobStatus.hasErrors()) {
+                    String errorString = getErrorString(jobStatus);
+                    System.out.println("Some errors occurred:");
+                    System.out.println(errorString);
+                }
 
                 return 0;
             }
             else {
                 System.out.println("Error while pushing source strings to CDS");
 
-                if (response != null) {
-                    String errorString = getErrorString(response);
+                if (jobStatus != null) {
+                    String errorString = getErrorString(jobStatus);
                     if (errorString != null) {
                         System.out.println(errorString);
                     }
@@ -253,12 +267,24 @@ public class MainClass {
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, token, secret,
                     mainClass.hostURL);
-            LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
+            LocaleData.TxJobStatus jobStatus = null;
+            try {
+                jobStatus = cdsHandler.pushSourceStrings(postData);
+            } catch (TimeLimitExceededException e) {
+                System.out.println("Source string clearing is queued for processing");
+                return 0;
+            }
 
-            if (response != null && response.isSuccessful()) {
+            if (jobStatus != null && jobStatus.isCompleted()) {
                 System.out.println("Source strings cleared from CDS");
 
-                String details = String.format(Locale.US, "%d strings deleted", response.deleted);
+                if (jobStatus.hasErrors()) {
+                    String errorString = getErrorString(jobStatus);
+                    System.out.println("Some errors occurred:");
+                    System.out.println(errorString);
+                }
+
+                String details = String.format(Locale.US, "%d strings deleted", jobStatus.data.details.deleted);
                 System.out.println(details);
 
                 return 0;
@@ -266,8 +292,8 @@ public class MainClass {
             else {
                 System.out.println("Error while contacting CDS");
 
-                if (response != null) {
-                    String errorString = getErrorString(response);
+                if (jobStatus != null) {
+                    String errorString = getErrorString(jobStatus);
                     if (errorString != null) {
                         System.out.println(errorString);
                     }
@@ -385,32 +411,33 @@ public class MainClass {
     }
 
     /**
-     * Utility method to get a human-readable string representation of the errors of a TxPostResponseData
+     * Utility method to get a human-readable string representation of the errors of a TxJobStatus
      * object.
      *
-     * @return A string containing all the errors of the provided response object or
-     * <code>null</code> if the provided response object contains no errors.
+     * @return A string containing all the errors of the provided job status object or
+     * <code>null</code> if the provided object contains no errors.
      */
     private static @Nullable
-    String getErrorString(@NonNull LocaleData.TxPostResponseData response) {
-        if (response.errors.length == 0) {
+    String getErrorString(@NonNull LocaleData.TxJobStatus jobStatus) {
+        if (!jobStatus.hasErrors()) {
             return null;
         }
 
-        return "Errors: " + Arrays.toString(response.errors);
+        return "Errors: " + Arrays.toString(jobStatus.data.errors);
     }
 
     /**
      * Utility method to get a human-readable string representation of the information of a
-     * TxPostResponseData object.
+     * successful TxJobStatus object.
      *
-     * @return A string containing details about the provided response object.
+     * @return A string containing details about the provided job status object.
      */
-    private static @NonNull String getDetailsString(@NonNull LocaleData.TxPostResponseData response) {
+    private static @NonNull String getDetailsString(@NonNull LocaleData.TxJobStatus jobStatus) {
+        LocaleData.TxJobStatus.Data.Details details =  jobStatus.data.details;
         return String.format(Locale.US, "%d strings created, %d strings updated, " +
                         "%d strings skipped, %d strings deleted, %d strings failed",
-                response.created, response.updated, response.skipped, response.deleted,
-                response.failed);
+                details.created, details.updated, details.skipped, details.deleted,
+                details.failed);
     }
 
     /**

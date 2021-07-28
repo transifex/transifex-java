@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
+import javax.naming.TimeLimitExceededException;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import okhttp3.mockwebserver.Dispatcher;
@@ -48,7 +50,6 @@ public class CDSHandlerTest {
     public static final String elBody = "{\"data\":{\"test_key\":{\"string\":\"Καλημέρα\"},\"another_key\":{\"string\":\"Καλό απόγευμα\"},\"key3\":{\"string\":\"\"}}}";
     public static final String esBody = "{\"data\":{\"test_key\":{\"string\":\"Buenos días\"},\"another_key\":{\"string\":\"Buenas tardes\"},\"key3\":{\"string\":\"\"}}}";
     public static final String elBodyBadFormatting = "not a JSON format";
-    public static final String errorString = "{\"status\":\"409\",\"code\":\"conflict\",\"title\":\"Conflict error\",\"detail\":\"Expected plural rules '['one', 'other']' instead got '['few', 'many', 'one', 'other', 'two', 'zero']' for new resource string on source language 'en'\",\"source\":{\"pointer\":\"/data/0/attributes/strings\"}}";
 
     public static Dispatcher getElEsDispatcher() {
         Dispatcher dispatcher = new Dispatcher() {
@@ -95,7 +96,6 @@ public class CDSHandlerTest {
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
-                String la = request.getPath();
                 switch (request.getPath()) {
                     // "/content/el?filter[tags]=tag a,tag b"
                     case "/content/el?filter%5Btags%5D=tag%20a%2Ctag%20b":
@@ -159,20 +159,47 @@ public class CDSHandlerTest {
 
         return dispatcher;
     }
-
+    // A dispatcher that emulates the "push content" and "job status" CDS endpoints. The "job status"
+    // endpoint responds with "processing", followed by a "completed" job status response.
     public static Dispatcher getPostDispatcher() {
+
         Dispatcher dispatcher = new Dispatcher() {
+
+            int counter = 0;
+
+            final int processingCount = 1;
+            final String jobId = "abcd";
+            final String jobLink = "/jobs/content/" + jobId;
+            final Gson gson = new Gson();
 
             @NonNull
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
-                String dummyCDSResponse = "{\"created\":0,\"updated\":0,\"skipped\":0,\"deleted\":0,\"failed\":0,\"errors\":[]}";
-
                 switch (request.getPath()) {
                     case "/content":
-                        return new MockResponse().setResponseCode(200).setBody(dummyCDSResponse);
+                        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+                        responseData.data = new LocaleData.TxPostResponseData.Data();
+                        responseData.data.id = jobId;
+                        responseData.data.links = new LocaleData.TxPostResponseData.Data.Links();
+                        responseData.data.links.job = jobLink;
+                        return new MockResponse().setResponseCode(202).setBody(gson.toJson(responseData));
+                    case jobLink:
+                        if (counter < processingCount) {
+                            counter++;
+                            LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+                            jobStatus.data = new LocaleData.TxJobStatus.Data();
+                            jobStatus.data.status = "processing";
+                            return new MockResponse().setResponseCode(200).setBody(gson.toJson(jobStatus));
+                        }
+                        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+                        jobStatus.data = new LocaleData.TxJobStatus.Data();
+                        jobStatus.data.status = "completed";
+                        jobStatus.data.details = new LocaleData.TxJobStatus.Data.Details();
+                        jobStatus.data.details.created = 2;
+                        return new MockResponse().setResponseCode(200).setBody(gson.toJson(jobStatus));
                 }
+
                 return new MockResponse().setResponseCode(404);
             }
         };
@@ -180,19 +207,63 @@ public class CDSHandlerTest {
         return dispatcher;
     }
 
-    public static Dispatcher getPostWithErrorDispatcher() {
+    // A dispatcher that emulates the push content and Job status CDS endpoints. The job status
+    // returned is "failed" and contains errors.
+    public static Dispatcher getPostWithFailedJobDispatcher() {
+
+        Dispatcher dispatcher = new Dispatcher() {
+
+            final String jobId = "abcd";
+            final String jobLink = "/jobs/content/" + jobId;
+            final Gson gson = new Gson();
+
+            @NonNull
+            @Override
+            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
+
+                switch (request.getPath()) {
+                    case "/content":
+                        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+                        responseData.data = new LocaleData.TxPostResponseData.Data();
+                        responseData.data.id = jobId;
+                        responseData.data.links = new LocaleData.TxPostResponseData.Data.Links();
+                        responseData.data.links.job = jobLink;
+                        return new MockResponse().setResponseCode(202).setBody(gson.toJson(responseData));
+                    case jobLink:
+                        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+                        jobStatus.data = new LocaleData.TxJobStatus.Data();
+                        jobStatus.data.status = "failed";
+                        jobStatus.data.details = new LocaleData.TxJobStatus.Data.Details();
+                        LocaleData.TxJobStatus.Data.Error error = new LocaleData.TxJobStatus.Data.Error();
+                        error.status = 409;
+                        error.code = "conflict";
+                        error.title = "Conflict error";
+                        error.detail = "Expected plural rules '['one', 'other']' instead got '['few', 'many', 'one', 'other', 'two', 'zero']' for new resource string on source language 'en'";
+                        jobStatus.data.errors = new LocaleData.TxJobStatus.Data.Error[]{error};
+                        return new MockResponse().setResponseCode(200).setBody(gson.toJson(jobStatus));
+                }
+
+                return new MockResponse().setResponseCode(404);
+            }
+        };
+
+        return dispatcher;
+    }
+
+    // A dispatcher that emulates the push content endpoints that returns 409.
+    public static Dispatcher getPostWith409Dispatcher() {
+
         Dispatcher dispatcher = new Dispatcher() {
 
             @NonNull
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
-                String dummyCDSResponse = "{\"created\":0,\"updated\":0,\"skipped\":0,\"deleted\":0,\"failed\":1,\"errors\":["+ errorString +"]}";
-
                 switch (request.getPath()) {
                     case "/content":
-                        return new MockResponse().setResponseCode(409).setBody(dummyCDSResponse);
+                        return new MockResponse().setResponseCode(409);
                 }
+
                 return new MockResponse().setResponseCode(404);
             }
         };
@@ -299,6 +370,7 @@ public class CDSHandlerTest {
         assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token");
         assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
         assertThat(recordedRequest.getHeader("x-native-sdk")).isEqualTo("mobile/android/" + BuildProperties.getSDKVersion());
+        assertThat(recordedRequest.getHeader("Accept-version")).isEqualTo("v2");
     }
 
     @Test
@@ -515,9 +587,12 @@ public class CDSHandlerTest {
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", "invalidHostURL");
 
         LocaleData.TxPostData postData = getPostData();
-        LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
+        LocaleData.TxJobStatus jobStatus = null;
+        try {
+            jobStatus = cdsHandler.pushSourceStrings(postData);
+        } catch (TimeLimitExceededException ignored) {}
 
-        assertThat(response).isNull();
+        assertThat(jobStatus).isNull();
     }
 
     @Test
@@ -527,21 +602,24 @@ public class CDSHandlerTest {
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
 
         LocaleData.TxPostData postData = getPostData();
-        LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
+        LocaleData.TxJobStatus jobStatus = null;
+        try {
+            jobStatus = cdsHandler.pushSourceStrings(postData);
+        } catch (TimeLimitExceededException ignored) {}
 
-        assertThat(response).isNotNull();
+        assertThat(jobStatus).isNotNull();
 
         RecordedRequest recordedRequest = null;
         try {
             recordedRequest = server.takeRequest();
-        } catch (InterruptedException ignored) {
-        }
+        } catch (InterruptedException ignored) {}
         assertThat(recordedRequest).isNotNull();
 
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
         assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer token:secret");
         assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json; charset=utf-8");
         assertThat(recordedRequest.getHeader("x-native-sdk")).isEqualTo("mobile/android/" + BuildProperties.getSDKVersion());
+        assertThat(recordedRequest.getHeader("Accept-version")).isEqualTo("v2");
 
         String postBody = recordedRequest.getBody().readUtf8();
         Gson gson = new Gson();
@@ -554,18 +632,37 @@ public class CDSHandlerTest {
     }
 
     @Test
-    public void testPushSourceStrings_CDSRespondsWithError_returnErrorInResponse() {
-        server.setDispatcher(getPostWithErrorDispatcher());
+    public void testPushSourceStrings_CDSRespondsWith409_returnNull() {
+        server.setDispatcher(getPostWith409Dispatcher());
 
         CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
 
         LocaleData.TxPostData postData = getPostData();
-        LocaleData.TxPostResponseData response = cdsHandler.pushSourceStrings(postData);
+        LocaleData.TxJobStatus jobStatus = null;
+        try {
+            jobStatus = cdsHandler.pushSourceStrings(postData);
+        } catch (TimeLimitExceededException ignored) {}
 
-        assertThat(response).isNotNull();
 
-        assertThat(response.errors).asList().hasSize(1);
-        LocaleData.TxPostResponseData.Error error = response.errors[0];
+        assertThat(jobStatus).isNull();
+    }
+
+    @Test
+    public void testPushSourceStrings_CDSRespondsWithFailedJob_returnErrorInResponse() {
+        server.setDispatcher(getPostWithFailedJobDispatcher());
+
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", baseUrl);
+
+        LocaleData.TxPostData postData = getPostData();
+        LocaleData.TxJobStatus jobStatus = null;
+        try {
+            jobStatus = cdsHandler.pushSourceStrings(postData);
+        } catch (TimeLimitExceededException ignored) {}
+
+        assertThat(jobStatus).isNotNull();
+
+        assertThat(jobStatus.data.errors).asList().hasSize(1);
+        LocaleData.TxJobStatus.Data.Error error = jobStatus.data.errors[0];
 
         assertThat(error.status).isEqualTo(409);
         assertThat(error.code).isEqualTo("conflict");

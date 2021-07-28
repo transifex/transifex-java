@@ -95,18 +95,34 @@ public class MainClassTest {
     }
 
     public static Dispatcher getPostDispatcher() {
+
         Dispatcher dispatcher = new Dispatcher() {
+
+            final String jobId = "abcd";
+            final String jobLink = "/jobs/content/" + jobId;
+            final Gson gson = new Gson();
 
             @NonNull
             @Override
             public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
 
-                String dummyCDSResponse = "{\"created\":0,\"updated\":0,\"skipped\":0,\"deleted\":0,\"failed\":0,\"errors\":[]}";
-
                 switch (request.getPath()) {
                     case "/content":
-                        return new MockResponse().setResponseCode(200).setBody(dummyCDSResponse);
+                        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+                        responseData.data = new LocaleData.TxPostResponseData.Data();
+                        responseData.data.id = jobId;
+                        responseData.data.links = new LocaleData.TxPostResponseData.Data.Links();
+                        responseData.data.links.job = jobLink;
+                        return new MockResponse().setResponseCode(202).setBody(gson.toJson(responseData));
+                    case jobLink:
+                        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+                        jobStatus.data = new LocaleData.TxJobStatus.Data();
+                        jobStatus.data.status = "completed";
+                        jobStatus.data.details = new LocaleData.TxJobStatus.Data.Details();
+                        jobStatus.data.details.created = 2;
+                        return new MockResponse().setResponseCode(200).setBody(gson.toJson(jobStatus));
                 }
+
                 return new MockResponse().setResponseCode(404);
             }
         };

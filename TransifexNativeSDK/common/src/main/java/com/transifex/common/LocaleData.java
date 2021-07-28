@@ -185,33 +185,68 @@ public class LocaleData {
      *     https://github.com/transifex/transifex-delivery/#push-content</a>
      */
     public static class TxPostResponseData {
-        public int created;
-        public int updated;
-        public int skipped;
-        public int deleted;
-        public int failed;
-        public Error[] errors;
 
-        public boolean isSuccessful() {
-            return errors == null || errors.length == 0;
-        }
-
-        public static class Error {
-            public int status;
-            public String code;
-            public String title;
-            public String detail;
-
-            @Override
-            public String toString() {
-                return "Error{" +
-                        "status=" + status +
-                        ", code='" + code + '\'' +
-                        ", title='" + title + '\'' +
-                        ", detail='" + detail + '\'' +
-                        '}';
+        public static class Data {
+            public static class Links {
+                public String job;
             }
+
+            public String id;
+            public Links links;
         }
+
+        public Data data;
+    }
+
+    /**
+     * The data structure that CDS responds with when getting the job status after pushing the
+     * source strings.
+     *
+     * @see <a href="https://github.com/transifex/transifex-delivery/#job-status">
+     *     https://github.com/transifex/transifex-delivery/#job-status</a>
+     */
+    public static class TxJobStatus {
+         public static class Data {
+
+             public static class Error {
+                 public int status;
+                 public String code;
+                 public String title;
+                 public String detail;
+
+                 @Override
+                 public String toString() {
+                     return "Error{" +
+                             "status=" + status +
+                             ", code='" + code + '\'' +
+                             ", title='" + title + '\'' +
+                             ", detail='" + detail + '\'' +
+                             '}';
+                 }
+             }
+
+             public static class Details {
+                 public int created;
+                 public int updated;
+                 public int skipped;
+                 public int deleted;
+                 public int failed;
+             }
+
+             public Details details;
+             public Error[] errors;
+             public String status;
+         }
+
+         public Data data;
+
+         public boolean isCompleted() {
+            return data.status.equals("completed");
+         }
+
+         public boolean hasErrors() {
+            return data.errors == null || data.errors.length != 0;
+         }
     }
 
     //endregion
