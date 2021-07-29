@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.TimeLimitExceededException;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -187,9 +189,11 @@ public class CDSHandler {
                 LOGGER.log(Level.SEVERE, "IOException for locale " + localeCode + " : " + e);
 
                 // https://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
-                try {
-                    Utils.readInputStream(connection.getErrorStream());
-                } catch (IOException ignored) {}
+                if (connection.getErrorStream() != null) {
+                    try {
+                        Utils.readInputStream(connection.getErrorStream());
+                    } catch (IOException ignored) {}
+                }
 
                 return new ConnectionData(connection, null, e);
             }
@@ -328,18 +332,46 @@ public class CDSHandler {
     }
 
     /**
+     * Pushes the provided source strings to CDS and waits until the server completes the processing
+     * of the pushed strings.
+     * <p>
+     * The method is synchronous.
+     *
+     * @param postData The data structure containing the source strings and the purge value.
+     *
+     * @return A {@link LocaleData.TxJobStatus} object containing the server's response. The
+     * caller should check the job status and act according to the
+     * <a href="https://github.com/transifex/transifex-delivery/#job-status">CDS documentation</a>.
+     * The job status can be either <code>"completed"</code> or <code>"failed"</code>.
+     * If everything fails, <code>null</code> is returned.
+     *
+     * @throws TimeLimitExceededException When the server takes longer than 20 seconds to complete
+     * processing the job.
+     */
+    public @Nullable
+    LocaleData.TxJobStatus pushSourceStrings(@NonNull LocaleData.TxPostData postData) throws TimeLimitExceededException {
+        LocaleData.TxPostResponseData response = pushSourceStringsInternal(postData);
+        if (response == null) {
+            return null;
+        }
+        return getJobStatus(response);
+    }
+
+    /**
      * Pushes the provided source strings to CDS.
      * <p>
      * The method is synchronous.
      *
-     * @param postData The data containing the source strings and the purge value.
+     * @param postData The data structure containing the source strings and the purge value.
      *
-     * @return A {@link LocaleData.TxPostResponseData} object containing the server's response. The
-     * caller should check if the response contains errors or not. If everything fails,
-     * <code>null</code> is returned.
+     * @return A {@link LocaleData.TxPostResponseData} object containing the job id that handles
+     * the pushed strings. You can query the job status using
+     * {@link #getJobStatus(LocaleData.TxPostResponseData)}.
+     *
+     * @see <a href="https://github.com/transifex/transifex-delivery/#push-content">
+     *     https://github.com/transifex/transifex-delivery/#push-content</a>
      */
-    public @Nullable
-    LocaleData.TxPostResponseData pushSourceStrings(@NonNull LocaleData.TxPostData postData) {
+    private @Nullable LocaleData.TxPostResponseData pushSourceStringsInternal(@NonNull LocaleData.TxPostData postData) {
         // Check URL
         URL url = null;
         try {
@@ -352,6 +384,7 @@ public class CDSHandler {
         }
 
         // Post data
+        LocaleData.TxPostResponseData responseData = null;
         HttpURLConnection connection = null;
         try {
             connection = (HttpURLConnection) url.openConnection();
@@ -371,15 +404,26 @@ public class CDSHandler {
             writer.close();
 
             int code = connection.getResponseCode();
+
             switch (code) {
-                case 200: {
-                    String result = Utils.readInputStream(connection.getInputStream());
-                    return mGson.fromJson(result, LocaleData.TxPostResponseData.class);
+                case 202: {
+                    String response = Utils.readInputStream(connection.getInputStream());
+                    responseData = mGson.fromJson(response, LocaleData.TxPostResponseData.class);
+                    if (responseData.data == null || responseData.data.links == null
+                            || responseData.data.links.job == null
+                            || responseData.data.links.job.isEmpty()) {
+                        LOGGER.log(Level.SEVERE, "Invalid server response" );
+                        return null;
+                    }
+                    return responseData;
                 }
                 case 409: {
-                    LOGGER.log(Level.SEVERE, "Server responded with code " + code);
-                    String result = Utils.readInputStream(connection.getErrorStream());
-                    return mGson.fromJson(result, LocaleData.TxPostResponseData.class);
+                    LOGGER.log(Level.SEVERE, "Server responded with code " + code + "\n"
+                            + "Another content upload is already in progress");
+                    if (connection.getErrorStream() != null) {
+                        Utils.readInputStream(connection.getErrorStream());
+                    }
+                    return null;
                 }
                 default:
                     LOGGER.log(Level.SEVERE, "Server responded with code " + code);
@@ -389,10 +433,12 @@ public class CDSHandler {
             LOGGER.log(Level.SEVERE, "IOException: " + e);
 
             // https://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
-            try {
-                Utils.readInputStream(connection.getErrorStream());
-                connection.getErrorStream().close();
-            } catch (IOException ignored) {}
+            if (connection.getErrorStream() != null) {
+                try {
+                    Utils.readInputStream(connection.getErrorStream());
+                } catch (IOException ignored) {
+                }
+            }
 
             return null;
         } catch(JsonSyntaxException e) {
@@ -402,6 +448,90 @@ public class CDSHandler {
         } finally {
             connection.disconnect();
         }
+    }
+
+    /**
+     * Queries the job status after a call to {@link #pushSourceStringsInternal(LocaleData.TxPostData)}
+     * and waits until the job is completed.
+     * <p>
+     * The method is synchronous.
+     *
+     * @param responseData The server's response after a call to
+     * {@link #pushSourceStringsInternal(LocaleData.TxPostData)}.
+     *
+     * @return The job status object or <code>null</code> if everything failed. The job status can
+     * be either <code>"completed"</code> or <code>"failed"</code>.
+     *
+     * @throws TimeLimitExceededException When the server takes longer than 20 seconds to complete
+     * processing the job.
+     *
+     * @see <a href="https://github.com/transifex/transifex-delivery/#job-status">
+     *     https://github.com/transifex/transifex-delivery/#job-status</a>
+     */
+    private @Nullable LocaleData.TxJobStatus getJobStatus(@NonNull LocaleData.TxPostResponseData responseData) throws TimeLimitExceededException {
+        URL url = null;
+        try {
+            URI cdsContentURI = new URI(mCdsHost);
+            cdsContentURI = new URIBuilderTiny(cdsContentURI).appendRawPaths(responseData.data.links.job).build();
+            url = new URL(cdsContentURI.toString());
+        } catch (MalformedURLException | URISyntaxException e) {
+            LOGGER.log(Level.SEVERE, "Invalid CDS host URL: " + mCdsHost);
+            return null;
+        }
+
+        HttpURLConnection connection = null;
+
+        for (int tries = 0; tries < MAX_RETRIES; tries++) {
+            try {
+                connection = (HttpURLConnection) url.openConnection();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "IOException when opening connection: " + e);
+                return null;
+            }
+
+            addHeaders(connection, true, null);
+
+            try {
+                connection.connect();
+                int code = connection.getResponseCode();
+                switch (code) {
+                    case 200: {
+                        String result = Utils.readInputStream(connection.getInputStream());
+                        LocaleData.TxJobStatus jobStatus = mGson.fromJson(result, LocaleData.TxJobStatus.class);
+                        if (jobStatus.data.status.equals("pending")
+                                || jobStatus.data.status.equals("processing")) {
+                            if (tries > 0) {
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException ignore) {}
+                            }
+                            continue;
+                        }
+
+                        return jobStatus;
+                    }
+                    default:
+                        LOGGER.log(Level.SEVERE, "Server responded with code " + code);
+                        return null;
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "IOException:" + e);
+
+                // https://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
+                if (connection.getErrorStream() != null) {
+                    try {
+                        Utils.readInputStream(connection.getErrorStream());
+                    } catch (IOException ignored) {}
+                }
+
+                return null;
+            }
+            finally {
+                connection.disconnect();
+            }
+        }
+
+        throw new TimeLimitExceededException("Server is still processing the pushed strings");
     }
 
     /**
@@ -426,6 +556,7 @@ public class CDSHandler {
         }
 
         connection.addRequestProperty("x-native-sdk", "mobile/android/" + BuildProperties.getSDKVersion());
+        connection.addRequestProperty("Accept-version", "v2");
 
         if (etag != null) {
             connection.addRequestProperty("If-None-Match", etag);

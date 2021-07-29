@@ -187,26 +187,39 @@ public class LocaleDataTest {
     }
 
     @Test
-    public void testTxPostResponseDataIsSuccessful_noErrors_successful() {
-        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
+    public void testTxJobStatusIsCompleted_completed_returnTrue() {
+        LocaleData.TxJobStatus responseData = new LocaleData.TxJobStatus();
+        responseData.data = new LocaleData.TxJobStatus.Data();
+        responseData.data.status = "completed";
 
-        assertThat(responseData.isSuccessful()).isTrue();
+        assertThat(responseData.isCompleted()).isTrue();
     }
 
     @Test
-    public void testTxPostResponseDataIsSuccessful_emptyErrorArray_successful() {
-        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
-        responseData.errors = new LocaleData.TxPostResponseData.Error[0];
+    public void testTxJobStatusIsCompleted_failed_returnFalse() {
+        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+        jobStatus.data = new LocaleData.TxJobStatus.Data();
+        jobStatus.data.status = "failed";
 
-        assertThat(responseData.isSuccessful()).isTrue();
+        assertThat(jobStatus.isCompleted()).isFalse();
     }
 
     @Test
-    public void testTxPostResponseDataIsSuccessful_errors_notSuccessful() {
-        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
-        responseData.errors = new LocaleData.TxPostResponseData.Error[]{new LocaleData.TxPostResponseData.Error()};
+    public void testTxJobStatusHasErrors_emptyErrorArray_returnFalse() {
+        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+        jobStatus.data = new LocaleData.TxJobStatus.Data();
+        jobStatus.data.errors = new LocaleData.TxJobStatus.Data.Error[0];
 
-        assertThat(responseData.isSuccessful()).isFalse();
+        assertThat(jobStatus.hasErrors()).isFalse();
+    }
+
+    @Test
+    public void testTxJobStatusHasErrors_hasError_returnTrue() {
+        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
+        jobStatus.data = new LocaleData.TxJobStatus.Data();
+        jobStatus.data.errors = new LocaleData.TxJobStatus.Data.Error[]{new LocaleData.TxJobStatus.Data.Error()};
+
+        assertThat(jobStatus.hasErrors()).isTrue();
     }
 
 }
