@@ -101,6 +101,10 @@ class StringXMLConverter {
             if (child.getName().equals("string")) {
                 String key = child.getAttribute("name").getValue();
                 String string = getXMLText(child);
+                // Ignore resource references
+                if (string.startsWith("@")) {
+                    continue;
+                }
                 stringMap.put(key, new LocaleData.StringInfo(string));
             }
             else if (child.getName().equals("plurals")) {
@@ -109,11 +113,19 @@ class StringXMLConverter {
                 if (pluralItems.isEmpty()) {
                     continue;
                 }
+                boolean hasResourceReference = false;
                 Plurals.Builder sb = new Plurals.Builder();
                 for (Element item : pluralItems) {
                     String quantity = item.getAttribute("quantity").getValue();
                     String itemString = getXMLText(item);
+                    if (itemString.startsWith("@")) {
+                        hasResourceReference = true;
+                        break;
+                    }
                     sb.setPlural(quantity, itemString);
+                }
+                if (hasResourceReference) {
+                    continue;
                 }
                 Plurals plurals;
                 try {

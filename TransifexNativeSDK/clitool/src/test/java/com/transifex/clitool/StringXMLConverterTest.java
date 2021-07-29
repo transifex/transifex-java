@@ -25,6 +25,8 @@ public class StringXMLConverterTest {
                     "    <string name=\"key1\">Some text</string>\n" +
                     "\n" +
                     "    <string name=\"key2\">Some text 2</string>\n" +
+                    "\n" +
+                    "    <string name=\"key3\">@string/key2</string>\n" +
                     "</resources>";
     private static final String stringsXMLTranslatable =
             "<resources>\n" +
