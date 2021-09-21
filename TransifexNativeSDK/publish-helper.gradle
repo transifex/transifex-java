@@ -21,6 +21,8 @@ task androidJavadoc(type: Javadoc) {
     options {
         addStringOption 'docencoding', 'utf-8'
         addStringOption 'charset', 'utf-8'
+        addStringOption 'source', '8'
+        addStringOption('Xdoclint:none', 'quiet')
         links 'https://docs.oracle.com/javase/7/docs/api/'
         links 'https://d.android.com/reference'
         links 'https://developer.android.com/reference/androidx/'

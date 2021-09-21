@@ -27,7 +27,7 @@ public class CDSHandlerAndroid extends CDSHandler {
     private final Executor mExecutor;
 
     /**
-     * A callback that provides the results of {@link #fetchTranslationsAsync(String, FetchTranslationsCallback)}
+     * A callback that provides the results of {@link #fetchTranslationsAsync(String, Set, FetchTranslationsCallback)}
      * when the operation is complete.
      */
     interface FetchTranslationsCallback {
