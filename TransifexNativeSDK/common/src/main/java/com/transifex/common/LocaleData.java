@@ -360,7 +360,7 @@ public class LocaleData {
         private final HashMap<String, LocaleStrings> mHashMap;
 
         /**
-         * Constructs an empty <tt>TranslationMap</tt> with the specified initial capacity.
+         * Constructs an empty <code>TranslationMap</code> with the specified initial capacity.
          *
          * @param initialCapacity The initial capacity. Set to the number of expected locales.
          */
