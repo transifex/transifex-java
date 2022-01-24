@@ -3,18 +3,18 @@
 [![CI](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg)](https://github.com/transifex/transifex-java/actions/workflows/gradle.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
-Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
-using [Transifex Native](https://www.transifex.com/native/). The Android library can fetch translations 
+Transifex Native Android SDK is a collection of tools to easily localize your Android applications
+using [Transifex Native](https://www.transifex.com/native/). The Android library can fetch translations
 over the air (OTA) to your apps and the command line tool can upload your app's source strings to Transifex.
 
-Learn more about [Transifex Native](https://docs.transifex.com/transifex-native-sdk-overview/introduction).
+Learn more about [Transifex Native](https://developers.transifex.com/docs/native).
 
 The full documentation is available at [https://transifex.github.io/transifex-java/](https://transifex.github.io/transifex-java/)
 
 ## Usage
 
-The SDK allows you to keep using the same string methods that Android 
-provides, such as `getString(int id)`, `getText(int id)`, etc, but at the same time taking 
+The SDK allows you to keep using the same string methods that Android
+provides, such as `getString(int id)`, `getText(int id)`, etc, but at the same time taking
 advantage of the features that Transifex Native offers, such as OTA translations.
 
 ### SDK installation
@@ -28,13 +28,13 @@ implementation 'com.transifex.txnative:txsdk:0.x.y'
 Please replace `x` and `y` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
-The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.2.0. 
+The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.2.0.
 
 The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat 1.2.0.
 
-### SDK configuration 
+### SDK configuration
 
-Configure the SDK in your `Application` class. 
+Configure the SDK in your `Application` class.
 
 The language codes supported by Transifex can be found [here](https://www.transifex.com/explore/languages/). They can either use 2 characters, such as `es`, or specify the regional code as well, such as `es_ES`. Keep in mind that in the sample code below you will have to replace `<transifex_token>` with the actual token that is associated with your Transifex project and resource.
 
@@ -42,7 +42,7 @@ The language codes supported by Transifex can be found [here](https://www.transi
     @Override
     public void onCreate() {
         super.onCreate();
-        
+
         // Initialize TxNative
         String token = "<transifex_token>";
 
@@ -50,7 +50,7 @@ The language codes supported by Transifex can be found [here](https://www.transi
                 "en",                                                                 // source locale
                 new String[]{"en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"},   // supported locales
                 null);
-        
+
         TxNative.init(
                 getApplicationContext(),   // application context
                 localeState,               // a LocaleState instance
@@ -91,7 +91,7 @@ If your app doesn't use `Appcompat`, you should define a dummy string in your de
 
 This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don't do that, Android will always pick the first locale selected by the user.
 
-### Context Wrapping 
+### Context Wrapping
 
 The SDK's functionality is enabled by wrapping the context, so that all string resource related methods, such a [`getString()`](https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)), [`getText()`](https://developer.android.com/reference/android/content/res/Resources#getText(int)), flow through the SDK.
 
@@ -152,25 +152,25 @@ If you want to use the SDK in some arbitrary place where you can get your applic
 ```java
     ...
     // Wrap the context
-    Context wrappedContext = TxNative.generalWrap(getApplicationContext()); 
+    Context wrappedContext = TxNative.generalWrap(getApplicationContext());
     // Use the wrapped context for getting a string
-    wrappedContext.getString();                                      
+    wrappedContext.getString();
 ```
 
 If you want to disable the SDK functionality, don't initialize it and don't call any `TxNative` methods. `TxNative.wrap()` and `TxNative.generalWrap()` will be a no-op and the context will not be wrapped. Thus, all `getString()` etc methods, won't flow through the SDK.
 
 ### Fetching translations
 
-As soon as `fetchTranslations()` is called, the SDK will attempt to download the 
-translations for the locales that are defined in the initialization of `TxNative` and 
+As soon as `fetchTranslations()` is called, the SDK will attempt to download the
+translations for the locales that are defined in the initialization of `TxNative` and
 the source locale strings.
 
 The `fetchTranslations()` method in the previous example is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
 
 ### Invalidating CDS cache
 
-The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex 
-and you need to see them on your app immediately, you need to make an HTTP request 
+The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex
+and you need to see them on your app immediately, you need to make an HTTP request
 to the [invalidation endpoint](https://github.com/transifex/transifex-delivery/#invalidate-cache) of CDS.
 
 ### Standard Cache
@@ -260,7 +260,7 @@ Get help for a particular command.
 
 `transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`
 
-Pushes the source strings of your app found in a module named "app_module_name". The tool reads the `strings.xml` resource file found in the main source set of the specified module: `app_module_name/src/main/res/values/strings.xml`. It processes it and pushes the result to the Transifex CDS. 
+Pushes the source strings of your app found in a module named "app_module_name". The tool reads the `strings.xml` resource file found in the main source set of the specified module: `app_module_name/src/main/res/values/strings.xml`. It processes it and pushes the result to the Transifex CDS.
 
 `transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml`
 
@@ -319,7 +319,7 @@ The following string operations will result in string rendering through TxNative
 * The lib calls string resource methods such as `getString()`, e.g. for logging or something else, using the context that the main app passes through initialization.
 * The lib has views that reference strings via layout or code and the main app displays these views in its activities.
 
-Note that if the main app starts any activity provided by the lib, string rendering won't go through TxNative. If you want to achieve this, you will have to integrate TxNative in the lib by following these steps: 
+Note that if the main app starts any activity provided by the lib, string rendering won't go through TxNative. If you want to achieve this, you will have to integrate TxNative in the lib by following these steps:
 1. Use TxNative as a dependency in your library.
 2. Implement TxNative in the lib's activities.
 3. Note that TxNative should not be initialized inside the lib. The main app is responsible for this.

@@ -4,14 +4,14 @@
 </style></head><body><h1 id="transifex-native-android-sdk">Transifex Native Android SDK</h1>
 <p><a href="https://github.com/transifex/transifex-java/actions/workflows/gradle.yml"><img src="https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg" alt="CI"></a>
 <a href="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk"><img src="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg" alt="Maven Central"></a></p>
-<p>Transifex Native Android SDK is a collection of tools to easily localize your Android applications 
-using <a href="https://www.transifex.com/native/">Transifex Native</a>. The Android library can fetch translations 
+<p>Transifex Native Android SDK is a collection of tools to easily localize your Android applications
+using <a href="https://www.transifex.com/native/">Transifex Native</a>. The Android library can fetch translations
 over the air (OTA) to your apps and the command line tool can upload your app&#39;s source strings to Transifex.</p>
-<p>Learn more about <a href="https://docs.transifex.com/transifex-native-sdk-overview/introduction">Transifex Native</a>.</p>
+<p>Learn more about <a href="https://developers.transifex.com/docs/native">Transifex Native</a>.</p>
 <p>The full documentation is available at <a href="https://transifex.github.io/transifex-java/">https://transifex.github.io/transifex-java/</a></p>
 <h2 id="usage">Usage</h2>
-<p>The SDK allows you to keep using the same string methods that Android 
-provides, such as <code>getString(int id)</code>, <code>getText(int id)</code>, etc, but at the same time taking 
+<p>The SDK allows you to keep using the same string methods that Android
+provides, such as <code>getString(int id)</code>, <code>getText(int id)</code>, etc, but at the same time taking
 advantage of the features that Transifex Native offers, such as OTA translations.</p>
 <h3 id="sdk-installation">SDK installation</h3>
 <p>Include the dependency:</p>
@@ -114,19 +114,19 @@ advantage of the features that Transifex Native offers, such as OTA translations
 <p>If you want to use the SDK in some arbitrary place where you can get your application&#39;s context, please do the following:</p>
 <pre><code class="lang-java">    ...
     <span class="hljs-comment">// Wrap the context</span>
-    Context wrappedContext = TxNative.generalWrap(getApplicationContext()); 
+    Context wrappedContext = TxNative.generalWrap(getApplicationContext());
     <span class="hljs-comment">// Use the wrapped context for getting a string</span>
     wrappedContext.getString();
 </code></pre>
 <p>If you want to disable the SDK functionality, don&#39;t initialize it and don&#39;t call any <code>TxNative</code> methods. <code>TxNative.wrap()</code> and <code>TxNative.generalWrap()</code> will be a no-op and the context will not be wrapped. Thus, all <code>getString()</code> etc methods, won&#39;t flow through the SDK.</p>
 <h3 id="fetching-translations">Fetching translations</h3>
-<p>As soon as <code>fetchTranslations()</code> is called, the SDK will attempt to download the 
-translations for the locales that are defined in the initialization of <code>TxNative</code> and 
+<p>As soon as <code>fetchTranslations()</code> is called, the SDK will attempt to download the
+translations for the locales that are defined in the initialization of <code>TxNative</code> and
 the source locale strings.</p>
 <p>The <code>fetchTranslations()</code> method in the previous example is called as soon as the application launches, but that&#39;s not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).</p>
 <h3 id="invalidating-cds-cache">Invalidating CDS cache</h3>
-<p>The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex 
-and you need to see them on your app immediately, you need to make an HTTP request 
+<p>The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex
+and you need to see them on your app immediately, you need to make an HTTP request
 to the <a href="https://github.com/transifex/transifex-delivery/#invalidate-cache">invalidation endpoint</a> of CDS.</p>
 <h3 id="standard-cache">Standard Cache</h3>
 <p>The default cache strategy used by the SDK, if no other cache is provided by the developer, is the <code>TxStandardCache.getCache()</code>. The standard cache operates by making use of the publicly exposed classes and interfaces from the <code>com.transifex.txnative.cache</code> package of the SDK, so it&#39;s easy to construct another cache strategy if that&#39;s desired.</p>
