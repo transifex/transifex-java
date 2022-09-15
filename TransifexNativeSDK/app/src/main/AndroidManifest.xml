@@ -20,7 +20,8 @@
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity android:name=".MainActivity"
-            android:label="@string/demo_activity_name">
+            android:label="@string/demo_activity_name"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

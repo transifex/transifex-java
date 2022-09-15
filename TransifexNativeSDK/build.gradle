@@ -1,8 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.versions = [
-            'kotlin' : '1.5.20',
-            'androidXAnnotation' : '1.2.0'
+            'kotlin' : '1.7.10',
+            'androidXAnnotation' : '1.4.0'
     ]
     ext {
         sdkVersionCode = 4                      // version code for txsdk
@@ -16,7 +16,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -25,7 +25,7 @@ buildscript {
 }
 
 plugins {
-    id "io.github.gradle-nexus.publish-plugin" version "1.0.0"
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
 allprojects {
@@ -89,7 +89,7 @@ gradle.projectsEvaluated {
             addStringOption 'docencoding', 'utf-8'
             addStringOption 'charset', 'utf-8'
             addStringOption 'source', '8'
-            addStringOption('Xdoclint:none', 'quiet')
+            addBooleanOption('Xdoclint:none', true)
             addStringOption 'overview', 'doc/readme.html'
             links 'https://docs.oracle.com/javase/7/docs/api/'
             links 'https://d.android.com/reference'

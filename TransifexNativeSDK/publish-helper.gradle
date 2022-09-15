@@ -22,7 +22,7 @@ task androidJavadoc(type: Javadoc) {
         addStringOption 'docencoding', 'utf-8'
         addStringOption 'charset', 'utf-8'
         addStringOption 'source', '8'
-        addStringOption('Xdoclint:none', 'quiet')
+        addBooleanOption('Xdoclint:none', true)
         links 'https://docs.oracle.com/javase/7/docs/api/'
         links 'https://d.android.com/reference'
         links 'https://developer.android.com/reference/androidx/'
@@ -51,19 +51,24 @@ task javaSourcesJar(type: Jar) {
 afterEvaluate {
     publishing {
         publications {
-            // Creates a Maven publication called 'library'.
+            // Creates a Maven publication called 'release'.
             release(MavenPublication) {
                 if (plugins.hasPlugin('android-library')) {
                     from components.release
+
+                    artifact androidJavadocJar
+                    // artifact javaSourcesJar is removed. It's created by AGP in the android
+                    // publishing block.
                 }
                 else if (plugins.hasPlugin('java')) {
                     from components.java
                     jar.preserveFileTimestamps = false
                     jar.reproducibleFileOrder = true
+
+                    artifact androidJavadocJar
+                    artifact javaSourcesJar
                 }
 
-                artifact androidJavadocJar
-                artifact javaSourcesJar
 
                 groupId rootProject.ext.pomGroupID
                 version rootProject.ext.sdkVersion

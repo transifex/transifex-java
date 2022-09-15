@@ -17,7 +17,7 @@ tasks.withType(Test) {
 
 dependencies {
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'net.moznion:uribuilder-tiny:2.7.1'
 
     testCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"

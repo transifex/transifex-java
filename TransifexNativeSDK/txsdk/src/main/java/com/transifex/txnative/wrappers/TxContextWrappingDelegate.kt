@@ -11,7 +11,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.appcompat.widget.Toolbar
 import com.transifex.txnative.TxNative
 
-// This class makes resource interception work in Appcompat 1.2.0
+// This class makes resource interception work in Appcompat 1.2.0 and later
 // https://github.com/JcMinarro/Philology/issues/35
 // https://stackoverflow.com/questions/55265834/change-locale-not-work-after-migrate-to-androidx/58004553#58004553
 
