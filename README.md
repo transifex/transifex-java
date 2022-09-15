@@ -22,15 +22,15 @@ advantage of the features that Transifex Native offers, such as OTA translations
 Include the dependency:
 
 ```groovy
-implementation 'com.transifex.txnative:txsdk:0.x.y'
+implementation 'com.transifex.txnative:txsdk:x.y.z'
 ```
 
-Please replace `x` and `y` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
+Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
-The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.2.0.
+The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.5.0.
 
-The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat 1.2.0.
+The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat.
 
 ### SDK configuration
 
@@ -66,7 +66,7 @@ The language codes supported by Transifex can be found [here](https://www.transi
 
 In this example, the SDK uses its default cache, `TxStandardCache`, and missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
 
-Besides downloading translations for all locales, you can also target specific locales or strings that have specific tags.
+Instead of downloading translations for all locales, you can target specific locales or strings that have specific tags.
 
 Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, it suffices to place the supported app languages in your app’s gradle file:
 
@@ -95,45 +95,11 @@ This will let Android know which locales your app supports and help it choose th
 
 The SDK's functionality is enabled by wrapping the context, so that all string resource related methods, such a [`getString()`](https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)), [`getText()`](https://developer.android.com/reference/android/content/res/Resources#getText(int)), flow through the SDK.
 
-To enable context wrapping in your activity, use the following code or have your activity extend a base class:
+To enable context wrapping in your `AppCompatActivity`, extend the SDK's [TxBaseAppcompatActivity](https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseAppCompatActivity) or copy its [implementation](https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseAppCompatActivity.java) to your own base class. 
+If you are using an older `AppCompat` version, please read the class's implementation as you may need to uncomment some code.
 
-```java
-public class BaseActivity extends Activity {
 
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(TxNative.wrap(base));
-    }
-
-}
-```
-
-If your activity extends `AppCompatActivity` activity, use the following code or have your activity extend a base class:
-```java
-public class BaseAppCompatActivity extends AppCompatActivity {
-
-    private TxContextWrappingDelegate mAppCompatDelegate;
-    private Resources mResources;
-
-    @NonNull
-    @Override
-    public AppCompatDelegate getDelegate() {
-        if (mAppCompatDelegate == null) {
-            mAppCompatDelegate = new TxContextWrappingDelegate(super.getDelegate());
-        }
-        return mAppCompatDelegate;
-    }
-
-    @SuppressLint("RestrictedApi")
-    @Override
-    public Resources getResources() {
-        if (mResources == null && VectorEnabledTintResources.shouldBeUsed()) {
-            mResources = new VectorEnabledTintResourcesWrapper(this, getBaseContext().getResources());
-        }
-        return mResources == null ? super.getResources() : mResources;
-    }
-}
-```
+If you don't use `AppCompat`, extend the SDK's [TxBaseActivity](https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseActivity) or copy its [implementation](https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseActivity.java) to your own base class.
 
 If you want to use the SDK outside an activity's context, such as a service context, make sure that you wrap the context:
 
@@ -320,7 +286,7 @@ The following string operations will result in string rendering through TxNative
 * The lib has views that reference strings via layout or code and the main app displays these views in its activities.
 
 Note that if the main app starts any activity provided by the lib, string rendering won't go through TxNative. If you want to achieve this, you will have to integrate TxNative in the lib by following these steps:
-1. Use TxNative as a dependency in your library.
+1. Use TxNative as a dependency in the lib.
 2. Implement TxNative in the lib's activities.
 3. Note that TxNative should not be initialized inside the lib. The main app is responsible for this.
 

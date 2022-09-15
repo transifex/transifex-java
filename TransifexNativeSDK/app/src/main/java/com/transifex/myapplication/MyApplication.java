@@ -12,8 +12,13 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // Uncomment to test our VectorEnabled wrapper
-        //AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        // Uncomment to test vector resources when running on older  platforms (< API 21)
+//        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
+        // Uncomment to test if everything works when AppCompat changes the resources to force
+        // night mode:
+        // https://stackoverflow.com/questions/55265834/change-locale-not-work-after-migrate-to-androidx/58004553#58004553
+//        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
 
         // Initialize TxNative
         String token = null;

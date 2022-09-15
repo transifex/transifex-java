@@ -7,12 +7,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.TextView;
 
+import com.transifex.txnative.activity.TxBaseAppCompatActivity;
+
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.text.HtmlCompat;
 
 
 // Extend your activity from BaseAppCompatActivity or BaseActivity
-public class MainActivity extends BaseAppCompatActivity {
+public class MainActivity extends TxBaseAppCompatActivity {
+
+    public static final String TAG = MainActivity.class.getSimpleName();
 
     Toolbar mToolbar;
     TextView mHelloLabel;
