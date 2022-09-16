@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key1">a"b\"c\\"d</string>
+    <string name="key2">a'b\'c\\'d</string>
+    <string name="key3">This <font color="#FF7700">is</font> a <b>bold</b> statement</string>
+    <string name="key4">&quot;\&quot;</string>
+</resources>

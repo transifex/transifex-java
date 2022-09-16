@@ -37,7 +37,11 @@ public class MyApplication extends Application {
                 null,                      // a TxCache implementation
                 null);                     // a MissingPolicy implementation
 
-        //TxNative.setTestMode(true);
+        // Uncomment to use strings as served by Android prefixed with "test: "
+//        TxNative.setTestMode(true);
+
+        // Required to render the HTML styling of R.string.styled_text_not_escaped
+//        TxNative.setSupportSpannable(true);
 
         // Fetch all translations from CDS
         TxNative.fetchTranslations(null, null);

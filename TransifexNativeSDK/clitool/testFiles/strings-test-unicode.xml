@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key1">Ελληνικά!</string>
+    <string name="key2">unicode heart: ❤</string>
+    <string name="key3">escaped heart: \u2764</string>
+</resources>

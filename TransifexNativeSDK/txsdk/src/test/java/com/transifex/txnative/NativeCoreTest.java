@@ -110,6 +110,7 @@ public class NativeCoreTest {
     }
 
     private static final String STRING_WITHOUT_TAGS = "this is not bold";
+    private static final String STRING_WITHOUT_TAGS_AND_HTML_ENTITIES = "there is a new\nline &amp; multiple   spaces";
     private static final String STRING_WITH_TAGS = "this is <b>bold</b>";
     private static final String STRING_WITH_TAGS_HTML_ESCAPED = "this is &lt;b>bold&lt;/b>";
 
@@ -306,8 +307,9 @@ public class NativeCoreTest {
 
     @Test
     @Config(qualifiers = "en")
-    public void testGetSpannedString_spanSupportEnabledWithHTMLEscapedString_returnSpannedString() {
-        // We expect the tags, even though they use "&lt;" instead of "<" to be parsed into spans
+    public void testGetSpannedString_spanSupportEnabledWithHTMLEscapedString_returnStringWithTags() {
+        // We expect to get a String object, since no tags exist in the  parsed string.
+        // However, "&lt;" should be converted to "<", so that tags exist in the returned string.
 
         LocaleState localeState = new LocaleState(mockContext,
                 "en",
@@ -354,6 +356,26 @@ public class NativeCoreTest {
         CharSequence string = nativeCore.getSpannedString(STRING_WITHOUT_TAGS);
 
         assertThat(string).isInstanceOf(String.class);
+    }
+
+    @Test
+    @Config(qualifiers = "en")
+    public void testGetSpannedString_spanSupportEnabledWithSimpleStringWithHTMLEntities_returnStringWithUnescapedHTMLEntities() {
+        // We expect to get a String object, since no tags exist in the  parsed string. New lines and
+        // multiple spaces should be preserved. "&amp;" should be converted to "&"
+
+        LocaleState localeState = new LocaleState(mockContext,
+                "en",
+                new String[]{"en", "el"},
+                null);
+        TxMemoryCache dummyCache = getEmptyMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        nativeCore.setSupportSpannable(true);
+
+        CharSequence string = nativeCore.getSpannedString(STRING_WITHOUT_TAGS_AND_HTML_ENTITIES);
+
+        assertThat(string).isInstanceOf(String.class);
+        assertThat(string).isEqualTo("there is a new\nline & multiple   spaces");
     }
 
     @Test
@@ -422,6 +444,26 @@ public class NativeCoreTest {
 
         assertThat(styledPart).isNotNull();
         assertThat(styledPart.toString()).isEqualTo("bold");
+    }
+
+    @Test
+    @Config(qualifiers = "en")
+    public void testGetSpannedString_spanSupportDisabledWithSimpleStringWithHTMLEntities_returnStringWithUnescapedHTMLEntities() {
+        // We expect to get a String object, since no tags exist in the  parsed string. New lines and
+        // multiple spaces should be preserved. "&amp;" should be converted to "&"
+
+        LocaleState localeState = new LocaleState(mockContext,
+                "en",
+                new String[]{"en", "el"},
+                null);
+        TxMemoryCache dummyCache = getEmptyMemoryCache();
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        nativeCore.setSupportSpannable(false);
+
+        CharSequence string = nativeCore.getSpannedString(STRING_WITHOUT_TAGS_AND_HTML_ENTITIES);
+
+        assertThat(string).isInstanceOf(String.class);
+        assertThat(string).isEqualTo("there is a new\nline & multiple   spaces");
     }
 
     // endregion spanned string

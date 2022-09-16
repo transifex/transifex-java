@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key1">a\tb\\tc</string>
+    <string name="key2">actual tab	should be replaced by space</string>
+    <string name="key3">multiple escaped tabs\t\t\tare preserved as tabs</string>
+    <string name="key4">multiple real tabs			are collapsed to a single space</string>
+</resources>
