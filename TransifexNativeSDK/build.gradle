@@ -91,9 +91,10 @@ gradle.projectsEvaluated {
             addStringOption 'source', '8'
             addBooleanOption('Xdoclint:none', true)
             addStringOption 'overview', 'doc/readme.html'
+            addBooleanOption("-frames", true)
             links 'https://docs.oracle.com/javase/7/docs/api/'
             links 'https://d.android.com/reference'
-            links 'https://developer.android.com/reference/androidx/'
+            linksOffline 'https://d.android.com/reference/', 'https://d.android.com/reference/androidx/'
         }
         title = "Transifex Native SDK $sdkVersion"
 
