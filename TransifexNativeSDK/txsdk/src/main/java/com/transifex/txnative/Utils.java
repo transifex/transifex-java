@@ -139,11 +139,32 @@ public class Utils {
     @SuppressWarnings("deprecation")
     @NonNull
     public static Spanned fromHtml(@NonNull String source, int flags) {
-        // taken from androidx.core.text
+        // Taken from androidx.core.text so that it runs in apps that don't depend on appcompat.
         if (Build.VERSION.SDK_INT >= 24) {
             return Html.fromHtml(source, flags);
         }
         return Html.fromHtml(source);
+    }
+
+    /**
+     * Converts HTML entities to the final character similarly to what <code>HtmlCompat.fromHTML()</code>
+     * or the Android XML parser would do.
+     * <p>
+     * The following conversions are performed:
+     * <ul>
+     *     <li>{@code "&amp;"} to {@code "&"}</li>
+     *     <li>{@code "&lt;"} to {@code "<"}</li>
+     *     <li>{@code "&gt;"} to {@code ">"}</li>
+     * </ul>
+     *  <p>Only the HTML entities supported by the Android XML parser are converted.
+     *
+     * @param string A string that may contain HTML entities.
+     * @return The finally rendered string.
+     */
+    public static String unescapeHTMLEntities(String string) {
+        return string.replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&");
     }
 
     /**

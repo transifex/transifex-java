@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key1">this \s should be ignored</string>
+    <string name="key2">an escaped backslash is here \\ is and here \\</string>
+    <string name="key3">the single backslash at the end is preserved \</string>
+</resources>

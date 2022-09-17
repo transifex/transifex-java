@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key1">"multiple spaces are allowed     here" but not    here</string>
+    <string name="key2">"single quotes ' ''" are allowed here but not here''</string>
+    <string name="key3">HTML entity quotes behave like normal &quot;       &quot;quotes</string>
+</resources>

@@ -95,7 +95,7 @@ public class TxNative {
      * </pre>
      *
      * <p>
-     * If enabled, {@link android.text.Html#fromHtml(String, int) Html#fromHtml(String, int)} is
+     * If enabled, {@link androidx.core.text.HtmlCompat#fromHtml(String, int)} is
      * used internally which is more CPU demanding than if left disabled.
      *
      * @see <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">

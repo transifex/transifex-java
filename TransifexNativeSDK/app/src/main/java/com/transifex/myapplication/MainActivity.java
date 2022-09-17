@@ -45,7 +45,7 @@ public class MainActivity extends TxBaseAppCompatActivity {
         mWelcomeLabel.setText(getString(R.string.welcome_text));
         //mWelcomeLabel.setText(R.string.welcome_text); // this also works
 
-        // String array
+        // String array [not supported at the moment]
         mArrayLabel = findViewById(R.id.array_label);
         {
             String[] strings = getResources().getStringArray(R.array.elements_array);
@@ -75,7 +75,7 @@ public class MainActivity extends TxBaseAppCompatActivity {
         mStyledLabel = findViewById(R.id.styled_label);
         {
             String string = getResources().getString(R.string.styled_text);
-            Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_LEGACY);
+            Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
             mStyledLabel.setText(styledString);
         }
 

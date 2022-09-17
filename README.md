@@ -9,15 +9,19 @@ over the air (OTA) to your apps and the command line tool can upload your app's 
 
 Learn more about [Transifex Native](https://developers.transifex.com/docs/native).
 
-The full documentation is available at [https://transifex.github.io/transifex-java/](https://transifex.github.io/transifex-java/)
+The full documentation is available at [https://transifex.github.io/transifex-java/](https://transifex.github.io/transifex-java/).
+
+## Sample app
+
+You can see the SDK used and configured in multiple ways in the provided [sample app](https://github.com/transifex/transifex-java/tree/master/TransifexNativeSDK/app) of this repo.
 
 ## Usage
 
 The SDK allows you to keep using the same string methods that Android
-provides, such as `getString(int id)`, `getText(int id)`, etc, but at the same time taking
+provides, such as `getString(int id)`, `getText(int id)`, etc. or strings in XML layout files, but at the same time taking
 advantage of the features that Transifex Native offers, such as OTA translations.
 
-### SDK installation
+## SDK installation
 
 Include the dependency:
 
@@ -32,11 +36,11 @@ The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [
 
 The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat.
 
-### SDK configuration
+## SDK configuration
 
 Configure the SDK in your `Application` class.
 
-The language codes supported by Transifex can be found [here](https://www.transifex.com/explore/languages/). They can either use 2 characters, such as `es`, or specify the regional code as well, such as `es_ES`. Keep in mind that in the sample code below you will have to replace `<transifex_token>` with the actual token that is associated with your Transifex project and resource.
+The language codes supported by Transifex can be found [here](https://explore.transifex.com/languages/). They can either use 2 characters, such as `es`, or specify the regional code as well, such as `es_ES`. Keep in mind that in the sample code below you will have to replace `<transifex_token>` with the actual token that is associated with your Transifex project and resource.
 
 ```java
     @Override
@@ -66,7 +70,7 @@ The language codes supported by Transifex can be found [here](https://www.transi
 
 In this example, the SDK uses its default cache, `TxStandardCache`, and missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
 
-Instead of downloading translations for all locales, you can target specific locales or strings that have specific tags.
+In this example, we fetch the translations of all locales. If you want, you can target specific locales or strings that have specific tags.
 
 Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, it suffices to place the supported app languages in your app’s gradle file:
 
@@ -91,7 +95,7 @@ If your app doesn't use `Appcompat`, you should define a dummy string in your de
 
 This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don't do that, Android will always pick the first locale selected by the user.
 
-### Context Wrapping
+## Context Wrapping
 
 The SDK's functionality is enabled by wrapping the context, so that all string resource related methods, such a [`getString()`](https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)), [`getText()`](https://developer.android.com/reference/android/content/res/Resources#getText(int)), flow through the SDK.
 
@@ -125,36 +129,32 @@ If you want to use the SDK in some arbitrary place where you can get your applic
 
 If you want to disable the SDK functionality, don't initialize it and don't call any `TxNative` methods. `TxNative.wrap()` and `TxNative.generalWrap()` will be a no-op and the context will not be wrapped. Thus, all `getString()` etc methods, won't flow through the SDK.
 
-### Fetching translations
+## Cache
 
-As soon as `fetchTranslations()` is called, the SDK will attempt to download the
-translations for the locales that are defined in the initialization of `TxNative` and
-the source locale strings.
+The SDK relies on a cache mechanism to return source strings and translations for the supported locales. If the cache is empty, the SDK will return a string based on the current [missing policy](https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/MissingPolicy).
 
-The `fetchTranslations()` method in the previous example is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
+The cache is updated when `fetchTranslations()` is called. You can read more on that later.
 
-### Invalidating CDS cache
-
-The cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex
-and you need to see them on your app immediately, you need to make an HTTP request
-to the [invalidation endpoint](https://github.com/transifex/transifex-delivery/#invalidate-cache) of CDS.
+The cache can be prepopulated by the developer, using the command-line tool's [pull command](#pulling).
 
 ### Standard Cache
 
-The default cache strategy used by the SDK, if no other cache is provided by the developer, is the `TxStandardCache.getCache()`. The standard cache operates by making use of the publicly exposed classes and interfaces from the `com.transifex.txnative.cache` package of the SDK, so it's easy to construct another cache strategy if that's desired.
+The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by [TxStandardCache.getCache()](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache-android.content.Context-java.lang.Integer-java.io.File-). The standard cache operates by making use of the publicly exposed classes and interfaces from the [com.transifex.txnative.cache](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary) package of the SDK, so it's easy to construct another cache strategy if that's desired.
 
 The standard cache is initialized with a memory cache that manages all cached entries in memory. When the memory cache gets initialized, it tries to look up if there are any already stored translations in the file system:
 
 * First, it looks for translations saved in the app's [Assets directory](https://developer.android.com/reference/android/content/res/AssetManager) that may have been offered by the developer, using the command-line tool when building the app.
 * Secondly, it looks for translations in the app's [internal cache directory](https://developer.android.com/training/data-storage/app-specific#internal-create-cache), in case the app had already downloaded the translations from the server from a previous launch. These translations take precedence over the previous ones, if found.
 
-Whenever new translations are fetched from the server using the `fetchTranslations()` method, the standard cache is updated and those translations are stored as-is in the app's cache directory, in the same directory used previsouly during initialization. The in-memory cache though is not affected by the update. An app restart is required to read the newly saved translations.
+Whenever new translations are fetched from the server using the `fetchTranslations()` method, the standard cache is updated and those translations are stored as-is in the app's cache directory, in the same directory used previsouly during initialization. **The in-memory cache though is not affected by the update.** An app restart is required to read the newly saved translations.
 
-#### Alternative cache strategy
+Under SDK's default configuration, the first time that the app is launched, the source strings are displayed, unless the developer had bundled translations via the command-line tool.
 
-The SDK allows you to implement your own cache from scratch by implementing the `TxCache` interface. Alternatively, you may change the standard cache strategy by implementing your own using the SDK's publicly exposed classes.
+### Alternative cache strategy
 
-In order to achieve that, you can create a a method that returns a `TxCache` instance, just like in the `TxStandardCache.getCache()` case. For example, the standard cache is created as follows:
+The SDK allows you to implement your own cache from scratch by implementing the [TxCache](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxCache) interface. Alternatively, you may change the standard cache strategy by implementing your own using the SDK's publicly exposed classes.
+
+In order to achieve that, you can create a a method that returns an object that implements `TxCache`. For example, the standard cache is created as follows (you can see the full source code [here](https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/cache/TxStandardCache.java)):
 
 ```java
 return new TxFileOutputCacheDecorator(
@@ -173,9 +173,12 @@ return new TxFileOutputCacheDecorator(
 
 If you want to have your memory cache updated with the new translations when `fetchTranslations()` is called, you can remove the `TXReadonlyCacheDecorator`.
 
-### Sample app
+## Fetching translations
 
-You can see the SDK used and configured in more advanced ways in the provided sample app of this repo. You can also check out a simpler app at the [Transifex Native repo](https://github.com/transifex/transifex-native-sandbox).
+As soon as [fetchTranslations()](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations-java.lang.String-java.util.Set-) is called, the SDK will attempt to download both the source locale strings
+and the translations for the supported locales. If successful, it will update the cache. 
+
+The `fetchTranslations()` method in the SDK configuration example is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
 
 ## Transifex Command Line Tool
 
@@ -183,15 +186,15 @@ Transifex Command Line Tool is a command line tool that can assist developers in
 
 ### Building
 
-To build the tool, enter the `TransifexNativeSDK` directory and run from the command line:
+You can get the cli tool pre-built from the [release page](https://github.com/transifex/transifex-java/releases).
+
+If you want to build the tool yourself, enter the `TransifexNativeSDK` directory and run from the command line:
 
 ```
 gradlew :clitool:assemble
 ```
 
 You will find the built `.jar` file at `clitool/build/libs/transifex.jar`. You can copy it wherever you want.
-
-Alternatively you can get it pre-built from the [release page](https://github.com/transifex/transifex-java/releases).
 
 ### Running
 
@@ -214,38 +217,38 @@ To use the tool on your app's Android Studio project, enter the root directory o
 
 #### Help
 
-`transifex`, `transifex -h`, `transifex --help`
-
+`transifex`, `transifex -h`, `transifex --help`  
 Displays a help dialog with all the options and commands.
 
-`transifex help <command>`
-
+`transifex help <command>`  
 Get help for a particular command.
 
 #### Pushing
 
-`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`
-
+`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`  
 Pushes the source strings of your app found in a module named "app_module_name". The tool reads the `strings.xml` resource file found in the main source set of the specified module: `app_module_name/src/main/res/values/strings.xml`. It processes it and pushes the result to the Transifex CDS.
 
-`transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml`
-
+`transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml ...`  
 If your app has a more complex string setup, you can specify one or more string resource files.
 
-`transifex clear -t <transifex_token> -s <transifex_secret>`
+`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name> --dry-run -v`  
+Append `--dry-run -v` to display the source strings that will be pushed without actually pushing them.
 
+`transifex clear -t <transifex_token> -s <transifex_secret>`  
 Clears all existing resource content from CDS. This action will also remove existing localizations.
 
 #### Pulling
 
-`transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`
-
+`transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`  
 Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the "assets" directory of the main source set of the specified app module: `app_module_name/src/main/assets/txnative`. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.
 
 
-`transifex pull -t <transifex_token> -d <directory> -l <locale>...`
-
+`transifex pull -t <transifex_token> -d <directory> -l <locale>...`  
 If you have a different setup, you can enter the path to your app's `assets` directory.
+
+Note that cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex
+and you need to see them on your app immediately or pull them using the above command, you need to make an HTTP request
+to the [invalidation endpoint](https://github.com/transifex/transifex-delivery/#invalidate-cache) of CDS.
 
 ## Advanced topics
 
@@ -256,6 +259,31 @@ There are cases where you don't want TxNative to interfere with string loading. 
 ```java
     getApplicationContext().getString(<string_ID>);
 ```
+### String styling
+
+As explained in Android's [documentation](https://developer.android.com/guide/topics/resources/string-resource#FormattingAndStyling), strings can have styling applied to them if they contain HTML markup.
+
+You can write a string with HTML tags, where the opening brackets have been escaped (using `&lt;` instead of `<`): 
+
+```
+<string name="styled_text">A &lt;font color="#FF7700">localization&lt;/font> platform</string>
+```
+
+Then you can use [`fromHTML()`](https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler)) to get styled text:
+
+```
+String string = getResources().getString(R.string.styled_text);
+Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
+someView.setText(styledString);
+```
+
+If your string is referenced in an XML layout resource and you don't want set it programatically, write the string with normal opening brackets:
+
+```
+<string name="styled_text">A <font color="#FF7700">localization</font> platform</string>
+```
+
+and enable [`TxNative.setSupportSpannable(true)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable-boolean-). If the SDK detects tags in your string, it will use `fromHTML()` to render them correctly. Note that new lines will be converted to spaces and sequences of whitespace characters will be collapsed into a single space.
 
 ### TxNative and 3rd party libraries
 
