@@ -18,7 +18,7 @@ You can see the SDK used and configured in multiple ways in the provided [sample
 ## Usage
 
 The SDK allows you to keep using the same string methods that Android
-provides, such as `getString(int id)`, `getText(int id)`, etc. or strings in XML layout files, but at the same time taking
+provides, such as `getString(int id)`, `getText(int id)`, etc. or use strings in XML layout files, but at the same time taking
 advantage of the features that Transifex Native offers, such as OTA translations.
 
 ## SDK installation
@@ -68,9 +68,9 @@ The language codes supported by Transifex can be found [here](https://explore.tr
      }
 ```
 
-In this example, the SDK uses its default cache, `TxStandardCache`, and missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
+In this example, the SDK uses its default cache, `TxStandardCache`, and default missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
 
-In this example, we fetch the translations of all locales. If you want, you can target specific locales or strings that have specific tags.
+In this example, we fetch the translations for all locales. If you want, you can target specific locales or strings that have specific tags.
 
 Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, it suffices to place the supported app languages in your app’s gradle file:
 
@@ -148,7 +148,7 @@ The standard cache is initialized with a memory cache that manages all cached en
 
 Whenever new translations are fetched from the server using the `fetchTranslations()` method, the standard cache is updated and those translations are stored as-is in the app's cache directory, in the same directory used previsouly during initialization. **The in-memory cache though is not affected by the update.** An app restart is required to read the newly saved translations.
 
-Under SDK's default configuration, the first time that the app is launched, the source strings are displayed, unless the developer had bundled translations via the command-line tool.
+Under the SDK's default configuration, the first time the app is launched, the source strings are displayed, unless the developer has bundled translations via the command-line tool.
 
 ### Alternative cache strategy
 
@@ -261,7 +261,7 @@ There are cases where you don't want TxNative to interfere with string loading. 
 ```
 ### String styling
 
-As explained in Android's [documentation](https://developer.android.com/guide/topics/resources/string-resource#FormattingAndStyling), strings can have styling applied to them if they contain HTML markup.
+As explained in Android's [documentation](https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML), strings can have styling applied to them if they contain HTML markup.
 
 You can write a string with HTML tags, where the opening brackets have been escaped (using `&lt;` instead of `<`): 
 
@@ -284,6 +284,37 @@ If your string is referenced in an XML layout resource and you don't want set it
 ```
 
 and enable [`TxNative.setSupportSpannable(true)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable-boolean-). If the SDK detects tags in your string, it will use `fromHTML()` to render them correctly. Note that new lines will be converted to spaces and sequences of whitespace characters will be collapsed into a single space.
+
+### Stylable attributes
+
+Android lets you define attributes that can point to different string resources, according to the current theme. For example you can create an `attr.xml` file that declares a stylable:
+
+```xml
+  <declare-styleable name="custom_view">
+        <attr name="label" format="string|reference"/>
+  </declare-styleable>
+```
+
+You can set the string value of this attribute to a TextView the following way:
+
+```java
+    TypedValue typedValue = new TypedValue();
+    getTheme().resolveAttribute(R.attr.label, typedValue, true);
+    textView.setText(typedValue.resourceId); 
+    // textView.setText(typedValue.string); // DON'T DO THAT!!!
+```
+
+or the following way:
+
+```java
+    TypedArray typedArray  = getTheme().obtainStyledAttributes(set, R.styleable.custom_view, defStyleAttr, defStyleRes);
+    textView.setText(typedArray.getResourceId(R.styleable.custom_view_label, -1)); // Get the resource id of the stylable attribute under the current theme
+    // textView.setText(typedArray.getString(R.styleable.custom_view_label, -1)); // DON'T DO THAT!!!
+    typedArray.recycle();
+```
+
+Note that if you try to resolve the string value directly from the theme methods, the call will not pass through the SDK. The trick here is to resolve the resource id from the theme methods.
+
 
 ### TxNative and 3rd party libraries
 
@@ -320,9 +351,17 @@ Note that if the main app starts any activity provided by the lib, string render
 
 ## Limitations
 
+The SDK has some limitations, which most of the time can be overcome with workarouds.
+
+### String Arrrays
+
 Currently, the SDK does not support [String arrays](https://developer.android.com/guide/topics/resources/string-resource#StringArray). The command line tool will not upload them to Transifex and the SDK will not override the respective methods. String arrays presentation will work as normal using Android's localization system, which will require that you have them translated in the respective `strings.xml` files.
 
+### Menu XML files
+
 Strings that are referenced in [menu](https://developer.android.com/guide/topics/ui/menus) layout files will not be handled by the SDK. They will use Android's localization system as normal.
+
+### ActionBar
 
 Even though the SDK handles the strings referenced in a [`Toolbar`](https://developer.android.com/reference/androidx/appcompat/widget/Toolbar), it won't handle strings referenced in an [`ActionBar`](https://developer.android.com/reference/android/app/ActionBar). You will have to set them programmatically (e.g. by calling [`setTitle()`](https://developer.android.com/reference/android/app/ActionBar#setTitle(java.lang.CharSequence))) to take advantage of the SDK. Otherwise, Android's localization system will be used.
 
