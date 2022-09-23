@@ -1,7 +1,9 @@
 package com.transifex.clitool;
 
 import com.google.gson.Gson;
+import com.transifex.common.CDSMockHelper;
 import com.transifex.common.LocaleData;
+import com.transifex.common.TempDirHelper;
 import com.transifex.common.Utils;
 
 import org.junit.After;
@@ -13,121 +15,39 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import androidx.annotation.NonNull;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class MainClassTest {
 
-    private MockWebServer server = null;
-    private String baseUrl = null;
-    File tempDir = new File("build" + File.separator + "unitTestTempDir");
+    // The tests rely on the following directories:
+    //
+    // txsdk/src/test/res/values
+    // txsdk/src/test/res/values-el
+    // txsdk/src/test/res/values-es
+
+    private CDSMockHelper cdsMock = null;
+    TempDirHelper tempDirHelper = null;
 
     @Before
     public void setUp() {
-        server = new MockWebServer();
-        baseUrl = server.url("").toString();
+        cdsMock = new CDSMockHelper();
+        cdsMock.setUpServer();
 
-        if (tempDir.exists()) {
-            Utils.deleteDirectory(tempDir);
-        }
+        tempDirHelper = new TempDirHelper();
+        tempDirHelper.setUp();
     }
 
     @After
     public void Teardown() {
-        if (server != null) {
-            try {
-                server.shutdown();
-            } catch (IOException ignored) {}
+        if (cdsMock != null) {
+            cdsMock.teardownServer();
         }
 
-        if (tempDir.exists()) {
-            boolean deleted = Utils.deleteDirectory(tempDir);
-            if (!deleted) {
-                System.out.println("Could not delete tmp dir after test. Next test may fail.");
-            }
+        if (tempDirHelper != null) {
+            tempDirHelper.tearDown();
         }
-    }
-
-    public static final String elBody = "{\"data\":{\"test_key\":{\"string\":\"Καλημέρα\"},\"another_key\":{\"string\":\"Καλό απόγευμα\"},\"key3\":{\"string\":\"\"}}}";
-    public static final String esBody = "{\"data\":{\"test_key\":{\"string\":\"Buenos días\"},\"another_key\":{\"string\":\"Buenas tardes\"},\"key3\":{\"string\":\"\"}}}";
-
-    public static Dispatcher getElEsDispatcher() {
-        Dispatcher dispatcher = new Dispatcher() {
-
-            @NonNull
-            @Override
-            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
-
-                switch (request.getPath()) {
-                    case "/content/el":
-                        return new MockResponse().setResponseCode(200).setBody(elBody);
-                    case "/content/es":
-                        return new MockResponse().setResponseCode(200).setBody(esBody);
-                }
-                return new MockResponse().setResponseCode(404);
-            }
-        };
-
-        return dispatcher;
-    }
-
-    public static Dispatcher getElDispatcher() {
-        Dispatcher dispatcher = new Dispatcher() {
-
-            @NonNull
-            @Override
-            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
-
-                switch (request.getPath()) {
-                    case "/content/el":
-                        return new MockResponse().setResponseCode(200).setBody(elBody);
-                }
-                return new MockResponse().setResponseCode(404);
-            }
-        };
-
-        return dispatcher;
-    }
-
-    public static Dispatcher getPostDispatcher() {
-
-        Dispatcher dispatcher = new Dispatcher() {
-
-            final String jobId = "abcd";
-            final String jobLink = "/jobs/content/" + jobId;
-            final Gson gson = new Gson();
-
-            @NonNull
-            @Override
-            public MockResponse dispatch (RecordedRequest request) throws InterruptedException {
-
-                switch (request.getPath()) {
-                    case "/content":
-                        LocaleData.TxPostResponseData responseData = new LocaleData.TxPostResponseData();
-                        responseData.data = new LocaleData.TxPostResponseData.Data();
-                        responseData.data.id = jobId;
-                        responseData.data.links = new LocaleData.TxPostResponseData.Data.Links();
-                        responseData.data.links.job = jobLink;
-                        return new MockResponse().setResponseCode(202).setBody(gson.toJson(responseData));
-                    case jobLink:
-                        LocaleData.TxJobStatus jobStatus = new LocaleData.TxJobStatus();
-                        jobStatus.data = new LocaleData.TxJobStatus.Data();
-                        jobStatus.data.status = "completed";
-                        jobStatus.data.details = new LocaleData.TxJobStatus.Data.Details();
-                        jobStatus.data.details.created = 2;
-                        return new MockResponse().setResponseCode(200).setBody(gson.toJson(jobStatus));
-                }
-
-                return new MockResponse().setResponseCode(404);
-            }
-        };
-
-        return dispatcher;
     }
 
     @Test
@@ -159,9 +79,9 @@ public class MainClassTest {
         // This test relies on having the following file:
         // txsdk/src/test/res/values/strings.xml
 
-        server.setDispatcher(getPostDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getPostDispatcher());
 
-        String args = String.format("-u %s push -t token -s secret -f %s -a %s -a %s", baseUrl,
+        String args = String.format("-u %s push -t token -s secret -f %s -a %s -a %s", cdsMock.getBaseUrl(),
                 "../txsdk/src/test/res/values/strings.xml", "some_tag", "another_tag");
         int returnValue = MainClass.testMain(args);
 
@@ -169,7 +89,7 @@ public class MainClassTest {
 
         RecordedRequest recordedRequest = null;
         try {
-            recordedRequest = server.takeRequest();
+            recordedRequest = cdsMock.getServer().takeRequest();
         } catch (InterruptedException ignored) {
         }
         assertThat(recordedRequest).isNotNull();
@@ -196,9 +116,9 @@ public class MainClassTest {
         // The second file contains the same keys as the first file but with a different values. We
         // expect to see the last file's value in the pushed strings.
 
-        server.setDispatcher(getPostDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getPostDispatcher());
 
-        String args = String.format("-u %s push -t token -s secret -f %s -f %s", baseUrl,
+        String args = String.format("-u %s push -t token -s secret -f %s -f %s", cdsMock.getBaseUrl(),
                 "../txsdk/src/test/res/values/strings.xml",
                 "../txsdk/src/test/res/values-el/strings.xml");
         int returnValue = MainClass.testMain(args);
@@ -207,7 +127,7 @@ public class MainClassTest {
 
         RecordedRequest recordedRequest = null;
         try {
-            recordedRequest = server.takeRequest();
+            recordedRequest = cdsMock.getServer().takeRequest();
         } catch (InterruptedException ignored) {
         }
         assertThat(recordedRequest).isNotNull();
@@ -222,16 +142,16 @@ public class MainClassTest {
 
     @Test
     public void testClear() {
-        server.setDispatcher(getPostDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getPostDispatcher());
 
-        String args = String.format("-u %s clear -t token -s secret", baseUrl);
+        String args = String.format("-u %s clear -t token -s secret", cdsMock.getBaseUrl());
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);
 
         RecordedRequest recordedRequest = null;
         try {
-            recordedRequest = server.takeRequest();
+            recordedRequest = cdsMock.getServer().takeRequest();
         } catch (InterruptedException ignored) {
         }
         assertThat(recordedRequest).isNotNull();
@@ -245,79 +165,79 @@ public class MainClassTest {
 
     @Test
     public void testPull_normal() {
-        server.setDispatcher(getElEsDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
-        String args = String.format("-u %s pull -t token -l el es -d %s", baseUrl, tempDir.getPath());
+        String args = String.format("-u %s pull -t token -l el es -d %s", cdsMock.getBaseUrl(), tempDirHelper.getFile().getPath());
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);
 
-        File elFile = Paths.get(tempDir.getPath(), MainClass.OUT_DIR_NAME, "el", MainClass.OUT_FILE_NAME).toFile();
+        File elFile = Paths.get(tempDirHelper.getFile().getPath(), MainClass.OUT_DIR_NAME, "el", MainClass.OUT_FILE_NAME).toFile();
         String elString = null;
         try {
             elString = Utils.readInputStream(new FileInputStream(elFile));
         } catch (IOException ignored) {}
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
 
-        File esFile = Paths.get(tempDir.getPath(), MainClass.OUT_DIR_NAME, "es", MainClass.OUT_FILE_NAME).toFile();
+        File esFile = Paths.get(tempDirHelper.getFile().getPath(), MainClass.OUT_DIR_NAME, "es", MainClass.OUT_FILE_NAME).toFile();
         String esString = null;
         try {
             esString = Utils.readInputStream(new FileInputStream(esFile));
         } catch (IOException ignored) {}
         assertThat(esString).isNotNull();
-        assertThat(esString).isEqualTo(esBody);
+        assertThat(esString).isEqualTo(CDSMockHelper.esBody);
     }
 
     @Test
     public void testPull_consecutiveRuns() {
-        server.setDispatcher(getElEsDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
-        String args = String.format("-u %s pull -t token -l el -d %s", baseUrl, tempDir.getPath());
+        String args = String.format("-u %s pull -t token -l el -d %s", cdsMock.getBaseUrl(), tempDirHelper.getFile().getPath());
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);
 
-        args = String.format("-u %s pull -t token -l es -d %s", baseUrl, tempDir.getPath());
+        args = String.format("-u %s pull -t token -l es -d %s", cdsMock.getBaseUrl(), tempDirHelper.getFile().getPath());
         returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(0);
 
-        File elFile = Paths.get(tempDir.getPath(), MainClass.OUT_DIR_NAME, "el", MainClass.OUT_FILE_NAME).toFile();
+        File elFile = Paths.get(tempDirHelper.getFile().getPath(), MainClass.OUT_DIR_NAME, "el", MainClass.OUT_FILE_NAME).toFile();
         String elString = null;
         try {
             elString = Utils.readInputStream(new FileInputStream(elFile));
         } catch (IOException ignored) {}
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
 
-        File esFile = Paths.get(tempDir.getPath(), MainClass.OUT_DIR_NAME, "es", MainClass.OUT_FILE_NAME).toFile();
+        File esFile = Paths.get(tempDirHelper.getFile().getPath(), MainClass.OUT_DIR_NAME, "es", MainClass.OUT_FILE_NAME).toFile();
         String esString = null;
         try {
             esString = Utils.readInputStream(new FileInputStream(esFile));
         } catch (IOException ignored) {}
         assertThat(esString).isNotNull();
-        assertThat(esString).isEqualTo(esBody);
+        assertThat(esString).isEqualTo(CDSMockHelper.esBody);
     }
 
     @Test
     public void testPull_onlyElInResponse() {
-        server.setDispatcher(getElDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcher());
 
-        String args = String.format("-u %s pull -t token -l el es -d %s", baseUrl, tempDir.getPath());
+        String args = String.format("-u %s pull -t token -l el es -d %s", cdsMock.getBaseUrl(), tempDirHelper.getFile().getPath());
         int returnValue = MainClass.testMain(args);
 
         assertThat(returnValue).isEqualTo(1);
 
-        File elFile = Paths.get(tempDir.getPath(), MainClass.OUT_DIR_NAME, "el", MainClass.OUT_FILE_NAME).toFile();
+        File elFile = Paths.get(tempDirHelper.getFile().getPath(), MainClass.OUT_DIR_NAME, "el", MainClass.OUT_FILE_NAME).toFile();
         String elString = null;
         try {
             elString = Utils.readInputStream(new FileInputStream(elFile));
         } catch (IOException ignored) {}
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
 
-        File esFile = Paths.get(tempDir.getPath(), MainClass.OUT_DIR_NAME, "es", MainClass.OUT_FILE_NAME).toFile();
+        File esFile = Paths.get(tempDirHelper.getFile().getPath(), MainClass.OUT_DIR_NAME, "es", MainClass.OUT_FILE_NAME).toFile();
         assertThat(esFile.exists()).isFalse();
     }
 }

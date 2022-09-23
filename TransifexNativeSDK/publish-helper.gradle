@@ -23,7 +23,6 @@ task androidJavadoc(type: Javadoc) {
         addStringOption 'charset', 'utf-8'
         addStringOption 'source', '8'
         addBooleanOption('Xdoclint:none', true)
-        links 'https://docs.oracle.com/javase/7/docs/api/'
         links 'https://d.android.com/reference'
         linksOffline 'https://d.android.com/reference/', 'https://d.android.com/reference/androidx/'
     }

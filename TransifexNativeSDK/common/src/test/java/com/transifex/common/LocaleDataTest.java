@@ -10,39 +10,6 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class LocaleDataTest {
 
-    public static LocaleData.LocaleStrings getElLocaleStrings() {
-        HashMap<String, LocaleData.StringInfo> map = new HashMap<>();
-        map.put("test_key", new LocaleData.StringInfo("Καλημέρα"));
-        map.put("test_key3", new LocaleData.StringInfo(""));
-        return new LocaleData.LocaleStrings(map);
-    }
-
-    public static LocaleData.LocaleStrings getEsLocaleStrings() {
-        HashMap<String, LocaleData.StringInfo> map = new HashMap<>();
-        map.put("test_key", new LocaleData.StringInfo("Buenos días"));
-        map.put("test_key3", new LocaleData.StringInfo(""));
-        return new LocaleData.LocaleStrings(map);
-    }
-
-    public static LocaleData.TranslationMap getElEsTranslationMap() {
-        LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(2);
-        translationMap.put("el", getElLocaleStrings());
-        translationMap.put("es", getEsLocaleStrings());
-        return translationMap;
-    }
-
-    public static LocaleData.TranslationMap getElTranslationMap() {
-        LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(1);
-        translationMap.put("el", getElLocaleStrings());
-        return translationMap;
-    }
-
-    public static LocaleData.TranslationMap getEsTranslationMap() {
-        LocaleData.TranslationMap translationMap = new LocaleData.TranslationMap(1);
-        translationMap.put("es", getElLocaleStrings());
-        return translationMap;
-    }
-
     @Test
     public void testStringInfoHash() {
         LocaleData.StringInfo a = new LocaleData.StringInfo("a");
@@ -91,17 +58,17 @@ public class LocaleDataTest {
 
     @Test
     public void testLocaleStringsHash() {
-        LocaleData.LocaleStrings a = getElLocaleStrings();
-        LocaleData.LocaleStrings a2 = getElLocaleStrings();
+        LocaleData.LocaleStrings a = StringTestData.getElLocaleStrings();
+        LocaleData.LocaleStrings a2 = StringTestData.getElLocaleStrings();
 
         assertThat(a.hashCode()).isEqualTo(a2.hashCode());
     }
 
     @Test
     public void testLocaleStringsEquals() {
-        LocaleData.LocaleStrings a = getElLocaleStrings();
-        LocaleData.LocaleStrings a2 = getElLocaleStrings();
-        LocaleData.LocaleStrings b = getEsLocaleStrings();
+        LocaleData.LocaleStrings a = StringTestData.getElLocaleStrings();
+        LocaleData.LocaleStrings a2 = StringTestData.getElLocaleStrings();
+        LocaleData.LocaleStrings b = StringTestData.getEsLocaleStrings();
 
         assertThat(a).isEqualTo(a2);
         assertThat(a).isNotEqualTo(b);
@@ -109,7 +76,7 @@ public class LocaleDataTest {
 
     @Test
     public void testLocaleStringsGetMap() {
-        LocaleData.LocaleStrings a = getElLocaleStrings();
+        LocaleData.LocaleStrings a = StringTestData.getElLocaleStrings();
 
         HashMap<String, LocaleData.StringInfo> map = a.getMap();
 
@@ -119,7 +86,7 @@ public class LocaleDataTest {
 
     @Test
     public void testLocaleStringsGetMap_alterMap() {
-        LocaleData.LocaleStrings a = getElLocaleStrings();
+        LocaleData.LocaleStrings a = StringTestData.getElLocaleStrings();
 
         HashMap<String, LocaleData.StringInfo> map = a.getMap();
         map.put("test_key4", new LocaleData.StringInfo("some text"));
@@ -137,8 +104,8 @@ public class LocaleDataTest {
 
     @Test
     public void testLocaleStringsCopyConstructor() {
-        LocaleData.LocaleStrings a = getElLocaleStrings();
-        LocaleData.LocaleStrings sameAsA = getElLocaleStrings();
+        LocaleData.LocaleStrings a = StringTestData.getElLocaleStrings();
+        LocaleData.LocaleStrings sameAsA = StringTestData.getElLocaleStrings();
 
         LocaleData.LocaleStrings copyOfA = new LocaleData.LocaleStrings(a);
         a.put("test_key4", new LocaleData.StringInfo("some text"));
@@ -150,25 +117,25 @@ public class LocaleDataTest {
     @Test
     public void testTranslationMapPutGet() {
         LocaleData.TranslationMap a = new LocaleData.TranslationMap(10);
-        a.put("el", getElLocaleStrings());
+        a.put("el", StringTestData.getElLocaleStrings());
 
         assertThat(a.getLocales()).containsExactly("el");
-        assertThat(a.get("el")).isEqualTo(getElLocaleStrings());
+        assertThat(a.get("el")).isEqualTo(StringTestData.getElLocaleStrings());
     }
 
     @Test
     public void testTranslationMapHash() {
-        LocaleData.TranslationMap a = getElEsTranslationMap();
-        LocaleData.TranslationMap a2 = getElEsTranslationMap();
+        LocaleData.TranslationMap a = StringTestData.getElEsTranslationMap();
+        LocaleData.TranslationMap a2 = StringTestData.getElEsTranslationMap();
 
         assertThat(a.hashCode()).isEqualTo(a2.hashCode());
     }
 
     @Test
     public void testTranslationMapEquals() {
-        LocaleData.TranslationMap a = getElEsTranslationMap();
-        LocaleData.TranslationMap a2 = getElEsTranslationMap();
-        LocaleData.TranslationMap b = getElTranslationMap();
+        LocaleData.TranslationMap a = StringTestData.getElEsTranslationMap();
+        LocaleData.TranslationMap a2 = StringTestData.getElEsTranslationMap();
+        LocaleData.TranslationMap b = StringTestData.getElTranslationMap();
 
         assertThat(a).isEqualTo(a2);
         assertThat(a).isNotEqualTo(b);
@@ -176,11 +143,11 @@ public class LocaleDataTest {
 
     @Test
     public void testTranslationMapCopyConstructor() {
-        LocaleData.TranslationMap a = getElEsTranslationMap();
-        LocaleData.TranslationMap sameAsA = getElEsTranslationMap();
+        LocaleData.TranslationMap a = StringTestData.getElEsTranslationMap();
+        LocaleData.TranslationMap sameAsA = StringTestData.getElEsTranslationMap();
 
         LocaleData.TranslationMap copyOfA = new LocaleData.TranslationMap(a);
-        a.put("de", getElLocaleStrings());
+        a.put("de", StringTestData.getElLocaleStrings());
 
         assertThat(copyOfA).isNotEqualTo(a);
         assertThat(copyOfA).isEqualTo(sameAsA);

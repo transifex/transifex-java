@@ -14,50 +14,42 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static com.google.common.truth.Truth.assertThat;
 
 public class TranslationsDownloaderTest {
 
-    private MockWebServer server = null;
-    private String baseUrl = null;
-    File tempDir = new File("build" + File.separator + "unitTestTempDir");
+    private CDSMockHelper cdsMock = null;
+    TempDirHelper tempDir = null;
 
     @Before
     public void setUp() {
-        server = new MockWebServer();
-        baseUrl = server.url("").toString();
+        cdsMock = new CDSMockHelper();
+        cdsMock.setUpServer();
 
-        if (tempDir.exists()) {
-            Utils.deleteDirectory(tempDir);
-        }
+        tempDir = new TempDirHelper();
+        tempDir.setUp();
     }
 
     @After
     public void Teardown() {
-        if (server != null) {
-            try {
-                server.shutdown();
-            } catch (IOException ignored) {}
+        if (cdsMock != null) {
+            cdsMock.teardownServer();
         }
 
-        if (tempDir.exists()) {
-            boolean deleted = Utils.deleteDirectory(tempDir);
-            if (!deleted) {
-                System.out.println("Could not delete tmp dir after test. Next test may fail.");
-            }
+        if (tempDir != null) {
+            tempDir.tearDown();
         }
     }
 
     @Test
     public void testSaveTranslations_dirDoesNotExist() {
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
 
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles).isEmpty();
@@ -65,20 +57,20 @@ public class TranslationsDownloaderTest {
 
     @Test
     public void testSaveTranslations_normalResponse() {
-        server.setDispatcher(CDSHandlerTest.getElEsDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
-        boolean tempDirCreated =  tempDir.mkdirs();
+        boolean tempDirCreated =  tempDir.getFile().mkdirs();
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
 
         RecordedRequest recordedRequest = null;
         try {
-            recordedRequest = server.takeRequest();
+            recordedRequest = cdsMock.getServer().takeRequest();
         } catch (InterruptedException ignored) {
         }
         assertThat(recordedRequest).isNotNull();
@@ -97,7 +89,7 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
 
         String esString = null;
         try {
@@ -105,21 +97,21 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(esString).isNotNull();
-        assertThat(esString).isEqualTo(CDSHandlerTest.esBody);
+        assertThat(esString).isEqualTo(CDSMockHelper.esBody);
     }
 
     @Test
     public void testSaveTranslations_onlyElInResponse() {
-        server.setDispatcher(CDSHandlerTest.getElDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcher());
 
-        boolean tempDirCreated =  tempDir.mkdirs();
+        boolean tempDirCreated =  tempDir.getFile().mkdirs();
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el");
 
@@ -129,21 +121,21 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
     }
 
     @Test
     public void testSaveTranslations_specifyLocale_normalResponse() {
-        server.setDispatcher(CDSHandlerTest.getElEsDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
-        boolean tempDirCreated =  tempDir.mkdirs();
+        boolean tempDirCreated =  tempDir.getFile().mkdirs();
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations("el", null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations("el", null, tempDir.getFile(), "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el");
 
@@ -153,22 +145,22 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
     }
 
     @Test
     public void testSaveTranslations_specifyTags_normalResponse() {
-        server.setDispatcher(CDSHandlerTest.getElEsWithTagsDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsWithTagsDispatcher());
 
-        boolean tempDirCreated =  tempDir.mkdirs();
+        boolean tempDirCreated =  tempDir.getFile().mkdirs();
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         Set<String> tags = new HashSet<>(Arrays.asList("tag a", "tag b"));
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tags, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, tags, tempDir.getFile(), "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el", "es");
 
@@ -178,7 +170,7 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
 
         String esString = null;
         try {
@@ -186,14 +178,14 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(esString).isNotNull();
-        assertThat(esString).isEqualTo(CDSHandlerTest.esBody);
+        assertThat(esString).isEqualTo(CDSMockHelper.esBody);
     }
 
     @Test
     public void testSaveTranslations_overwriteExistingFile() {
-        server.setDispatcher(CDSHandlerTest.getElDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcher());
 
-        File localeDir = new File(tempDir.getAbsoluteFile() + File.separator + "el");
+        File localeDir = new File(tempDir.getFile().getAbsoluteFile() + File.separator + "el");
         boolean localeDirCreated =  localeDir.mkdirs();
         assertThat(localeDirCreated).isTrue();
 
@@ -206,10 +198,10 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         String[] localeCodes = new String[]{"el"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
         assertThat(translationFiles).isNotNull();
         assertThat(translationFiles.keySet()).containsExactly("el");
 
@@ -219,14 +211,14 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         assertThat(elString).isNotNull();
-        assertThat(elString).isEqualTo(CDSHandlerTest.elBody);
+        assertThat(elString).isEqualTo(CDSMockHelper.elBody);
     }
 
     @Test
     public void testSaveTranslations_skipExistingFileIfError() {
-        server.setDispatcher(CDSHandlerTest.getElDispatcher());
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcher());
 
-        File localeDir = new File(tempDir.getAbsoluteFile() + File.separator + "es");
+        File localeDir = new File(tempDir.getFile().getAbsoluteFile() + File.separator + "es");
         boolean localeDirCreated =  localeDir.mkdirs();
         assertThat(localeDirCreated).isTrue();
 
@@ -239,10 +231,10 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         String[] localeCodes = new String[]{"es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, baseUrl);
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
-        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir, "strings.txt");
+        HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
         assertThat(translationFiles).isEmpty();
 
         String esString = null;

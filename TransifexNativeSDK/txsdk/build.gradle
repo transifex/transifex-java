@@ -1,5 +1,7 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+}
 
 android {
     compileSdkVersion 32
@@ -10,8 +12,6 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 32
-        versionCode rootProject.ext.sdkVersionCode
-        versionName rootProject.ext.sdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -28,6 +28,14 @@ android {
         }
     }
 
+    // Have aapt2 use src/test/res for resource generation. Unfortunately, the test strings
+    // end up in the main source set and the resulting .aar
+    sourceSets {
+        main {
+            res.srcDirs += ['src/test/res']
+        }
+    }
+
     // https://developer.android.com/studio/publish-library/configure-pub-variants
     publishing {
         singleVariant('release') {
@@ -40,9 +48,6 @@ android {
 }
 
 tasks.withType(Test) {
-    // Have aapt2 use src/test/res for resource generation
-    android.sourceSets.main.res.srcDirs += 'src/test/res'
-
     systemProperty "file.encoding", "UTF-8"
 }
 
@@ -67,11 +72,13 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.4'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
     testImplementation 'org.mockito:mockito-core:3.8.0'
+    testImplementation testFixtures(project(':common'))
 
     androidTestCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'com.google.truth:truth:1.1'
+    androidTestImplementation testFixtures(project(':common'))
 }
 
 apply from: '../publish-helper.gradle'

@@ -1,9 +1,13 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+}
 
 android {
     compileSdkVersion 32
     buildToolsVersion "30.0.3"
+
+    namespace 'com.transifex.myapplication'
 
     defaultConfig {
         applicationId "com.transifex.myapplication"
@@ -14,7 +18,7 @@ android {
 
         // https://stackoverflow.com/a/41345440/941314
         // Needed for multilingual-support after Android N
-        resConfigs "en", "el", "de", "fr", "ar", "sl"
+        resConfigs 'en', 'el', 'de', 'fr', 'ar', 'sl'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

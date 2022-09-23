@@ -4,15 +4,21 @@ import android.content.Context;
 import android.content.res.AssetManager;
 
 import com.transifex.common.LocaleData;
+import com.transifex.common.TranslationMapStorage;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SmallTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class TxDiskTranslationsProviderTest {
+@RunWith(AndroidJUnit4.class)
+@SmallTest
+public class TxDiskTranslationsProviderAssetsTest {
 
     // This test, in contrast to the unit test found in the "test" folder, tests the AssetManager
     // version of TxDiskTranslationsProvider.
@@ -35,7 +41,7 @@ public class TxDiskTranslationsProviderTest {
 
     @Test
     public void testGetTranslations_translationsInAssets() {
-        TxDiskTranslationsProvider provider = new TxDiskTranslationsProvider(assetManager, "txnative");
+        TxDiskTranslationsProvider provider = new TxDiskTranslationsProvider(assetManager, TranslationMapStorage.DEFAULT_TRANSLATIONS_DIR_NAME);
         LocaleData.TranslationMap map = provider.getTranslations();
 
         assertThat(map).isEqualTo(TxStandardCacheTest.getAssetsEquivalentTranslationMap());
