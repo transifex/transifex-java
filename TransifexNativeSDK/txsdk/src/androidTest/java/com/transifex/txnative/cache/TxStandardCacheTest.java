@@ -3,21 +3,26 @@ package com.transifex.txnative.cache;
 import android.content.Context;
 
 import com.transifex.common.LocaleData;
+import com.transifex.common.TempDirHelper;
 import com.transifex.common.TranslationMapStorage;
-import com.transifex.common.Utils;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.lang.reflect.Field;
 
 import androidx.test.espresso.core.internal.deps.guava.util.concurrent.MoreExecutors;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.SmallTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import static com.google.common.truth.Truth.assertThat;
 
+@RunWith(AndroidJUnit4.class)
+@SmallTest
 public class TxStandardCacheTest {
 
     // The tests rely on the following directory:
@@ -25,26 +30,22 @@ public class TxStandardCacheTest {
     // androidTest/assets/txnative
 
     Context appContext = null;
-    File txNativeCacheDir;
+    TempDirHelper tmpDirHelper = null;
 
     @Before
     public void setUp() {
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         File cacheDir = appContext.getCacheDir();
-        txNativeCacheDir= new File(cacheDir.getPath() +File.separator + TranslationMapStorage.DEFAULT_TRANSLATIONS_DIR_NAME);
-        if (txNativeCacheDir.exists()) {
-            Utils.deleteDirectory(txNativeCacheDir);
-        }
+        File txNativeCacheDir = new File(cacheDir.getPath() + File.separator + TranslationMapStorage.DEFAULT_TRANSLATIONS_DIR_NAME);
+        tmpDirHelper = new TempDirHelper(txNativeCacheDir);
+        tmpDirHelper.setUp();
     }
 
     @After
     public void Teardown() {
-        if (txNativeCacheDir.exists()) {
-            boolean deleted = Utils.deleteDirectory(txNativeCacheDir);
-            if (!deleted) {
-                System.out.println("Could not delete tmp dir after test. Next test may fail.");
-            }
+        if (tmpDirHelper != null) {
+            tmpDirHelper.tearDown();
         }
     }
 

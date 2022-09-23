@@ -16,7 +16,6 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -26,13 +25,8 @@ buildscript {
 
 plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
-}
-
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
+    id 'com.android.application' version '7.3.0' apply false
+    id 'com.android.library' version '7.3.0' apply false
 }
 
 // Initialize publishing/signing extra properties with environmental vars
@@ -92,7 +86,6 @@ gradle.projectsEvaluated {
             addBooleanOption('Xdoclint:none', true)
             addStringOption 'overview', 'doc/readme.html'
             addBooleanOption("-frames", true)
-            links 'https://docs.oracle.com/javase/7/docs/api/'
             links 'https://d.android.com/reference'
             linksOffline 'https://d.android.com/reference/', 'https://d.android.com/reference/androidx/'
         }
