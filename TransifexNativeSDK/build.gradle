@@ -5,11 +5,11 @@ buildscript {
             'androidXAnnotation' : '1.4.0'
     ]
     ext {
-        sdkVersionCode = 4                      // version code for txsdk
-        sdkVersion = '1.0.0'                    // version for txsdk and common
+        sdkVersionCode = 5                      // version code for txsdk
+        sdkVersion = '1.1.0'                    // version for txsdk and common
         pomGroupID = "com.transifex.txnative"   // pom group id for txsdk and common
 
-        cliVersion = '1.0.0'                    // clitool version
+        cliVersion = '1.1.0'                    // clitool version
     }
     repositories {
         google()
