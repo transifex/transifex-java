@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     namespace = 'com.transifex.txnative'
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 32
+        targetSdkVersion 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -60,7 +60,7 @@ configurations.all  {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    compileOnly 'androidx.appcompat:appcompat:1.5.0'
+    compileOnly 'androidx.appcompat:appcompat:1.5.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation 'io.github.inflationx:viewpump:2.0.3'
     api project(':common')

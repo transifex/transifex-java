@@ -2,7 +2,7 @@
 buildscript {
     ext.versions = [
             'kotlin' : '1.7.10',
-            'androidXAnnotation' : '1.4.0'
+            'androidXAnnotation' : '1.5.0'
     ]
     ext {
         sdkVersionCode = 5                      // version code for txsdk

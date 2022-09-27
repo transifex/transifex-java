@@ -271,7 +271,7 @@ You can write a string with HTML tags, where the opening brackets have been esca
 
 Then you can use [`fromHTML()`](https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler)) to get styled text:
 
-```
+```java
 String string = getResources().getString(R.string.styled_text);
 Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
 someView.setText(styledString);
@@ -279,7 +279,7 @@ someView.setText(styledString);
 
 If your string is referenced in an XML layout resource and you don't want set it programatically, write the string with normal opening brackets:
 
-```
+```xml
 <string name="styled_text">A <font color="#FF7700">localization</font> platform</string>
 ```
 
