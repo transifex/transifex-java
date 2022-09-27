@@ -1,6 +1,7 @@
 androidx.appcompat.app
 com.transifex.common
 com.transifex.txnative
+com.transifex.txnative.activity
 com.transifex.txnative.cache
 com.transifex.txnative.missingpolicy
 com.transifex.txnative.transformers
