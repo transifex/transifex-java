@@ -28,14 +28,6 @@ android {
         }
     }
 
-    // Have aapt2 use src/test/res for resource generation. Unfortunately, the test strings
-    // end up in the main source set and the resulting .aar
-    sourceSets {
-        main {
-            res.srcDirs += ['src/test/res']
-        }
-    }
-
     // https://developer.android.com/studio/publish-library/configure-pub-variants
     publishing {
         singleVariant('release') {
@@ -69,7 +61,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.truth:truth:1.1'
     testImplementation 'androidx.test:core:1.4.0'
-    testImplementation 'org.robolectric:robolectric:4.4'
+    testImplementation 'org.robolectric:robolectric:4.8.2'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
     testImplementation 'org.mockito:mockito-core:3.8.0'
     testImplementation testFixtures(project(':common'))

@@ -29,7 +29,7 @@ Include the dependency:
 implementation 'com.transifex.txnative:txsdk:x.y.z'
 ```
 
-Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
+Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
 The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.5.0.
