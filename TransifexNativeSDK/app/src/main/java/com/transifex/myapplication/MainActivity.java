@@ -71,12 +71,12 @@ public class MainActivity extends TxBaseAppCompatActivity {
             mFormatLabel.setText(formattedString);
         }
 
-        // Styled string
+        // Styled text
         mStyledLabel = findViewById(R.id.styled_label);
         {
             String string = getResources().getString(R.string.styled_text);
-            Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
-            mStyledLabel.setText(styledString);
+            Spanned styledText = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
+            mStyledLabel.setText(styledText);
         }
 
         // Themed attribute referencing string resource

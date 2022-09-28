@@ -40,7 +40,7 @@ public class NativeCore {
     final Resources mSourceLocaleResources; // Resources using the source locale
 
     boolean mTestModeEnabled;
-    boolean mSupportSpannableEnabled;
+    boolean mSupportSpannableEnabled = true;
 
     /**
      * Create an instance of the core SDK class.
@@ -385,33 +385,34 @@ public class NativeCore {
     }
 
     /**
-     * Parses the provided string's tags into spans and returns a {@link SpannedString} object
-     * if {@link #setSupportSpannable(boolean)} is set to <code>true</code>. If it's set to
-     * <code>false</code> or no tags exist, it returns a {@link String}.
+     * If {@link #setSupportSpannable(boolean)} is set to <code>true</code>, it parses the provided
+     * string's tags into spans and returns a {@link SpannedString} object. If it's set to
+     * <code>false</code> or no tags exist, it returns a {@link String} after unescaping some HTML
+     * entities using {@link Utils#unescapeHTMLEntities(String)}.
      * <p>
      * If {@link #setSupportSpannable(boolean)} is set to <code>false</code>, the returned
-     * String will keep any found tags.
+     * String will keep any found tags as plain text.
      *
-     * @param string A string that may contain markup that can be parsed using
-     *               <code>HtmlCompat.fromHtml</code> to return a SpannedString containing spans.
+     * @param string A string that may contain HTML markup.
      *
-     * @return A {@link Spanned} or String object.
+     * @return A {@link Spanned} or {@link String} object.
      */
     @NonNull CharSequence getSpannedString(@NonNull String string) {
         if (mSupportSpannableEnabled) {
-            // If a span was found, return a "Spanned" object. Otherwise, return "String".
-            Spanned spanned = Utils.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
-            if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
-                return new SpannedString(spanned);
-            }
-            else {
-                // We don't return spanned.toString() because it applies some transformations that
-                // are not desirable. For example, it removes new lines.
+            // We want to use fromHTML() only if the provided string  contains tags. If not,
+            // unescapeHTMLEntities() is preferable. It has much better performance and it also
+            // keeps new lines and multiple spaces.
+            if (!string.contains("<")) {
                 return Utils.unescapeHTMLEntities(string);
             }
-        }
-        else {
-            // This is faster than "fromHTML()" and is enough for most cases
+            Spanned spanned = Utils.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
+            // If a span was found, return a "Spanned" object. Otherwise, return "String".
+            if (spanned.getSpans(0, spanned.length(), Object.class).length != 0) {
+                return new SpannedString(spanned);
+            } else {
+                return Utils.unescapeHTMLEntities(string);
+            }
+        } else {
             return Utils.unescapeHTMLEntities(string);
         }
     }
