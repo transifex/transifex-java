@@ -21,9 +21,11 @@ public class Utils {
     private static final String TAG = Utils.class.getSimpleName();
 
     private static final boolean sIsAppcompatPresent;
+    private static final boolean sIsMaterialComponenetsPresent;
 
     static {
         sIsAppcompatPresent = isClassPresent("androidx.appcompat.widget.Toolbar");
+        sIsMaterialComponenetsPresent = isClassPresent("com.google.android.material.textfield.TextInputLayout");
     }
 
     /**
@@ -185,5 +187,13 @@ public class Utils {
      */
     public static boolean isAppcompatPresent() {
         return sIsAppcompatPresent;
+    }
+
+    /**
+     * Checks if <a href="https://material.io/develop/android/docs/getting-started"><code>Material Components</code></a>
+     * classes are available at runtime.
+     */
+    public static boolean isMaterialComponentsPresent() {
+        return sIsMaterialComponenetsPresent;
     }
 }

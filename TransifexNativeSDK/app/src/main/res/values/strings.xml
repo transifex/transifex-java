@@ -28,6 +28,8 @@
 
     <string name="styled_text_not_escaped">This is <font face="monospace" color="#0000FF">blue</font></string>
 
+    <string name="hint_problem">Describe the problem in detail <font color='#FF0000'>*</font></string>
+
     <string name="dark_theme">Dark theme</string>
 
     <string name="light_theme">Light theme</string>
