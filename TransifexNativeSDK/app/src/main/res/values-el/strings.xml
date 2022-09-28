@@ -26,6 +26,10 @@
 
     <string name="styled_text">A &lt;font color="#FF7700">localization&lt;/font> platform &lt;u>that&lt;/u> moves as &lt;b>fast&lt;/b> as &lt;big>you&lt;/big> do\n https://www.transifex.com/ ελ</string>
 
+    <string name="styled_text_not_escaped">This is <font face="monospace" color="#0000FF">blue</font> ελ</string>
+
+    <string name="hint_problem">Describe the problem in detail <font color='#FF0000'>*</font> ελ</string>
+
     <string name="dark_theme">Dark theme ελ</string>
 
     <string name="light_theme">Light theme ελ</string>

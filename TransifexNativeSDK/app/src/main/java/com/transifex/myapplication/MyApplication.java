@@ -41,7 +41,7 @@ public class MyApplication extends Application {
 //        TxNative.setTestMode(true);
 
         // Required to render the HTML styling of R.string.styled_text_not_escaped
-//        TxNative.setSupportSpannable(true);
+        TxNative.setSupportSpannable(true);
 
         // Fetch all translations from CDS
         TxNative.fetchTranslations(null, null);

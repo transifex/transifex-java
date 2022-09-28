@@ -7,7 +7,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.transifex.txnative.transformers.SupportToolbarTransformer;
+import com.transifex.txnative.transformers.TextInputLayoutTransformer;
 import com.transifex.txnative.transformers.TextViewTransformer;
 import com.transifex.txnative.transformers.ToolbarTransformer;
 import com.transifex.txnative.transformers.ViewTransformer;
@@ -33,6 +35,7 @@ class TxInterceptor implements Interceptor {
     private final TextViewTransformer mTextViewTransformer;
     private ToolbarTransformer mToolbarTransformer;
     private final SupportToolbarTransformer mSupportToolbarTransformer;
+    private final TextInputLayoutTransformer mTextInputLayoutTransformer;
 
     public TxInterceptor() {
         mViewTransformer = new ViewTransformer();
@@ -41,6 +44,7 @@ class TxInterceptor implements Interceptor {
             mToolbarTransformer = new ToolbarTransformer();
         }
         mSupportToolbarTransformer = new SupportToolbarTransformer();
+        mTextInputLayoutTransformer = new TextInputLayoutTransformer();
     }
 
     @NonNull
@@ -61,6 +65,9 @@ class TxInterceptor implements Interceptor {
             }
             else if (Utils.isAppcompatPresent() && view instanceof androidx.appcompat.widget.Toolbar) {
                 mSupportToolbarTransformer.transform(context, view, attrs);
+            }
+            else if (Utils.isMaterialComponentsPresent() && view instanceof TextInputLayout) {
+                mTextInputLayoutTransformer.transform(context, view, attrs);
             }
             else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && view instanceof Toolbar) {
                 mToolbarTransformer.transform(context, view, attrs);
