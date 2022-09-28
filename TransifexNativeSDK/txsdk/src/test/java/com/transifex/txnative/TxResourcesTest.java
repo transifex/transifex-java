@@ -6,6 +6,7 @@ import android.os.Build;
 
 import com.transifex.common.LocaleData;
 import com.transifex.txnative.cache.TxMemoryCache;
+import com.transifex.txnative.test.R;
 
 import org.junit.Before;
 import org.junit.Test;

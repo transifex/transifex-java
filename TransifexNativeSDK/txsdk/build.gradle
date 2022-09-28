@@ -4,14 +4,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     namespace = 'com.transifex.txnative'
 
     defaultConfig {
         minSdkVersion 18
-        targetSdkVersion 32
+        targetSdkVersion 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -25,14 +25,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-
-    // Have aapt2 use src/test/res for resource generation. Unfortunately, the test strings
-    // end up in the main source set and the resulting .aar
-    sourceSets {
-        main {
-            res.srcDirs += ['src/test/res']
         }
     }
 
@@ -60,7 +52,7 @@ configurations.all  {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    compileOnly 'androidx.appcompat:appcompat:1.5.0'
+    compileOnly 'androidx.appcompat:appcompat:1.5.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation 'io.github.inflationx:viewpump:2.0.3'
     api project(':common')
@@ -69,7 +61,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'com.google.truth:truth:1.1'
     testImplementation 'androidx.test:core:1.4.0'
-    testImplementation 'org.robolectric:robolectric:4.4'
+    testImplementation 'org.robolectric:robolectric:4.8.2'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
     testImplementation 'org.mockito:mockito-core:3.8.0'
     testImplementation testFixtures(project(':common'))

@@ -3,7 +3,7 @@ package com.transifex.txnative.missingpolicy;
 import android.content.Context;
 import android.os.Build;
 
-import com.transifex.txnative.R;
+import com.transifex.txnative.test.R;
 
 import org.junit.Before;
 import org.junit.Test;

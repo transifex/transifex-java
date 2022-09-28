@@ -29,7 +29,7 @@ Include the dependency:
 implementation 'com.transifex.txnative:txsdk:x.y.z'
 ```
 
-Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
+Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
 The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.5.0.
@@ -271,7 +271,7 @@ You can write a string with HTML tags, where the opening brackets have been esca
 
 Then you can use [`fromHTML()`](https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler)) to get styled text:
 
-```
+```java
 String string = getResources().getString(R.string.styled_text);
 Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
 someView.setText(styledString);
@@ -279,7 +279,7 @@ someView.setText(styledString);
 
 If your string is referenced in an XML layout resource and you don't want set it programatically, write the string with normal opening brackets:
 
-```
+```xml
 <string name="styled_text">A <font color="#FF7700">localization</font> platform</string>
 ```
 
