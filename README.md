@@ -139,7 +139,7 @@ The cache can be prepopulated by the developer, using the command-line tool's [p
 
 ### Standard Cache
 
-The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by [TxStandardCache.getCache()](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache-android.content.Context-java.lang.Integer-java.io.File-). The standard cache operates by making use of the publicly exposed classes and interfaces from the [com.transifex.txnative.cache](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary) package of the SDK, so it's easy to construct another cache strategy if that's desired.
+The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by [TxStandardCache.getCache()](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache(android.content.Context,java.lang.Integer,java.io.File)). The standard cache operates by making use of the publicly exposed classes and interfaces from the [com.transifex.txnative.cache](https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary) package of the SDK, so it's easy to construct another cache strategy if that's desired.
 
 The standard cache is initialized with a memory cache that manages all cached entries in memory. When the memory cache gets initialized, it tries to look up if there are any already stored translations in the file system:
 
@@ -175,7 +175,7 @@ If you want to have your memory cache updated with the new translations when `fe
 
 ## Fetching translations
 
-As soon as [fetchTranslations()](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations-java.lang.String-java.util.Set-) is called, the SDK will attempt to download both the source locale strings
+As soon as [fetchTranslations()](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations(java.lang.String,java.util.Set)) is called, the SDK will attempt to download both the source locale strings
 and the translations for the supported locales. If successful, it will update the cache. 
 
 The `fetchTranslations()` method in the SDK configuration example is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
@@ -261,29 +261,30 @@ There are cases where you don't want TxNative to interfere with string loading. 
 ```
 ### String styling
 
-As explained in Android's [documentation](https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML), strings can have styling applied to them if they contain HTML markup.
+As explained in Android's [documentation](https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML), strings can have styling applied to them if they contain HTML markup. There are two ways to accomplish that.
 
-You can write a string with HTML tags, where the opening brackets have been escaped (using `&lt;` instead of `<`): 
-
-```
-<string name="styled_text">A &lt;font color="#FF7700">localization&lt;/font> platform</string>
-```
-
-Then you can use [`fromHTML()`](https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler)) to get styled text:
-
-```java
-String string = getResources().getString(R.string.styled_text);
-Spanned styledString = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
-someView.setText(styledString);
-```
-
-If your string is referenced in an XML layout resource and you don't want set it programatically, write the string with normal opening brackets:
+Write a string  with HTML markup. For example:
 
 ```xml
 <string name="styled_text">A <font color="#FF7700">localization</font> platform</string>
 ```
 
-and enable [`TxNative.setSupportSpannable(true)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable-boolean-). If the SDK detects tags in your string, it will use `fromHTML()` to render them correctly. Note that new lines will be converted to spaces and sequences of whitespace characters will be collapsed into a single space.
+The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use `getText()` (not `getString()`) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling [`TxNative.setSupportSpannable(false)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean)). 
+Note that when span support is enabled, the SDK uses `fromHTML()` internally when tags are detected. This has the side-effect of new lines being converted to spaces and sequences of whitespace characters being collapsed into a single space.
+
+Alternatively, you can write a string with the opening brackets escaped (using `&lt;` instead of `<`): 
+
+```xml
+<string name="styled_text">A &lt;font color="#FF7700">localization&lt;/font> platform</string>
+```
+
+Then, you can use [`fromHTML()`](https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler)) to get styled text as shown below:
+
+```java
+String string = getResources().getString(R.string.styled_text);
+Spanned styledTest = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
+someView.setText(styledText);
+```
 
 ### Stylable attributes
 

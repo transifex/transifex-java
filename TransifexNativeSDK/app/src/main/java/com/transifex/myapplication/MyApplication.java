@@ -40,8 +40,9 @@ public class MyApplication extends Application {
         // Uncomment to use strings as served by Android prefixed with "test: "
 //        TxNative.setTestMode(true);
 
-        // Required to render the HTML styling of R.string.styled_text_not_escaped
-        TxNative.setSupportSpannable(true);
+        // Uncomment, to disable styling of strings with HTML markup such as
+        // R.string.styled_text_not_escaped
+//        TxNative.setSupportSpannable(false);
 
         // Fetch all translations from CDS
         TxNative.fetchTranslations(null, null);

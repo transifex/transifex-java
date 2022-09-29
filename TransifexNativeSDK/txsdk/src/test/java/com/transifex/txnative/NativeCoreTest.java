@@ -391,6 +391,7 @@ public class NativeCoreTest {
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
         NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        nativeCore.setSupportSpannable(false);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITH_TAGS);
 
@@ -425,6 +426,7 @@ public class NativeCoreTest {
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
         NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        nativeCore.setSupportSpannable(false);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITH_TAGS_HTML_ESCAPED);
 
@@ -452,6 +454,10 @@ public class NativeCoreTest {
     public void testGetSpannedString_spanSupportDisabledWithSimpleStringWithHTMLEntities_returnStringWithUnescapedHTMLEntities() {
         // We expect to get a String object, since no tags exist in the  parsed string. New lines and
         // multiple spaces should be preserved. "&amp;" should be converted to "&"
+
+        // This test is the same as
+        // testGetSpannedString_spanSupportEnabledWithSimpleStringWithHTMLEntities_returnStringWithUnescapedHTMLEntities
+        // The result should be the same, regardless of spannable support.
 
         LocaleState localeState = new LocaleState(mockContext,
                 "en",

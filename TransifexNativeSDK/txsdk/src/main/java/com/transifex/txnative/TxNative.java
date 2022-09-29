@@ -82,24 +82,27 @@ public class TxNative {
 
     /**
      * If enabled, the <code>getText()</code> method can return a {@link android.text.SpannedString SpannedString}
-     * if tags exist in the source string. If disabled, a plain String is always returned. It's
-     * disabled by default.
+     * where all tags are parsed into spans. If disabled, a  {@link String} is returned at all times
+     * and all tags are kept as plain text. It's enabled by default.
      * <p>
-     * Enable it, if your strings contain HTML tags using {@code "<"} and  {@code ">"} characters.
-     * Leave it disabled if your strings are HTML-escaped such as the following:
+     * Leave it enabled, if you have strings that contain HTML tags using {@code "<"} and  {@code ">"}
+     * characters and you want HTML styling to be applied when the strings are referenced in your
+     * layout.
+     * <p>
+     * Disable it if your strings are HTML-escaped such as the following:
      * <pre>{@code
      * <resources>
      *   <string name="welcome_messages">Hello, %1$s! You have &lt;b>%2$d new messages&lt;/b>.</string>
      * </resources>
      * }
      * </pre>
-     *
-     * <p>
-     * If enabled, {@link androidx.core.text.HtmlCompat#fromHtml(String, int)} is
-     * used internally which is more CPU demanding than if left disabled.
+     * In this case, you can use {@link androidx.core.text.HtmlCompat#fromHtml(String, int)}
+     * on the result of <code>getText()</code> or <code>getString()</code> to get a SpannedString,
+     * which you can set to a view programmatically.
      *
      * @see <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">
      *     https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML</a>
+     * @see NativeCore#getSpannedString(String)
      */
     public static void setSupportSpannable(boolean enabled ){
         if (sNativeCore == null) {
