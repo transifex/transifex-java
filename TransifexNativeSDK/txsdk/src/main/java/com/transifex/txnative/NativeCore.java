@@ -233,8 +233,8 @@ public class NativeCore {
         // 4. the key was not found in the Cache for the resolved locale
         if (TextUtils.isEmpty(translatedString)) {
             CharSequence sourceString = getSourceString(txResources, id);
-            return mMissingPolicy.get(sourceString, id, txResources.getResourceEntryName(id),
-                    mLocaleState.getResolvedLocale());
+            return mMissingPolicy.get(txResources.getWrappedResources(), sourceString, id,
+                    txResources.getResourceEntryName(id),mLocaleState.getResolvedLocale());
         }
 
         return getSpannedString(translatedString);
@@ -288,8 +288,9 @@ public class NativeCore {
         // No ICU string found in cache or no quantity string was rendered
         if (TextUtils.isEmpty(quantityString)) {
             CharSequence sourceString = getSourceQuantityString(txResources, id, quantity);
-            return mMissingPolicy.getQuantityString(sourceString, id, quantity,
-                    txResources.getResourceEntryName(id), mLocaleState.getResolvedLocale());
+            return mMissingPolicy.getQuantityString(txResources.getWrappedResources(),
+                    sourceString, id, quantity, txResources.getResourceEntryName(id),
+                    mLocaleState.getResolvedLocale());
         }
 
         return getSpannedString(quantityString);

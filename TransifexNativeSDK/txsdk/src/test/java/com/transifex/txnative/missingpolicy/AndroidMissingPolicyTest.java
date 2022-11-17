@@ -42,8 +42,8 @@ public class AndroidMissingPolicyTest {
         CharSequence sourceString = "dummy source string";
         String resourceEntryName = mockContext.getResources().getResourceEntryName(R.string.tx_test_key);
 
-        AndroidMissingPolicy policy = new AndroidMissingPolicy(mockContext);
-        CharSequence translated = policy.get(sourceString, R.string.tx_test_key, resourceEntryName, "el");
+        AndroidMissingPolicy policy = new AndroidMissingPolicy();
+        CharSequence translated = policy.get(mockContext.getResources(), sourceString, R.string.tx_test_key, resourceEntryName, "el");
 
         assertThat(translated).isEqualTo("test ελ");
     }
@@ -57,8 +57,8 @@ public class AndroidMissingPolicyTest {
         CharSequence sourceString = "dummy source string";
         String resourceEntryName = mockContext.getResources().getResourceEntryName(R.plurals.tx_plural_test_key);
 
-        AndroidMissingPolicy policy = new AndroidMissingPolicy(mockContext);
-        CharSequence translated = policy.getQuantityString(sourceString, R.plurals.tx_plural_test_key, 1, resourceEntryName, "el");
+        AndroidMissingPolicy policy = new AndroidMissingPolicy();
+        CharSequence translated = policy.getQuantityString(mockContext.getResources(), sourceString, R.plurals.tx_plural_test_key, 1, resourceEntryName, "el");
 
         assertThat(translated).isEqualTo("αυτοκίνητο");
     }

@@ -1,5 +1,6 @@
 package com.transifex.txnative.missingpolicy;
 
+import android.content.res.Resources;
 import android.os.Build;
 import android.text.Spanned;
 import android.text.SpannedString;
@@ -7,6 +8,7 @@ import android.text.style.StyleSpan;
 
 import com.transifex.txnative.Utils;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -14,6 +16,7 @@ import org.robolectric.annotation.Config;
 
 import static android.text.Html.FROM_HTML_MODE_LEGACY;
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.P)
@@ -22,6 +25,13 @@ public class WrappedStringPolicyTest {
     final int stringId = 0;
     final String stringResourceName = "dummy_name";
     final String locale = "el";
+
+    private Resources resources;
+
+    @Before
+    public void setUp() {
+        resources = mock(Resources.class);
+    }
 
     @Test
     public void testWrapString_normal() {
@@ -94,7 +104,7 @@ public class WrappedStringPolicyTest {
     public void testGet_normal() {
         WrappedStringPolicy policy = new WrappedStringPolicy("<", " !end");
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.get(resources, sourceString, stringId, stringResourceName, locale);
 
         assertThat(translated).isEqualTo("<The quick\n brown fox !end");
     }
@@ -103,7 +113,7 @@ public class WrappedStringPolicyTest {
     public void testGetQuantityString_normal() {
         WrappedStringPolicy policy = new WrappedStringPolicy("<", " !end");
         String sourceString = "The quick\n brown fox";
-        CharSequence translated = policy.getQuantityString(sourceString, stringId, 1, stringResourceName, locale);
+        CharSequence translated = policy.getQuantityString(resources, sourceString, stringId, 1, stringResourceName, locale);
 
         assertThat(translated).isEqualTo("<The quick\n brown fox !end");
     }

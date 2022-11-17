@@ -3,6 +3,7 @@ package com.transifex.txnative.missingpolicy;
 import android.content.res.Resources;
 
 import com.transifex.txnative.LocaleState;
+import com.transifex.txnative.TxResources;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.PluralsRes;
@@ -20,6 +21,8 @@ public interface MissingPolicy {
      * Classes that implement this interface may choose to return anything relevant to the given
      * source string or not, based on their custom policy.
      *
+     * @param resources A Resources object. This is the wrapped resources object returned by
+     * {@link TxResources#getWrappedResources()}.
      * @param sourceString The source string.
      * @param id The string resource identifier as defined by
      * {@link Resources#getIdentifier(String, String, String)}.
@@ -29,8 +32,8 @@ public interface MissingPolicy {
      *
      * @return The translated string.
      */
-    @NonNull CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
-                              @NonNull String resourceName, @NonNull String locale);
+    @NonNull CharSequence get(@NonNull Resources resources, @NonNull CharSequence sourceString,
+                              @StringRes int id, @NonNull String resourceName, @NonNull String locale);
 
     /**
      * Return a quantity string as a translation based on the given source quantity string and
@@ -39,6 +42,8 @@ public interface MissingPolicy {
      * Classes that implement this interface may choose to return anything relevant to the given
      * source string or not, based on their custom policy.
      *
+     * @param resources A Resources object. This is the wrapped resources object returned by
+     * {@link TxResources#getWrappedResources()}.
      * @param sourceQuantityString The source string having grammatically correct pluralization for
      *                             the given quantity.
      * @param id The plurals resource identifier as defined by
@@ -51,7 +56,8 @@ public interface MissingPolicy {
      *
      * @return The translated string.
      */
-    @NonNull CharSequence getQuantityString(@NonNull CharSequence sourceQuantityString,
+    @NonNull CharSequence getQuantityString(@NonNull Resources resources,
+                                            @NonNull CharSequence sourceQuantityString,
                                             @PluralsRes int id, int quantity,
                                             @NonNull String resourceName, @NonNull String locale);
 }

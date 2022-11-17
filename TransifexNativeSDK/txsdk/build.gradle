@@ -53,7 +53,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
     compileOnly 'androidx.appcompat:appcompat:1.5.1'
-    compileOnly 'com.google.android.material:material:1.6.1'
+    compileOnly 'com.google.android.material:material:1.7.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation 'io.github.inflationx:viewpump:2.0.3'
     api project(':common')
