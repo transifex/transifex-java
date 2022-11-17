@@ -1,5 +1,7 @@
 package com.transifex.txnative.missingpolicy;
 
+import android.content.res.Resources;
+
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -149,8 +151,9 @@ public class PseudoTranslationPolicy implements MissingPolicy {
      * processed and will lose their markup.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
-                                      @NonNull String resourceName, @NonNull String locale) {
+    @NonNull public CharSequence get(@NonNull Resources resources,
+                                     @NonNull CharSequence sourceString, @StringRes int id,
+                                     @NonNull String resourceName, @NonNull String locale) {
         return processString(sourceString);
     }
 
@@ -161,7 +164,7 @@ public class PseudoTranslationPolicy implements MissingPolicy {
      * processed and will lose their markup.
      */
     @Override
-    @NonNull public CharSequence getQuantityString(
+    @NonNull public CharSequence getQuantityString(@NonNull Resources resources,
             @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
             @NonNull String resourceName, @NonNull String locale) {
         return processString(sourceQuantityString);

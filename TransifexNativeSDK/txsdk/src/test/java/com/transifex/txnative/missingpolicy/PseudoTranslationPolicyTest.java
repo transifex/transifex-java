@@ -1,14 +1,25 @@
 package com.transifex.txnative.missingpolicy;
 
+import android.content.res.Resources;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class PseudoTranslationPolicyTest {
 
     final int stringId = 0;
     final String stringResourceName = "dummy_name";
     final String locale = "el";
+
+    private Resources resources;
+
+    @Before
+    public void setUp() {
+        resources = mock(Resources.class);
+    }
 
     @Test
     public void testProcessString() {
@@ -60,7 +71,7 @@ public class PseudoTranslationPolicyTest {
     public void testGet() {
         String sourceString = "The quick\n brown fox \nένα!";
         PseudoTranslationPolicy policy = new PseudoTranslationPolicy();
-        CharSequence translated = policy.get(sourceString, stringId, stringResourceName, locale);
+        CharSequence translated = policy.get(resources, sourceString, stringId, stringResourceName, locale);
 
         assertThat(translated).isEqualTo("Ťȟê ʠüıċǩ\n ƀȓøẁñ ƒøẋ \nένα!");
     }
@@ -69,7 +80,7 @@ public class PseudoTranslationPolicyTest {
     public void testGetQuantityString() {
         String sourceString = "The quick\n brown fox \nένα!";
         PseudoTranslationPolicy policy = new PseudoTranslationPolicy();
-        CharSequence translated = policy.getQuantityString(sourceString, stringId, 1, stringResourceName, locale);
+        CharSequence translated = policy.getQuantityString(resources, sourceString, stringId, 1, stringResourceName, locale);
 
         assertThat(translated).isEqualTo("Ťȟê ʠüıċǩ\n ƀȓøẁñ ƒøẋ \nένα!");
     }

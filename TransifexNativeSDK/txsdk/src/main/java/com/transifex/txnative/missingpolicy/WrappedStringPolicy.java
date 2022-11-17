@@ -1,6 +1,7 @@
 package com.transifex.txnative.missingpolicy;
 
 
+import android.content.res.Resources;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.SpannedString;
@@ -88,7 +89,8 @@ public class WrappedStringPolicy implements MissingPolicy{
      * Returns a wrapped string.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
+    @NonNull public CharSequence get(@NonNull Resources resources,
+                                     @NonNull CharSequence sourceString, @StringRes int id,
                                      @NonNull String resourceName, @NonNull String locale) {
         return wrapString(sourceString);
     }
@@ -97,7 +99,7 @@ public class WrappedStringPolicy implements MissingPolicy{
      * Returns a wrapped quantity string.
      */
     @Override
-    @NonNull public CharSequence getQuantityString(
+    @NonNull public CharSequence getQuantityString(@NonNull Resources resources,
             @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
             @NonNull String resourceName, @NonNull String locale) {
         return wrapString(sourceQuantityString);

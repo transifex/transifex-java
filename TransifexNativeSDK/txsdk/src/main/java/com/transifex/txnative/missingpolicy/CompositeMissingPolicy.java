@@ -1,5 +1,7 @@
 package com.transifex.txnative.missingpolicy;
 
+import android.content.res.Resources;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
@@ -29,11 +31,12 @@ public class CompositeMissingPolicy implements MissingPolicy{
      * Returns a string after it has been fed to all of the provided policies from first to last.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
+    @NonNull public CharSequence get(@NonNull Resources resources,
+                                     @NonNull CharSequence sourceString, @StringRes int id,
                                      @NonNull String resourceName, @NonNull String locale) {
         CharSequence string = sourceString;
         for (MissingPolicy policy : mMissingPolicies) {
-            string = policy.get(string, id, resourceName, locale);
+            string = policy.get(resources, string, id, resourceName, locale);
         }
 
         return  string;
@@ -44,12 +47,13 @@ public class CompositeMissingPolicy implements MissingPolicy{
      * to last.
      */
     @Override
-    @NonNull public CharSequence getQuantityString(
+    @NonNull public CharSequence getQuantityString(@NonNull Resources resources,
             @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
             @NonNull String resourceName, @NonNull String locale) {
         CharSequence quantityString = sourceQuantityString;
         for (MissingPolicy policy : mMissingPolicies) {
-            quantityString = policy.getQuantityString(quantityString, id, quantity, resourceName, locale);
+            quantityString = policy.getQuantityString(resources, quantityString, id, quantity,
+                    resourceName, locale);
         }
 
         return  quantityString;

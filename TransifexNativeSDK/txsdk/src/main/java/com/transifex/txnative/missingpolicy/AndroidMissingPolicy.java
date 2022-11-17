@@ -1,27 +1,36 @@
 package com.transifex.txnative.missingpolicy;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.PluralsRes;
 import androidx.annotation.StringRes;
 
 /**
- * Returns the string using Android's localization system.
+ * Returns a translated string using Android's localization system.
+ * <p>
+ * You can use this policy to fall back to translations provided via <code>strings.xml</code>
+ * when a translation string can't be provided by TxNative's cache.
  */
 public class AndroidMissingPolicy implements MissingPolicy{
 
-    Context context;
+
+    public AndroidMissingPolicy(){
+
+    }
 
     /**
      * Creates a new instance.
+     * <p>
+     * This constructor has been deprecated. A context is no longer needed.
      *
      * @param applicationContext The application context. <b>Do not provide</b> a context wrapped by
      *                           {@link com.transifex.txnative.TxNative#wrap(Context) TxNative#wrap(Context)}
      *                           or {@link com.transifex.txnative.TxNative#generalWrap(Context) TxNative#generalWrap(Context)}.
      */
+    @Deprecated
     public AndroidMissingPolicy(@NonNull Context applicationContext) {
-        this.context = applicationContext;
     }
 
     /**
@@ -31,9 +40,10 @@ public class AndroidMissingPolicy implements MissingPolicy{
      * without using TxNative functionality.
      */
     @Override
-    @NonNull public CharSequence get(@NonNull CharSequence sourceString, @StringRes int id,
+    @NonNull public CharSequence get(@NonNull Resources resources,
+                                     @NonNull CharSequence sourceString, @StringRes int id,
                                      @NonNull String resourceName, @NonNull String locale) {
-        return context.getResources().getText(id);
+        return resources.getText(id);
     }
 
     /**
@@ -43,9 +53,9 @@ public class AndroidMissingPolicy implements MissingPolicy{
      * without using TxNative functionality.
      */
     @Override
-    @NonNull public CharSequence getQuantityString(
+    @NonNull public CharSequence getQuantityString(@NonNull Resources resources,
             @NonNull CharSequence sourceQuantityString, @PluralsRes int id, int quantity,
             @NonNull String resourceName, @NonNull String locale) {
-        return context.getResources().getQuantityText(id, quantity);
+        return resources.getQuantityText(id, quantity);
     }
 }

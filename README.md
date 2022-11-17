@@ -68,11 +68,13 @@ The language codes supported by Transifex can be found [here](https://explore.tr
      }
 ```
 
-In this example, the SDK uses its default cache, `TxStandardCache`, and default missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.
+In this example, the SDK uses its default cache, `TxStandardCache`, and default missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. For example, if you want to fallback to translations provided via `strings.xml` files, use the [`AndroidMissingPolicy`](https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/AndroidMissingPolicy.html). You can read more about cache implementations later on.
 
 In this example, we fetch the translations for all locales. If you want, you can target specific locales or strings that have specific tags.
 
-Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, it suffices to place the supported app languages in your app’s gradle file:
+## App configuration
+
+Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, place the supported app languages in your app’s gradle file:
 
 ```gradle
 android {
@@ -84,7 +86,9 @@ android {
     }
 ```
 
-If your app doesn't use `Appcompat`, you should define a dummy string in your default, unlocalized `strings.xml` file and place a `strings.xml` file for each supported locale and define the same string there. For example:
+This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user.
+
+For some languages such as Kinyarwanda, you will need to do some more work. You should define a dummy string in your default, unlocalized `strings.xml` file and place a `strings.xml` file for that locale and define the same string there. For example:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -93,7 +97,9 @@ If your app doesn't use `Appcompat`, you should define a dummy string in your de
 </resources>
 ```
 
-This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don't do that, Android will always pick the first locale selected by the user.
+If you don't do that, Android will never choose that language.
+
+If you don't use `Appcompat` you will have to place a `strings.xml` for all supported locales.
 
 ## Context Wrapping
 
@@ -270,7 +276,7 @@ Write a string  with HTML markup. For example:
 ```
 
 The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use `getText()` (not `getString()`) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling [`TxNative.setSupportSpannable(false)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean)). 
-Note that when span support is enabled, the SDK uses `fromHTML()` internally when tags are detected. This has the side-effect of new lines being converted to spaces and sequences of whitespace characters being collapsed into a single space.
+Note that when span support is enabled and tags are detected in a string, the SDK uses `fromHTML()`. This has the side-effect of new lines being converted to spaces and sequences of whitespace characters being collapsed into a single space.
 
 Alternatively, you can write a string with the opening brackets escaped (using `&lt;` instead of `<`): 
 
