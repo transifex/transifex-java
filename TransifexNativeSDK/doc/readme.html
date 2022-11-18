@@ -19,7 +19,7 @@ advantage of the features that Transifex Native offers, such as OTA translations
 <p>Include the dependency:</p>
 <pre><code class="lang-groovy"><span class="hljs-keyword">implementation</span> <span class="hljs-string">'com.transifex.txnative:txsdk:x.y.z'</span>
 </code></pre>
-<p>Please replace <code>x</code>, <code>y</code> and <code>z</code> with the latest version numbers: <a href="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk"><img src="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk/badge.svg" alt="Maven Central"></a></p>
+<p>Please replace <code>x</code>, <code>y</code> and <code>z</code> with the latest version numbers: <a href="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk"><img src="https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955" alt="Maven Central"></a></p>
 <p>The library&#39;s minimum supported SDK is 18 (Android 4.3) and is compatible with <a href="https://developer.android.com/jetpack/androidx/releases/appcompat">Appcompat</a> 1.5.0.</p>
 <p>The SDK does not add Appcompat as a dependency. It can work in apps that don&#39;t use Appcompat and in apps that use Appcompat.</p>
 <h2 id="sdk-configuration">SDK configuration</h2>
@@ -49,9 +49,10 @@ advantage of the features that Transifex Native offers, such as OTA translations
         TxNative.fetchTranslations(<span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>);
      }
 </code></pre>
-<p>In this example, the SDK uses its default cache, <code>TxStandardCache</code>, and default missing policy, <code>SourceStringPolicy</code>. However, you can choose between different cache and missing policy implementations or even provide your own. You can read more on that later.</p>
+<p>In this example, the SDK uses its default cache, <code>TxStandardCache</code>, and default missing policy, <code>SourceStringPolicy</code>. However, you can choose between different cache and missing policy implementations or even provide your own. For example, if you want to fallback to translations provided via <code>strings.xml</code> files, use the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/AndroidMissingPolicy.html"><code>AndroidMissingPolicy</code></a>. You can read more about cache implementations later on.</p>
 <p>In this example, we fetch the translations for all locales. If you want, you can target specific locales or strings that have specific tags.</p>
-<p>Starting from Android N, Android has <a href="https://developer.android.com/guide/topics/resources/multilingual-support.html">multilingual support</a>: users can select more that one locale in Android&#39;s settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of <code>Appcompat</code>, it suffices to place the supported app languages in your app’s gradle file:</p>
+<h2 id="app-configuration">App configuration</h2>
+<p>Starting from Android N, Android has <a href="https://developer.android.com/guide/topics/resources/multilingual-support.html">multilingual support</a>: users can select more that one locale in Android&#39;s settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of <code>Appcompat</code>, place the supported app languages in your app’s gradle file:</p>
 <pre><code class="lang-gradle"><span class="hljs-class">android </span>{
     ...
     <span class="hljs-class">defaultConfig </span>{
@@ -60,13 +61,15 @@ advantage of the features that Transifex Native offers, such as OTA translations
 
     }
 </code></pre>
-<p>If your app doesn&#39;t use <code>Appcompat</code>, you should define a dummy string in your default, unlocalized <code>strings.xml</code> file and place a <code>strings.xml</code> file for each supported locale and define the same string there. For example:</p>
+<p>This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user.</p>
+<p>For some languages such as Kinyarwanda, you will need to do some more work. You should define a dummy string in your default, unlocalized <code>strings.xml</code> file and place a <code>strings.xml</code> file for that locale and define the same string there. For example:</p>
 <pre><code class="lang-xml"><span class="php"><span class="hljs-meta">&lt;?</span>xml version=<span class="hljs-string">"1.0"</span> encoding=<span class="hljs-string">"utf-8"</span><span class="hljs-meta">?&gt;</span></span>
 <span class="hljs-tag">&lt;<span class="hljs-name">resources</span>&gt;</span>
     <span class="hljs-tag">&lt;<span class="hljs-name">string</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"dummy"</span>&gt;</span>dummy<span class="hljs-tag">&lt;/<span class="hljs-name">string</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">resources</span>&gt;</span>
 </code></pre>
-<p>This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user. If you don&#39;t do that, Android will always pick the first locale selected by the user.</p>
+<p>If you don&#39;t do that, Android will never choose that language.</p>
+<p>If you don&#39;t use <code>Appcompat</code> you will have to place a <code>strings.xml</code> for all supported locales.</p>
 <h2 id="context-wrapping">Context Wrapping</h2>
 <p>The SDK&#39;s functionality is enabled by wrapping the context, so that all string resource related methods, such a <a href="https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object..."><code>getString()</code></a>), <a href="https://developer.android.com/reference/android/content/res/Resources#getText(int"><code>getText()</code></a>), flow through the SDK.</p>
 <p>To enable context wrapping in your <code>AppCompatActivity</code>, extend the SDK&#39;s <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseAppCompatActivity">TxBaseAppcompatActivity</a> or copy its <a href="https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseAppCompatActivity.java">implementation</a> to your own base class. 
@@ -94,7 +97,7 @@ If you are using an older <code>AppCompat</code> version, please read the class&
 <p>The cache is updated when <code>fetchTranslations()</code> is called. You can read more on that later.</p>
 <p>The cache can be prepopulated by the developer, using the command-line tool&#39;s <a href="#pulling">pull command</a>.</p>
 <h3 id="standard-cache">Standard Cache</h3>
-<p>The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache-android.content.Context-java.lang.Integer-java.io.File-">TxStandardCache.getCache()</a>. The standard cache operates by making use of the publicly exposed classes and interfaces from the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary">com.transifex.txnative.cache</a> package of the SDK, so it&#39;s easy to construct another cache strategy if that&#39;s desired.</p>
+<p>The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache(android.content.Context,java.lang.Integer,java.io.File">TxStandardCache.getCache()</a>). The standard cache operates by making use of the publicly exposed classes and interfaces from the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary">com.transifex.txnative.cache</a> package of the SDK, so it&#39;s easy to construct another cache strategy if that&#39;s desired.</p>
 <p>The standard cache is initialized with a memory cache that manages all cached entries in memory. When the memory cache gets initialized, it tries to look up if there are any already stored translations in the file system:</p>
 <ul>
 <li>First, it looks for translations saved in the app&#39;s <a href="https://developer.android.com/reference/android/content/res/AssetManager">Assets directory</a> that may have been offered by the developer, using the command-line tool when building the app.</li>
@@ -120,7 +123,7 @@ If you are using an older <code>AppCompat</code> version, please read the class&
 </code></pre>
 <p>If you want to have your memory cache updated with the new translations when <code>fetchTranslations()</code> is called, you can remove the <code>TXReadonlyCacheDecorator</code>.</p>
 <h2 id="fetching-translations">Fetching translations</h2>
-<p>As soon as <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations-java.lang.String-java.util.Set-">fetchTranslations()</a> is called, the SDK will attempt to download both the source locale strings
+<p>As soon as <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations(java.lang.String,java.util.Set">fetchTranslations()</a>) is called, the SDK will attempt to download both the source locale strings
 and the translations for the supported locales. If successful, it will update the cache. </p>
 <p>The <code>fetchTranslations()</code> method in the SDK configuration example is called as soon as the application launches, but that&#39;s not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).</p>
 <h2 id="transifex-command-line-tool">Transifex Command Line Tool</h2>
@@ -159,16 +162,20 @@ to the <a href="https://github.com/transifex/transifex-delivery/#invalidate-cach
 <pre><code class="lang-java">    <span class="hljs-selector-tag">getApplicationContext</span>()<span class="hljs-selector-class">.getString</span>(&lt;string_ID&gt;);
 </code></pre>
 <h3 id="string-styling">String styling</h3>
-<p>As explained in Android&#39;s <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">documentation</a>, strings can have styling applied to them if they contain HTML markup.</p>
-<p>You can write a string with HTML tags, where the opening brackets have been escaped (using <code>&amp;lt;</code> instead of <code>&lt;</code>): </p>
-<pre><code>&lt;<span class="hljs-built_in">string</span> name=<span class="hljs-string">"styled_text"</span>&gt;A &amp;lt;<span class="hljs-built_in">font</span> <span class="hljs-built_in">color</span>=<span class="hljs-string">"#FF7700"</span>&gt;localization&amp;lt;/<span class="hljs-built_in">font</span>&gt; platform&lt;/<span class="hljs-built_in">string</span>&gt;
-</code></pre><p>Then you can use <a href="https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler"><code>fromHTML()</code></a>) to get styled text:</p>
-<pre><code><span class="hljs-keyword">String</span> <span class="hljs-keyword">string</span> = getResources().getString(R.<span class="hljs-keyword">string</span>.styled_text);
-Spanned styledString = HtmlCompat.fromHtml(<span class="hljs-keyword">string</span>, HtmlCompat.FROM_HTML_MODE_COMPACT);
-someView.setText(styledString);
-</code></pre><p>If your string is referenced in an XML layout resource and you don&#39;t want set it programatically, write the string with normal opening brackets:</p>
-<pre><code>&lt;<span class="hljs-built_in">string</span> name=<span class="hljs-string">"styled_text"</span>&gt;A &lt;<span class="hljs-built_in">font</span> <span class="hljs-built_in">color</span>=<span class="hljs-string">"#FF7700"</span>&gt;localization&lt;/<span class="hljs-built_in">font</span>&gt; platform&lt;/<span class="hljs-built_in">string</span>&gt;
-</code></pre><p>and enable <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable-boolean-"><code>TxNative.setSupportSpannable(true)</code></a>. If the SDK detects tags in your string, it will use <code>fromHTML()</code> to render them correctly. Note that new lines will be converted to spaces and sequences of whitespace characters will be collapsed into a single space.</p>
+<p>As explained in Android&#39;s <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">documentation</a>, strings can have styling applied to them if they contain HTML markup. There are two ways to accomplish that.</p>
+<p>Write a string  with HTML markup. For example:</p>
+<pre><code class="lang-xml">&lt;<span class="hljs-built_in">string</span> name=<span class="hljs-string">"styled_text"</span>&gt;A &lt;<span class="hljs-built_in">font</span> <span class="hljs-built_in">color</span>=<span class="hljs-string">"#FF7700"</span>&gt;localization&lt;/<span class="hljs-built_in">font</span>&gt; platform&lt;/<span class="hljs-built_in">string</span>&gt;
+</code></pre>
+<p>The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use <code>getText()</code> (not <code>getString()</code>) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean"><code>TxNative.setSupportSpannable(false)</code></a>). 
+Note that when span support is enabled and tags are detected in a string, the SDK uses <code>fromHTML()</code>. This has the side-effect of new lines being converted to spaces and sequences of whitespace characters being collapsed into a single space.</p>
+<p>Alternatively, you can write a string with the opening brackets escaped (using <code>&amp;lt;</code> instead of <code>&lt;</code>): </p>
+<pre><code class="lang-xml">&lt;<span class="hljs-built_in">string</span> name=<span class="hljs-string">"styled_text"</span>&gt;A &amp;lt;<span class="hljs-built_in">font</span> <span class="hljs-built_in">color</span>=<span class="hljs-string">"#FF7700"</span>&gt;localization&amp;lt;/<span class="hljs-built_in">font</span>&gt; platform&lt;/<span class="hljs-built_in">string</span>&gt;
+</code></pre>
+<p>Then, you can use <a href="https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler"><code>fromHTML()</code></a>) to get styled text as shown below:</p>
+<pre><code class="lang-java"><span class="hljs-keyword">String</span> <span class="hljs-keyword">string</span> = getResources().getString(R.<span class="hljs-keyword">string</span>.styled_text);
+Spanned styledTest = HtmlCompat.fromHtml(<span class="hljs-keyword">string</span>, HtmlCompat.FROM_HTML_MODE_COMPACT);
+someView.setText(styledText);
+</code></pre>
 <h3 id="stylable-attributes">Stylable attributes</h3>
 <p>Android lets you define attributes that can point to different string resources, according to the current theme. For example you can create an <code>attr.xml</code> file that declares a stylable:</p>
 <pre><code class="lang-xml">  <span class="hljs-tag">&lt;<span class="hljs-name">declare-styleable</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"custom_view"</span>&gt;</span>
