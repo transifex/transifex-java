@@ -43,29 +43,37 @@ Configure the SDK in your `Application` class.
 The language codes supported by Transifex can be found [here](https://explore.transifex.com/languages/). They can either use 2 characters, such as `es`, or specify the regional code as well, such as `es_ES`. Keep in mind that in the sample code below you will have to replace `<transifex_token>` with the actual token that is associated with your Transifex project and resource.
 
 ```java
-    @Override
-    public void onCreate() {
-        super.onCreate();
+@Override
+public void onCreate() {
+    super.onCreate();
 
-        // Initialize TxNative
-        String token = "<transifex_token>";
+    // Initialize TxNative
+    String token = "<transifex_token>";
 
-        LocaleState localeState = new LocaleState(getApplicationContext(),
-                "en",                                                                 // source locale
-                new String[]{"en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"},   // supported locales
-                null);
+    LocaleState localeState = new LocaleState(getApplicationContext(),
+        // source locale
+        "en",
+        // supported locales
+        new String[]{"en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"},
+        null);
 
-        TxNative.init(
-                getApplicationContext(),   // application context
-                localeState,               // a LocaleState instance
-                token,                     // token
-                null,                      // cdsHost URL
-                null,                      // a TxCache implementation
-                null);                     // a MissingPolicy implementation
+    TxNative.init(
+        // application context
+        getApplicationContext(),
+        // a LocaleState instance
+        localeState,
+        // token
+        token,
+        // cdsHost URL
+        null,
+        // a TxCache implementation
+        null,
+        // a MissingPolicy implementation
+        null);
 
-        // Fetch all translations from CDS
-        TxNative.fetchTranslations(null, null);
-     }
+    // Fetch all translations from CDS
+    TxNative.fetchTranslations(null, null);
+}
 ```
 
 In this example, the SDK uses its default cache, `TxStandardCache`, and default missing policy, `SourceStringPolicy`. However, you can choose between different cache and missing policy implementations or even provide your own. For example, if you want to fallback to translations provided via `strings.xml` files, use the [`AndroidMissingPolicy`](https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/AndroidMissingPolicy.html). You can read more about cache implementations later on.
@@ -78,12 +86,10 @@ Starting from Android N, Android has [multilingual support](https://developer.an
 
 ```gradle
 android {
-    ...
-    defaultConfig {
-
-        resConfigs "en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"
-
-    }
+...
+defaultConfig {
+    resConfigs "en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"
+}
 ```
 
 This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user.
@@ -105,7 +111,7 @@ If you don't use `Appcompat` you will have to place a `strings.xml` for all supp
 
 The SDK's functionality is enabled by wrapping the context, so that all string resource related methods, such a [`getString()`](https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)), [`getText()`](https://developer.android.com/reference/android/content/res/Resources#getText(int)), flow through the SDK.
 
-To enable context wrapping in your `AppCompatActivity`, extend the SDK's [TxBaseAppcompatActivity](https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseAppCompatActivity) or copy its [implementation](https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseAppCompatActivity.java) to your own base class. 
+To enable context wrapping in your `AppCompatActivity`, extend the SDK's [TxBaseAppcompatActivity](https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseAppCompatActivity) or copy its [implementation](https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseAppCompatActivity.java) to your own base class.
 If you are using an older `AppCompat` version, please read the class's implementation as you may need to uncomment some code.
 
 
@@ -126,11 +132,11 @@ public class SimpleIntentService extends JobIntentService {
 If you want to use the SDK in some arbitrary place where you can get your application's context, please do the following:
 
 ```java
-    ...
-    // Wrap the context
-    Context wrappedContext = TxNative.generalWrap(getApplicationContext());
-    // Use the wrapped context for getting a string
-    wrappedContext.getString();
+...
+// Wrap the context
+Context wrappedContext = TxNative.generalWrap(getApplicationContext());
+// Use the wrapped context for getting a string
+wrappedContext.getString();
 ```
 
 If you want to disable the SDK functionality, don't initialize it and don't call any `TxNative` methods. `TxNative.wrap()` and `TxNative.generalWrap()` will be a no-op and the context will not be wrapped. Thus, all `getString()` etc methods, won't flow through the SDK.
@@ -164,17 +170,17 @@ In order to achieve that, you can create a a method that returns an object that 
 
 ```java
 return new TxFileOutputCacheDecorator(
-                <cached Translations Directory>,
-                new TXReadonlyCacheDecorator(
-                        new TxProviderBasedCache(
-                                <providers array>,
-                                new TxUpdateFilterCache(
-                                        <update policy>,
-                                        new TxMemoryCache()
-                                )
-                        )
-                )
-        );
+    <cached Translations Directory>,
+    new TXReadonlyCacheDecorator(
+        new TxProviderBasedCache(
+            <providers array>,
+            new TxUpdateFilterCache(
+                <update policy>,
+                new TxMemoryCache()
+            )
+        )
+    )
+);
 ```
 
 If you want to have your memory cache updated with the new translations when `fetchTranslations()` is called, you can remove the `TXReadonlyCacheDecorator`.
@@ -182,7 +188,7 @@ If you want to have your memory cache updated with the new translations when `fe
 ## Fetching translations
 
 As soon as [fetchTranslations()](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations(java.lang.String,java.util.Set)) is called, the SDK will attempt to download both the source locale strings
-and the translations for the supported locales. If successful, it will update the cache. 
+and the translations for the supported locales. If successful, it will update the cache.
 
 The `fetchTranslations()` method in the SDK configuration example is called as soon as the application launches, but that's not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).
 
@@ -223,33 +229,33 @@ To use the tool on your app's Android Studio project, enter the root directory o
 
 #### Help
 
-`transifex`, `transifex -h`, `transifex --help`  
+`transifex`, `transifex -h`, `transifex --help`
 Displays a help dialog with all the options and commands.
 
-`transifex help <command>`  
+`transifex help <command>`
 Get help for a particular command.
 
 #### Pushing
 
-`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`  
+`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name>`
 Pushes the source strings of your app found in a module named "app_module_name". The tool reads the `strings.xml` resource file found in the main source set of the specified module: `app_module_name/src/main/res/values/strings.xml`. It processes it and pushes the result to the Transifex CDS.
 
-`transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml ...`  
+`transifex push -t <transifex_token> -s <transifex_secret> -f path/to/strings1.xml path2/to/strings2.xml ...`
 If your app has a more complex string setup, you can specify one or more string resource files.
 
-`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name> --dry-run -v`  
+`transifex push -t <transifex_token> -s <transifex_secret> -m <app_module_name> --dry-run -v`
 Append `--dry-run -v` to display the source strings that will be pushed without actually pushing them.
 
-`transifex clear -t <transifex_token> -s <transifex_secret>`  
+`transifex clear -t <transifex_token> -s <transifex_secret>`
 Clears all existing resource content from CDS. This action will also remove existing localizations.
 
 #### Pulling
 
-`transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`  
+`transifex pull -t <transifex_token> -m <app_module_name> -l <locale>...`
 Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the "assets" directory of the main source set of the specified app module: `app_module_name/src/main/assets/txnative`. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.
 
 
-`transifex pull -t <transifex_token> -d <directory> -l <locale>...`  
+`transifex pull -t <transifex_token> -d <directory> -l <locale>...`
 If you have a different setup, you can enter the path to your app's `assets` directory.
 
 Note that cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex
@@ -263,7 +269,7 @@ to the [invalidation endpoint](https://github.com/transifex/transifex-delivery/#
 There are cases where you don't want TxNative to interfere with string loading. For example, many apps have API keys or some configuration saved in non-translatable strings in their `strings.xml` file. A method like `getString()` is used to retrieve the strings. If you are using the SDK's default missing policy, `SourceStringPolicy`, the expected string will be returned. If, however, you are using some other policy, the string may be altered and your app will not behave as expected. In such a case, make sure that you are using a non-wrapped context when loading such a string:
 
 ```java
-    getApplicationContext().getString(<string_ID>);
+getApplicationContext().getString(<string_ID>);
 ```
 ### String styling
 
@@ -275,10 +281,10 @@ Write a string  with HTML markup. For example:
 <string name="styled_text">A <font color="#FF7700">localization</font> platform</string>
 ```
 
-The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use `getText()` (not `getString()`) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling [`TxNative.setSupportSpannable(false)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean)). 
+The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use `getText()` (not `getString()`) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling [`TxNative.setSupportSpannable(false)`](https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean)).
 Note that when span support is enabled and tags are detected in a string, the SDK uses `fromHTML()`. This has the side-effect of new lines being converted to spaces and sequences of whitespace characters being collapsed into a single space.
 
-Alternatively, you can write a string with the opening brackets escaped (using `&lt;` instead of `<`): 
+Alternatively, you can write a string with the opening brackets escaped (using `&lt;` instead of `<`):
 
 ```xml
 <string name="styled_text">A &lt;font color="#FF7700">localization&lt;/font> platform</string>
@@ -297,27 +303,27 @@ someView.setText(styledText);
 Android lets you define attributes that can point to different string resources, according to the current theme. For example you can create an `attr.xml` file that declares a stylable:
 
 ```xml
-  <declare-styleable name="custom_view">
-        <attr name="label" format="string|reference"/>
-  </declare-styleable>
+<declare-styleable name="custom_view">
+    <attr name="label" format="string|reference"/>
+</declare-styleable>
 ```
 
 You can set the string value of this attribute to a TextView the following way:
 
 ```java
-    TypedValue typedValue = new TypedValue();
-    getTheme().resolveAttribute(R.attr.label, typedValue, true);
-    textView.setText(typedValue.resourceId); 
-    // textView.setText(typedValue.string); // DON'T DO THAT!!!
+TypedValue typedValue = new TypedValue();
+getTheme().resolveAttribute(R.attr.label, typedValue, true);
+textView.setText(typedValue.resourceId);
+// textView.setText(typedValue.string); // DON'T DO THAT!!!
 ```
 
 or the following way:
 
 ```java
-    TypedArray typedArray  = getTheme().obtainStyledAttributes(set, R.styleable.custom_view, defStyleAttr, defStyleRes);
-    textView.setText(typedArray.getResourceId(R.styleable.custom_view_label, -1)); // Get the resource id of the stylable attribute under the current theme
-    // textView.setText(typedArray.getString(R.styleable.custom_view_label, -1)); // DON'T DO THAT!!!
-    typedArray.recycle();
+TypedArray typedArray  = getTheme().obtainStyledAttributes(set, R.styleable.custom_view, defStyleAttr, defStyleRes);
+textView.setText(typedArray.getResourceId(R.styleable.custom_view_label, -1)); // Get the resource id of the stylable attribute under the current theme
+// textView.setText(typedArray.getString(R.styleable.custom_view_label, -1)); // DON'T DO THAT!!!
+typedArray.recycle();
 ```
 
 Note that if you try to resolve the string value directly from the theme methods, the call will not pass through the SDK. The trick here is to resolve the resource id from the theme methods.
@@ -328,7 +334,7 @@ Note that if you try to resolve the string value directly from the theme methods
 Some libs may contain their own localized strings, views or activities. In such as case, you don't want TxNative to interfere with string loading. To accomplish that, make sure that you pass a non-wrapped context to the library's initialization method:
 
 ```java
-    SomeSDK.init(getApplicationContext());
+SomeSDK.init(getApplicationContext());
 ```
 
 Note however that if a `View` provided by the library is used inside your app's activity, `TxNative` will be used during that view's inflation (if your activity is set up correctly). In that case, any library strings will not be found in TxNative translations and the result will depend on the missing policy used. `SourceStringPolicy` will return the source string provided by the library, which will probably be in English. Using, `AndroidMissingPolicy` will return the localized string using the library's localized string resources, as expected.
@@ -343,7 +349,7 @@ The strings included in the libraries have to be pushed to the CDS. You can push
 If your lib has an initialization method, make sure that your main app passes the wrapped context:
 
 ```java
-    YourLib.init(TxNative.wrap(getApplicationContext()));
+YourLib.init(TxNative.wrap(getApplicationContext()));
 ```
 
 The following string operations will result in string rendering through TxNative:
