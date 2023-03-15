@@ -86,9 +86,10 @@ Starting from Android N, Android has [multilingual support](https://developer.an
 
 ```gradle
 android {
-...
-defaultConfig {
-    resConfigs "en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"
+    ...
+    defaultConfig {
+        resConfigs "en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"
+    }
 }
 ```
 
@@ -214,9 +215,10 @@ To run the tool, type:
 ```
 java -jar /path/to/transifex.jar
 ```
-, where `/path/to/` is the path to the directory you placed "transifex.jar".
+where `/path/to/` is the path to the directory you placed "transifex.jar".
 
 Note that even though the tool uses UTF-8 internally, it's recommended to have your JVM's default character encoding set to UTF-8. If this isn't the case for your system, you can use:
+
 ```
 java -jar -Dfile.encoding=UTF8 /path/to/transifex.jar
 ```
@@ -377,6 +379,13 @@ Strings that are referenced in [menu](https://developer.android.com/guide/topics
 ### ActionBar
 
 Even though the SDK handles the strings referenced in a [`Toolbar`](https://developer.android.com/reference/androidx/appcompat/widget/Toolbar), it won't handle strings referenced in an [`ActionBar`](https://developer.android.com/reference/android/app/ActionBar). You will have to set them programmatically (e.g. by calling [`setTitle()`](https://developer.android.com/reference/android/app/ActionBar#setTitle(java.lang.CharSequence))) to take advantage of the SDK. Otherwise, Android's localization system will be used.
+
+## Video resources
+
+* [How to install the Transifex Native Android SDK](https://youtu.be/1Z3eTtzI1IA)
+* [How to push strings with Transifex Native in Android](https://youtu.be/V0L1cjaQTGk)
+* [How to bundle translations with Transifex Native in your Android package](https://youtu.be/zNPh4bIYOxY)
+
 
 ## License
 Licensed under Apache License 2.0, see [LICENSE](LICENSE) file.
