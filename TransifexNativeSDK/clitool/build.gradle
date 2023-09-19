@@ -15,8 +15,13 @@ jar {
 
     // Add dependencies in the final jar file to create a fat jar
     // https://discuss.gradle.org/t/how-to-include-dependencies-in-jar/19571/18
+    // exclude files:
+    // https://kennethjorgensen.com/blog/2014/fat-jars-with-excluded-dependencies-in-gradle/
     from {
-        configurations.runtimeClasspath.filter{ it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.filter { it.exists() }.collect { it.isDirectory() ? it : zipTree(it) }
+    } {
+        exclude "META-INF/versions/"
+        exclude "META-INF/LICENSE.txt"
     }
     preserveFileTimestamps = false
     reproducibleFileOrder = true
@@ -33,7 +38,7 @@ compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 javadoc.options.encoding = 'UTF-8'
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     // Use UTF-8 in the JVM that executes the test gradle tasks
     systemProperty "file.encoding", "UTF-8"
 }
@@ -41,13 +46,13 @@ tasks.withType(Test) {
 dependencies {
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
     implementation 'org.jdom:jdom2:2.0.6'
-    implementation 'info.picocli:picocli:4.6.3'
+    implementation 'info.picocli:picocli:4.7.5'
     implementation project(':common')
 
     testCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.google.truth:truth:1.1'
-    testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
-    testImplementation 'com.google.code.gson:gson:2.8.9'
+    testImplementation "junit:junit:$versions.junit"
+    testImplementation "com.google.truth:truth:$versions.truth"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$versions.okhttp3Mockwebserver"
+    testImplementation "com.google.code.gson:gson:$versions.gson"
     testImplementation testFixtures(project(':common'))
 }

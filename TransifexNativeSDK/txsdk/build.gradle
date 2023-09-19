@@ -4,13 +4,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.3"
-
     namespace = 'com.transifex.txnative'
 
     defaultConfig {
         minSdkVersion 18
+        compileSdk 33
         targetSdkVersion 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -39,11 +37,11 @@ android {
     }
 }
 
-tasks.withType(Test) {
+tasks.withType(Test).configureEach {
     systemProperty "file.encoding", "UTF-8"
 }
 
-configurations.all  {
+configurations.configureEach {
     resolutionStrategy {
         force "androidx.annotation:annotation:$versions.androidXAnnotation"
     }
@@ -52,25 +50,25 @@ configurations.all  {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    compileOnly 'androidx.appcompat:appcompat:1.5.1'
-    compileOnly 'com.google.android.material:material:1.7.0'
+    compileOnly "androidx.appcompat:appcompat:$versions.appcompat"
+    compileOnly "com.google.android.material:material:$versions.material"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation 'io.github.inflationx:viewpump:2.0.3'
     api project(':common')
 
     testCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'com.google.truth:truth:1.1'
-    testImplementation 'androidx.test:core:1.4.0'
-    testImplementation 'org.robolectric:robolectric:4.8.2'
-    testImplementation 'com.squareup.okhttp3:mockwebserver:4.9.0'
-    testImplementation 'org.mockito:mockito-core:3.8.0'
+    testImplementation "junit:junit:$versions.junit"
+    testImplementation "com.google.truth:truth:$versions.truth"
+    testImplementation "androidx.test:core:$versions.androidXTestCore"
+    testImplementation "org.robolectric:robolectric:$versions.roboelectric"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$versions.okhttp3Mockwebserver"
+    testImplementation "org.mockito:mockito-core:$versions.mockitoCore"
     testImplementation testFixtures(project(':common'))
 
     androidTestCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation 'com.google.truth:truth:1.1'
+    androidTestImplementation "androidx.test.ext:junit:$versions.androidXJunit"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$versions.androidxEspressoCore"
+    androidTestImplementation "com.google.truth:truth:$versions.truth"
     androidTestImplementation testFixtures(project(':common'))
 }
 

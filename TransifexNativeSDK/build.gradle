@@ -1,8 +1,19 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.versions = [
-            'kotlin' : '1.7.10',
-            'androidXAnnotation' : '1.5.0'
+            'kotlin' : '1.7.21',
+            'androidXAnnotation' : '1.7.0',
+            'appcompat' : '1.6.1',
+            'material' : '1.9.0',
+            'truth' : '1.1.3',
+            'gson' : '2.9.1',
+            'junit' : '4.13.2',
+            'androidXTestCore' : '1.5.0',
+            'roboelectric' : '4.10.3',
+            'mockitoCore' : '5.5.0',
+            'okhttp3Mockwebserver' : '4.10.0',
+            'androidXJunit' : '1.1.5',
+            'androidxEspressoCore' : '3.5.1'
     ]
     ext {
         sdkVersionCode = 7                      // version code for txsdk
@@ -24,7 +35,7 @@ buildscript {
 }
 
 plugins {
-    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
     id 'com.android.application' version '7.3.0' apply false
     id 'com.android.library' version '7.3.0' apply false
 }
@@ -105,11 +116,11 @@ gradle.projectsEvaluated {
     }
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
     delete "$rootProject.rootDir/tmp"
 }
 
-task cleanTmp(type: Delete) {
+tasks.register('cleanTmp', Delete) {
     delete "$rootProject.rootDir/tmp"
 }

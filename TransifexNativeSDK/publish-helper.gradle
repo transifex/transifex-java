@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-task androidJavadoc(type: Javadoc) {
+tasks.register('androidJavadoc', Javadoc) {
     if (plugins.hasPlugin('android-library')) {
         source = android.sourceSets.main.java.srcDirs
         classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
@@ -10,8 +10,7 @@ task androidJavadoc(type: Javadoc) {
                 owner.classpath += variant.javaCompileProvider.get().classpath
             }
         }
-    }
-    else {
+    } else {
         source = sourceSets.main.allJava
         classpath += configurations.runtimeClasspath
         classpath += configurations.compileClasspath
@@ -28,19 +27,20 @@ task androidJavadoc(type: Javadoc) {
     }
 }
 
-task androidJavadocJar(type: Jar, dependsOn: androidJavadoc) {
+tasks.register('androidJavadocJar', Jar) {
+    dependsOn androidJavadoc
+
     archiveClassifier.set('javadoc')
     from androidJavadoc.destinationDir
     preserveFileTimestamps = false
     reproducibleFileOrder = true
 }
 
-task javaSourcesJar(type: Jar) {
+tasks.register('javaSourcesJar', Jar) {
     archiveClassifier.set('sources')
     if (plugins.hasPlugin('android-library')) {
         from android.sourceSets.main.java.srcDirs
-    }
-    else {
+    } else {
         from sourceSets.main.allSource
     }
     preserveFileTimestamps = false
