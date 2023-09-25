@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
 }
 
 android {
@@ -24,6 +23,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     // https://developer.android.com/studio/publish-library/configure-pub-variants
@@ -52,7 +56,6 @@ dependencies {
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
     compileOnly "androidx.appcompat:appcompat:$versions.appcompat"
     compileOnly "com.google.android.material:material:$versions.material"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin"
     implementation 'io.github.inflationx:viewpump:2.0.3'
     api project(':common')
 

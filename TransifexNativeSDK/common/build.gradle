@@ -34,7 +34,7 @@ dependencies {
     testImplementation 'commons-io:commons-io:2.11.0'
 
     testFixturesCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    testFixturesImplementation "com.squareup.okhttp3:mockwebserver:$versions.okhttp3Mockwebserver"
+    testFixturesCompileOnly "com.squareup.okhttp3:mockwebserver:$versions.okhttp3Mockwebserver"
     testFixturesImplementation "com.google.code.gson:gson:$versions.gson"
 }
 

@@ -4,7 +4,7 @@ apply plugin: 'signing'
 tasks.register('androidJavadoc', Javadoc) {
     if (plugins.hasPlugin('android-library')) {
         source = android.sourceSets.main.java.srcDirs
-        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += project.files(android.getBootClasspath())
         android.libraryVariants.all { variant ->
             if (variant.name == 'release') {
                 owner.classpath += variant.javaCompileProvider.get().classpath
