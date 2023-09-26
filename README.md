@@ -88,7 +88,7 @@ Starting from Android N, Android has [multilingual support](https://developer.an
 android {
     ...
     defaultConfig {
-        resConfigs "en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"
+        resourceConfigurations += ['en', 'el', 'de', 'fr', 'ar', 'sl', 'es_ES', 'es_MX']
     }
 }
 ```

@@ -14,6 +14,7 @@ android {
         versionCode 1
         versionName "1.0"
         // https://stackoverflow.com/a/41345440/941314
+        // https://developer.android.com/build/shrink-code#unused-alt-resources
         // Needed for multilingual-support after Android N
         resourceConfigurations += ['en', 'el', 'de', 'fr', 'ar', 'sl']
 
