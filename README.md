@@ -32,7 +32,7 @@ implementation 'com.transifex.txnative:txsdk:x.y.z'
 Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
-The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) 1.5.0.
+The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat).
 
 The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat.
 
@@ -88,7 +88,7 @@ Starting from Android N, Android has [multilingual support](https://developer.an
 android {
     ...
     defaultConfig {
-        resConfigs "en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"
+        resourceConfigurations += ['en', 'el', 'de', 'fr', 'ar', 'sl', 'es_ES', 'es_MX']
     }
 }
 ```

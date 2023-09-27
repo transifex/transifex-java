@@ -5,3 +5,6 @@
 # Keep class names for better log ouput
 -keepnames class com.transifex.txnative.**
 -keepnames class com.transifex.common.**
+
+# Don't warn
+-dontwarn lombok.NonNull

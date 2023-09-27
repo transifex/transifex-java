@@ -5,7 +5,7 @@ import android.content.res.Resources;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.app.TxContextWrappingDelegate;
+import androidx.appcompat.app.TxContextWrappingDelegateJava;
 
 /**
  * A base activity that extends AppCompatActivity and implements context wrapping so that the
@@ -18,7 +18,7 @@ import androidx.appcompat.app.TxContextWrappingDelegate;
  */
 public class TxBaseAppCompatActivity extends AppCompatActivity {
 
-   private TxContextWrappingDelegate mAppCompatDelegate;
+   private TxContextWrappingDelegateJava mAppCompatDelegate;
    private Resources mResources;
 
    @NonNull
@@ -26,7 +26,7 @@ public class TxBaseAppCompatActivity extends AppCompatActivity {
    public AppCompatDelegate getDelegate() {
       // Wrap AppCompat delegate
       if (mAppCompatDelegate == null) {
-         mAppCompatDelegate = new TxContextWrappingDelegate(super.getDelegate());
+         mAppCompatDelegate = new TxContextWrappingDelegateJava(super.getDelegate());
       }
       return mAppCompatDelegate;
    }
