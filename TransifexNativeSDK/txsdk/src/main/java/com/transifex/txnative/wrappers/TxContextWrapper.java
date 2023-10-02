@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
  */
 public class TxContextWrapper extends ContextWrapper {
 
-    private Resources mResources;
+    private Resources mWrappedResources;
     private final NativeCore mNativeCore;
 
     public TxContextWrapper(@NonNull Context base, @NonNull NativeCore nativeCore) {
@@ -27,12 +27,15 @@ public class TxContextWrapper extends ContextWrapper {
     @SuppressLint("RestrictedApi")
     @Override
     public Resources getResources() {
-        if (mResources != null) {
-            return  mResources;
+        // If the base resources point to a new AssetManager object, re-wrap them.
+        if (mWrappedResources != null
+                && mWrappedResources.getAssets() != super.getResources().getAssets()) {
+            mWrappedResources = null;
         }
 
-        mResources = new TxResources(super.getResources(), mNativeCore);
-
-        return mResources;
+        if (mWrappedResources == null) {
+            mWrappedResources = new TxResources(super.getResources(), mNativeCore);
+        }
+        return mWrappedResources;
     }
 }

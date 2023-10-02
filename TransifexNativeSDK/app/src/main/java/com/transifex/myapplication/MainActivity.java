@@ -1,10 +1,13 @@
 package com.transifex.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Spanned;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.transifex.txnative.activity.TxBaseAppCompatActivity;
@@ -26,6 +29,7 @@ public class MainActivity extends TxBaseAppCompatActivity {
     TextView mFormatLabel;
     TextView mStyledLabel;
     TextView mReferenceUseLabel;
+    Button mButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +90,14 @@ public class MainActivity extends TxBaseAppCompatActivity {
             getTheme().resolveAttribute(R.attr.theme_string, typedValue, true);
             mReferenceUseLabel.setText(typedValue.resourceId);
         }
+
+        mButton = findViewById(R.id.button);
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, WebViewActivity.class));
+            }
+        });
 
     }
 

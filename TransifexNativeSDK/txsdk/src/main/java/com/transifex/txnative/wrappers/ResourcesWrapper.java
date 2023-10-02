@@ -20,6 +20,7 @@ import java.io.InputStream;
 import androidx.annotation.RequiresApi;
 
 // Taken from androidx.appcompat.widget.ResourcesWrapper
+// https://androidx.tech/artifacts/appcompat/appcompat-resources/1.6.1-source/androidx/appcompat/widget/ResourcesWrapper.java.html
 
 /**
  * This extends Resources but delegates the calls to another Resources object. This enables

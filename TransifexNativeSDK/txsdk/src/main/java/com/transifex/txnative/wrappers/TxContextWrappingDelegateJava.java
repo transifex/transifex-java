@@ -13,6 +13,7 @@ import com.transifex.txnative.TxNative;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StyleRes;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
 
@@ -25,7 +26,7 @@ import androidx.appcompat.widget.Toolbar;
  */
 public class TxContextWrappingDelegateJava extends AppCompatDelegate {
 
-    private AppCompatDelegate superDelegate;
+    private final AppCompatDelegate superDelegate;
 
     public TxContextWrappingDelegateJava(AppCompatDelegate superDelegate) {
         this.superDelegate = superDelegate;
@@ -77,6 +78,11 @@ public class TxContextWrappingDelegateJava extends AppCompatDelegate {
     @Override
     public void onPostResume() {
         superDelegate.onPostResume();
+    }
+
+    @Override
+    public void setTheme(@StyleRes int themeResId) {
+        superDelegate.setTheme(themeResId);
     }
 
     @Nullable
@@ -176,6 +182,11 @@ public class TxContextWrappingDelegateJava extends AppCompatDelegate {
     @Override
     public void setLocalNightMode(int mode) {
         superDelegate.setLocalNightMode(mode);
+    }
+
+    @Override
+    public int getLocalNightMode() {
+        return superDelegate.getLocalNightMode();
     }
 
     @NonNull
