@@ -4,15 +4,14 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import com.transifex.txnative.cache.TxCache;
 import com.transifex.txnative.missingpolicy.MissingPolicy;
 import com.transifex.txnative.wrappers.TxContextWrapper;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.transifex.txnative.cache.TxCache;
-
 import java.util.Set;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.github.inflationx.viewpump.ViewPump;
 import io.github.inflationx.viewpump.ViewPumpContextWrapper;
 

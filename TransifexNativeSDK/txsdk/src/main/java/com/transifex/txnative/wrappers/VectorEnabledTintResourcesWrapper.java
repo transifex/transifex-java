@@ -25,7 +25,7 @@ import androidx.appcompat.widget.VectorEnabledTintResources;
 
 /**
  * This extends VectorEnabledTintResources but delegates all calls, except for the ones implemented in
- * VectorEnabledTintResources, to the wrapped Resources object. This enables any customization done
+ * VectorEnabledTintResources, to the base Resources object. This enables any customization done
  * by some subclass of Resources to be also picked up, while having the functionality of
  * VectorEnabledTintResources.
  */

@@ -21,8 +21,8 @@ public interface MissingPolicy {
      * Classes that implement this interface may choose to return anything relevant to the given
      * source string or not, based on their custom policy.
      *
-     * @param resources A Resources object. This is the wrapped resources object returned by
-     * {@link TxResources#getWrappedResources()}.
+     * @param resources A Resources object. This is the base resources object returned by
+     * {@link TxResources#getBaseResources()}.
      * @param sourceString The source string.
      * @param id The string resource identifier as defined by
      * {@link Resources#getIdentifier(String, String, String)}.
@@ -42,8 +42,8 @@ public interface MissingPolicy {
      * Classes that implement this interface may choose to return anything relevant to the given
      * source string or not, based on their custom policy.
      *
-     * @param resources A Resources object. This is the wrapped resources object returned by
-     * {@link TxResources#getWrappedResources()}.
+     * @param resources A Resources object. This is the base resources object returned by
+     * {@link TxResources#getBaseResources()}.
      * @param sourceQuantityString The source string having grammatically correct pluralization for
      *                             the given quantity.
      * @param id The plurals resource identifier as defined by

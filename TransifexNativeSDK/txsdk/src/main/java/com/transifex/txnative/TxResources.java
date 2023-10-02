@@ -6,7 +6,9 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -16,7 +18,6 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Native;
 
 import androidx.annotation.AnyRes;
 import androidx.annotation.NonNull;
@@ -31,7 +32,7 @@ import androidx.annotation.StringRes;
  * <p>
  * We override some of the calls that return strings. The rest of the string methods, call
  * internally the ones we have overridden. The remaining methods are delegated to the
- * wrapped {@link Resources} object.
+ * base {@link Resources} object.
  * <p>
  * All resource method calls made programmatically by the user will reach here. String resources
  * used during the view inflation process will also be read from here, after having the process
@@ -110,7 +111,7 @@ public class TxResources extends Resources {
      * @return The {@link Resources} object that is being wrapped.
      */
     @NonNull
-    public Resources getWrappedResources() {
+    public Resources getBaseResources() {
         return mResources;
     }
 
@@ -133,16 +134,35 @@ public class TxResources extends Resources {
 
     /*
      * Delegates all `Resources` methods to the base `Resources` object (mResources), except for
-     * all string related methods which are overridden in this class or reach the super class. Code
+     * all string related methods, some of which were previously overridden and some that are not
+     * overridden, so that the default implementation of the super class is used. Code
      * below has been copied from `ResourcesWrapper` and  allows any customization of the
-     * wrapped Resources object, done by some subclass, to be also picked up.
+     * base Resources object, done by some subclass, to be also picked up.
+     *
+     * The following methods were also added because they seem as something that should be handled
+     * by the base Resources object:
+     *
+     * * public Typeface getFont(int id)
+     * * public int getColor(int id, Theme theme)
+     * * public ColorStateList getColorStateList(int id, Theme theme)
+     * * public float getFloat(int id)
+     * *
      */
 
+    @NonNull
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public Typeface getFont(int id) throws NotFoundException {
+        return mResources.getFont(id);
+    }
+
+    @NonNull
     @Override
     public int[] getIntArray(int id) throws NotFoundException {
         return mResources.getIntArray(id);
     }
 
+    @NonNull
     @Override
     public TypedArray obtainTypedArray(int id) throws NotFoundException {
         return mResources.obtainTypedArray(id);
@@ -205,10 +225,24 @@ public class TxResources extends Resources {
         return mResources.getColor(id);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public int getColor(int id, Theme theme) throws NotFoundException {
+        return mResources.getColor(id, theme);
+    }
+
+    @NonNull
     @SuppressWarnings("deprecation")
     @Override
     public ColorStateList getColorStateList(int id) throws NotFoundException {
         return mResources.getColorStateList(id);
+    }
+
+    @NonNull
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public ColorStateList getColorStateList(int id, Theme theme) {
+        return mResources.getColorStateList(id, theme);
     }
 
     @Override
@@ -221,26 +255,37 @@ public class TxResources extends Resources {
         return mResources.getInteger(id);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    @Override
+    public float getFloat(int id) {
+        return mResources.getFloat(id);
+    }
+
+    @NonNull
     @Override
     public XmlResourceParser getLayout(int id) throws NotFoundException {
         return mResources.getLayout(id);
     }
 
+    @NonNull
     @Override
     public XmlResourceParser getAnimation(int id) throws NotFoundException {
         return mResources.getAnimation(id);
     }
 
+    @NonNull
     @Override
     public XmlResourceParser getXml(int id) throws NotFoundException {
         return mResources.getXml(id);
     }
 
+    @NonNull
     @Override
     public InputStream openRawResource(int id) throws NotFoundException {
         return mResources.openRawResource(id);
     }
 
+    @NonNull
     @Override
     public InputStream openRawResource(int id, TypedValue value) throws NotFoundException {
         return mResources.openRawResource(id, value);
@@ -330,6 +375,16 @@ public class TxResources extends Resources {
             throws XmlPullParserException {
         mResources.parseBundleExtra(tagName, attrs, outBundle);
     }
+
+//    @RequiresApi(api = Build.VERSION_CODES.R)
+//    public void addLoaders(@NonNull ResourcesLoader... loaders) {
+//        mResources.addLoaders(loaders);
+//    }
+//
+//    @RequiresApi(api = Build.VERSION_CODES.R)
+//    public void removeLoaders(@NonNull ResourcesLoader... loaders) {
+//        mResources.removeLoaders(loaders);
+//    }
 
     //endregion Delegation
 }
