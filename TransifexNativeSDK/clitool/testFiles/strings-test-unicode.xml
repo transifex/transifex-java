@@ -3,4 +3,7 @@
     <string name="key1">Ελληνικά!</string>
     <string name="key2">unicode heart: ❤</string>
     <string name="key3">escaped heart: \u2764</string>
+    <string name="key4">html decimal escaped heart: &#10084;</string>
+    <string name="key5">html hexadecimal escaped heart: &#x2764;</string>
+    <string name="key6">long unicode emoji: 🧑‍🤝‍🧑</string>
 </resources>
