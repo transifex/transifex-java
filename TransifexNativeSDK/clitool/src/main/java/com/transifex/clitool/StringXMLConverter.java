@@ -41,6 +41,11 @@ class StringXMLConverter {
     public StringXMLConverter() {
         mXmlOutputter = new XMLOutputter();
         Format format = Format.getRawFormat();
+        // https://stackoverflow.com/questions/54920849/converting-xml-not-work-utf-8-xmloutputter-java
+        // The default escape strategy escapes long unicode characters (non-BMP UTF-16 surrogate pairs)
+        // to Numeric character references: "&#xhhhh;" .
+        // We want to keep them as unicode.
+        format.setEscapeStrategy(ch -> false);
 
         format.setLineSeparator(LineSeparator.UNIX);
 

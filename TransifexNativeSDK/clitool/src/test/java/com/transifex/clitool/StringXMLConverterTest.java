@@ -291,10 +291,13 @@ public class StringXMLConverterTest {
             e.printStackTrace();
         }
 
-        assertThat(stringMap.keySet()).containsExactly("key1", "key2", "key3").inOrder();
+        assertThat(stringMap.keySet()).containsExactly("key1", "key2", "key3", "key4", "key5", "key6").inOrder();
         assertThat(stringMap.get("key1").string).isEqualTo("Ελληνικά!");
         assertThat(stringMap.get("key2").string).isEqualTo("unicode heart: ❤");
         assertThat(stringMap.get("key3").string).isEqualTo("escaped heart: ❤");
+        assertThat(stringMap.get("key4").string).isEqualTo("html decimal escaped heart: ❤");
+        assertThat(stringMap.get("key5").string).isEqualTo("html hexadecimal escaped heart: ❤");
+        assertThat(stringMap.get("key6").string).isEqualTo("long unicode emoji: \uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1");
     }
 
     @Test
