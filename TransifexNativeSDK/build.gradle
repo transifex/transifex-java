@@ -15,11 +15,11 @@ buildscript {
             'androidxEspressoCore' : '3.5.1'
     ]
     ext {
-        sdkVersionCode = 8                      // version code for txsdk
-        sdkVersion = '1.2.2'                    // version for txsdk and common
+        sdkVersionCode = 9                      // version code for txsdk
+        sdkVersion = '1.2.3'                    // version for txsdk and common
         pomGroupID = "com.transifex.txnative"   // pom group id for txsdk and common
 
-        cliVersion = '1.2.2'                    // clitool version
+        cliVersion = '1.2.3'                    // clitool version
     }
     repositories {
         google()
