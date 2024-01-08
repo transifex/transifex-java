@@ -1,32 +1,30 @@
-<html><head><style>body {
-   color: black;
-}
-</style></head><body><h1 id="transifex-native-android-sdk">Transifex Native Android SDK</h1>
-<p><a href="https://github.com/transifex/transifex-java/actions/workflows/gradle.yml"><img src="https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg" alt="CI"></a>
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Transifex Native Android SDK.md</title><style></style></head><body id="preview">
+<h1 class="code-line" data-line-start="0" data-line-end="1"><a id="Transifex_Native_Android_SDK_0"></a>Transifex Native Android SDK</h1>
+<p class="has-line-data" data-line-start="2" data-line-end="4"><a href="https://github.com/transifex/transifex-java/actions/workflows/gradle.yml"><img src="https://github.com/transifex/transifex-java/actions/workflows/gradle.yml/badge.svg" alt="CI"></a><br>
 <a href="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk"><img src="https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955" alt="Maven Central"></a></p>
-<p>Transifex Native Android SDK is a collection of tools to easily localize your Android applications
-using <a href="https://www.transifex.com/native/">Transifex Native</a>. The Android library can fetch translations
-over the air (OTA) to your apps and the command line tool can upload your app&#39;s source strings to Transifex.</p>
-<p>Learn more about <a href="https://developers.transifex.com/docs/native">Transifex Native</a>.</p>
-<p>The full documentation is available at <a href="https://transifex.github.io/transifex-java/">https://transifex.github.io/transifex-java/</a>.</p>
-<h2 id="sample-app">Sample app</h2>
-<p>You can see the SDK used and configured in multiple ways in the provided <a href="https://github.com/transifex/transifex-java/tree/master/TransifexNativeSDK/app">sample app</a> of this repo.</p>
-<h2 id="usage">Usage</h2>
-<p>The SDK allows you to keep using the same string methods that Android
-provides, such as <code>getString(int id)</code>, <code>getText(int id)</code>, etc. or use strings in XML layout files, but at the same time taking
+<p class="has-line-data" data-line-start="5" data-line-end="8">Transifex Native Android SDK is a collection of tools to easily localize your Android applications<br>
+using <a href="https://www.transifex.com/native/">Transifex Native</a>. The Android library can fetch translations<br>
+over the air (OTA) to your apps and the command line tool can upload your app’s source strings to Transifex.</p>
+<p class="has-line-data" data-line-start="9" data-line-end="10">Learn more about <a href="https://developers.transifex.com/docs/native">Transifex Native</a>.</p>
+<p class="has-line-data" data-line-start="11" data-line-end="12">The full documentation is available at <a href="https://transifex.github.io/transifex-java/">https://transifex.github.io/transifex-java/</a>.</p>
+<h2 class="code-line" data-line-start="13" data-line-end="14"><a id="Sample_app_13"></a>Sample app</h2>
+<p class="has-line-data" data-line-start="15" data-line-end="16">You can see the SDK used and configured in multiple ways in the provided <a href="https://github.com/transifex/transifex-java/tree/master/TransifexNativeSDK/app">sample app</a> of this repo.</p>
+<h2 class="code-line" data-line-start="17" data-line-end="18"><a id="Usage_17"></a>Usage</h2>
+<p class="has-line-data" data-line-start="19" data-line-end="22">The SDK allows you to keep using the same string methods that Android<br>
+provides, such as <code>getString(int id)</code>, <code>getText(int id)</code>, etc. or use strings in XML layout files, but at the same time taking<br>
 advantage of the features that Transifex Native offers, such as OTA translations.</p>
-<h2 id="sdk-installation">SDK installation</h2>
-<p>Include the dependency:</p>
-<pre><code class="lang-groovy"><span class="hljs-keyword">implementation</span> <span class="hljs-string">'com.transifex.txnative:txsdk:x.y.z'</span>
+<h2 class="code-line" data-line-start="23" data-line-end="24"><a id="SDK_installation_23"></a>SDK installation</h2>
+<p class="has-line-data" data-line-start="25" data-line-end="26">Include the dependency:</p>
+<pre><code class="has-line-data" data-line-start="28" data-line-end="30" class="language-groovy">implementation <span class="hljs-string">'com.transifex.txnative:txsdk:x.y.z'</span>
 </code></pre>
-<p>Please replace <code>x</code>, <code>y</code> and <code>z</code> with the latest version numbers: <a href="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk"><img src="https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955" alt="Maven Central"></a></p>
-<p>The library&#39;s minimum supported SDK is 18 (Android 4.3) and is compatible with <a href="https://developer.android.com/jetpack/androidx/releases/appcompat">Appcompat</a>.</p>
-<p>The SDK does not add Appcompat as a dependency. It can work in apps that don&#39;t use Appcompat and in apps that use Appcompat.</p>
-<h2 id="sdk-configuration">SDK configuration</h2>
-<p>Configure the SDK in your <code>Application</code> class.</p>
-<p>The language codes supported by Transifex can be found <a href="https://explore.transifex.com/languages/">here</a>. They can either use 2 characters, such as <code>es</code>, or specify the regional code as well, such as <code>es_ES</code>. Keep in mind that in the sample code below you will have to replace <code>&lt;transifex_token&gt;</code> with the actual token that is associated with your Transifex project and resource.</p>
-<pre><code class="lang-java"><span class="hljs-meta">@Override</span>
-<span class="hljs-keyword">public</span> <span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">onCreate</span><span class="hljs-params">()</span> </span>{
+<p class="has-line-data" data-line-start="31" data-line-end="32">Please replace <code>x</code>, <code>y</code> and <code>z</code> with the latest version numbers: <a href="https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk"><img src="https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955" alt="Maven Central"></a></p>
+<p class="has-line-data" data-line-start="34" data-line-end="35">The library’s minimum supported SDK is 18 (Android 4.3).</p>
+<p class="has-line-data" data-line-start="36" data-line-end="37">The SDK requires <a href="https://developer.android.com/jetpack/androidx/releases/appcompat">Appcompat</a> and automatically adds it as a dependency.</p>
+<h2 class="code-line" data-line-start="38" data-line-end="39"><a id="SDK_configuration_38"></a>SDK configuration</h2>
+<p class="has-line-data" data-line-start="40" data-line-end="41">Configure the SDK in your <code>Application</code> class.</p>
+<p class="has-line-data" data-line-start="42" data-line-end="43">The language codes supported by Transifex can be found <a href="https://explore.transifex.com/languages/">here</a>. They can either use 2 characters, such as <code>es</code>, or specify the regional code as well, such as <code>es_ES</code>. Keep in mind that in the sample code below you will have to replace <code>&lt;transifex_token&gt;</code> with the actual token that is associated with your Transifex project and resource.</p>
+<pre><code class="has-line-data" data-line-start="45" data-line-end="77" class="language-java"><span class="hljs-annotation">@Override</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">onCreate</span><span class="hljs-params">()</span> </span>{
     <span class="hljs-keyword">super</span>.onCreate();
 
     <span class="hljs-comment">// Initialize TxNative</span>
@@ -57,197 +55,198 @@ advantage of the features that Transifex Native offers, such as OTA translations
     TxNative.fetchTranslations(<span class="hljs-keyword">null</span>, <span class="hljs-keyword">null</span>);
 }
 </code></pre>
-<p>In this example, the SDK uses its default cache, <code>TxStandardCache</code>, and default missing policy, <code>SourceStringPolicy</code>. However, you can choose between different cache and missing policy implementations or even provide your own. For example, if you want to fallback to translations provided via <code>strings.xml</code> files, use the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/AndroidMissingPolicy.html"><code>AndroidMissingPolicy</code></a>. You can read more about cache implementations later on.</p>
-<p>In this example, we fetch the translations for all locales. If you want, you can target specific locales or strings that have specific tags.</p>
-<h2 id="app-configuration">App configuration</h2>
-<p>Starting from Android N, Android has <a href="https://developer.android.com/guide/topics/resources/multilingual-support.html">multilingual support</a>: users can select more that one locale in Android&#39;s settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of <code>Appcompat</code>, place the supported app languages in your app’s gradle file:</p>
-<pre><code class="lang-gradle">android {
+<p class="has-line-data" data-line-start="78" data-line-end="79">In this example, the SDK uses its default cache, <code>TxStandardCache</code>, and default missing policy, <code>SourceStringPolicy</code>. However, you can choose between different cache and missing policy implementations or even provide your own. For example, if you want to fallback to translations provided via <code>strings.xml</code> files, use the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/AndroidMissingPolicy.html"><code>AndroidMissingPolicy</code></a>. You can read more about cache implementations later on.</p>
+<p class="has-line-data" data-line-start="80" data-line-end="81">In this example, we fetch the translations for all locales. If you want, you can target specific locales or strings that have specific tags.</p>
+<h2 class="code-line" data-line-start="82" data-line-end="83"><a id="App_configuration_82"></a>App configuration</h2>
+<p class="has-line-data" data-line-start="84" data-line-end="85">Starting from Android N, Android has <a href="https://developer.android.com/guide/topics/resources/multilingual-support.html">multilingual support</a>: users can select more that one locale in Android’s settings and the OS will try to pick the topmost locale that is supported by the app. Place the supported app languages in your app’s gradle file:</p>
+<pre><code class="has-line-data" data-line-start="87" data-line-end="94" class="language-gradle">android {
     ...
     defaultConfig {
         resourceConfigurations += [<span class="hljs-string">'en'</span>, <span class="hljs-string">'el'</span>, <span class="hljs-string">'de'</span>, <span class="hljs-string">'fr'</span>, <span class="hljs-string">'ar'</span>, <span class="hljs-string">'sl'</span>, <span class="hljs-string">'es_ES'</span>, <span class="hljs-string">'es_MX'</span>]
     }
 }
 </code></pre>
-<p>This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user.</p>
-<p>For some languages such as Kinyarwanda, you will need to do some more work. You should define a dummy string in your default, unlocalized <code>strings.xml</code> file and place a <code>strings.xml</code> file for that locale and define the same string there. For example:</p>
-<pre><code class="lang-xml"><span class="php"><span class="hljs-meta">&lt;?</span>xml version=<span class="hljs-string">"1.0"</span> encoding=<span class="hljs-string">"utf-8"</span><span class="hljs-meta">?&gt;</span></span>
-<span class="hljs-tag">&lt;<span class="hljs-name">resources</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">string</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"dummy"</span>&gt;</span>dummy<span class="hljs-tag">&lt;/<span class="hljs-name">string</span>&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">resources</span>&gt;</span>
+<p class="has-line-data" data-line-start="95" data-line-end="96">This will let Android know which locales your app supports and help it choose the correct one in case of a multilingual user.</p>
+<p class="has-line-data" data-line-start="97" data-line-end="98">For some languages such as Kinyarwanda, you will need to do some more work. You should define a dummy string in your default, unlocalized <code>strings.xml</code> file and place a <code>strings.xml</code> file for that locale and define the same string there. For example:</p>
+<pre><code class="has-line-data" data-line-start="100" data-line-end="105" class="language-xml"><span class="hljs-pi">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">resources</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">string</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"dummy"</span>&gt;</span>dummy<span class="hljs-tag">&lt;/<span class="hljs-title">string</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">resources</span>&gt;</span>
 </code></pre>
-<p>If you don&#39;t do that, Android will never choose that language.</p>
-<p>If you don&#39;t use <code>Appcompat</code> you will have to place a <code>strings.xml</code> for all supported locales.</p>
-<h2 id="context-wrapping">Context Wrapping</h2>
-<p>The SDK&#39;s functionality is enabled by wrapping the context, so that all string resource related methods, such a <a href="https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object..."><code>getString()</code></a>), <a href="https://developer.android.com/reference/android/content/res/Resources#getText(int"><code>getText()</code></a>), flow through the SDK.</p>
-<p>To enable context wrapping in your <code>AppCompatActivity</code>, extend the SDK&#39;s <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseAppCompatActivity">TxBaseAppcompatActivity</a> or copy its <a href="https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseAppCompatActivity.java">implementation</a> to your own base class.
-If you are using an older <code>AppCompat</code> version, please read the class&#39;s implementation as you may need to uncomment some code.</p>
-<p>If you don&#39;t use <code>AppCompat</code>, extend the SDK&#39;s <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseActivity">TxBaseActivity</a> or copy its <a href="https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseActivity.java">implementation</a> to your own base class.</p>
-<p>If you want to use the SDK outside an activity&#39;s context, such as a service context, make sure that you wrap the context:</p>
-<pre><code class="lang-java">public <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleIntentService</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">JobIntentService</span> </span>{
+<p class="has-line-data" data-line-start="106" data-line-end="107">If you don’t do that, Android will never choose that language.</p>
+<h2 class="code-line" data-line-start="108" data-line-end="109"><a id="Context_Wrapping_108"></a>Context Wrapping</h2>
+<p class="has-line-data" data-line-start="110" data-line-end="111">The SDK’s functionality is enabled by wrapping the context, so that all string resource related methods, such a <a href="https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)"><code>getString()</code></a>, <a href="https://developer.android.com/reference/android/content/res/Resources#getText(int)"><code>getText()</code></a>, flow through the SDK.</p>
+<p class="has-line-data" data-line-start="112" data-line-end="114">To enable context wrapping in your <code>AppCompatActivity</code>, extend the SDK’s <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseAppCompatActivity">TxBaseAppcompatActivity</a> or copy its <a href="https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseAppCompatActivity.java">implementation</a> to your own base class.<br>
+If you are using an older <code>AppCompat</code> version, please read the class’s implementation as you may need to uncomment some code.</p>
+<p class="has-line-data" data-line-start="116" data-line-end="117">If you want to use the SDK outside an activity’s context, such as a service context, make sure that you wrap the context:</p>
+<pre><code class="has-line-data" data-line-start="119" data-line-end="127" class="language-java"><span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">SimpleIntentService</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">JobIntentService</span> </span>{
 
-    <span class="hljs-meta">@Override</span>
-    <span class="hljs-keyword">protected</span> void attachBaseContext(<span class="hljs-type">Context</span> newBase) {
-        <span class="hljs-keyword">super</span>.attachBaseContext(<span class="hljs-type">TxNative</span>.generalWrap(newBase));
+    <span class="hljs-annotation">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title">attachBaseContext</span><span class="hljs-params">(Context newBase)</span> </span>{
+        <span class="hljs-keyword">super</span>.attachBaseContext(TxNative.wrap(newBase));
     }
 }
 </code></pre>
-<p>If you want to use the SDK in some arbitrary place where you can get your application&#39;s context, please do the following:</p>
-<pre><code class="lang-java">...
+<p class="has-line-data" data-line-start="128" data-line-end="129">If you want to use the SDK in some arbitrary place where you can get your application’s context, please do the following:</p>
+<pre><code class="has-line-data" data-line-start="131" data-line-end="137" class="language-java">...
 <span class="hljs-comment">// Wrap the context</span>
-Context wrappedContext = TxNative.generalWrap(getApplicationContext());
+Context wrappedContext = TxNative.wrap(getApplicationContext());
 <span class="hljs-comment">// Use the wrapped context for getting a string</span>
 wrappedContext.getString();
 </code></pre>
-<p>If you want to disable the SDK functionality, don&#39;t initialize it and don&#39;t call any <code>TxNative</code> methods. <code>TxNative.wrap()</code> and <code>TxNative.generalWrap()</code> will be a no-op and the context will not be wrapped. Thus, all <code>getString()</code> etc methods, won&#39;t flow through the SDK.</p>
-<h2 id="cache">Cache</h2>
-<p>The SDK relies on a cache mechanism to return source strings and translations for the supported locales. If the cache is empty, the SDK will return a string based on the current <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/MissingPolicy">missing policy</a>.</p>
-<p>The cache is updated when <code>fetchTranslations()</code> is called. You can read more on that later.</p>
-<p>The cache can be prepopulated by the developer, using the command-line tool&#39;s <a href="#pulling">pull command</a>.</p>
-<h3 id="standard-cache">Standard Cache</h3>
-<p>The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache(android.content.Context,java.lang.Integer,java.io.File">TxStandardCache.getCache()</a>). The standard cache operates by making use of the publicly exposed classes and interfaces from the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary">com.transifex.txnative.cache</a> package of the SDK, so it&#39;s easy to construct another cache strategy if that&#39;s desired.</p>
-<p>The standard cache is initialized with a memory cache that manages all cached entries in memory. When the memory cache gets initialized, it tries to look up if there are any already stored translations in the file system:</p>
+<p class="has-line-data" data-line-start="138" data-line-end="139">If you want to disable the SDK functionality, don’t initialize it and don’t call any <code>TxNative</code> methods. <code>TxNative.wrap()</code> will be a no-op and the context will not be wrapped. Thus, all <code>getString()</code> etc methods, won’t flow through the SDK.</p>
+<h2 class="code-line" data-line-start="140" data-line-end="141"><a id="Cache_140"></a>Cache</h2>
+<p class="has-line-data" data-line-start="142" data-line-end="143">The SDK relies on a cache mechanism to return source strings and translations for the supported locales. If the cache is empty, the SDK will return a string based on the current <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/missingpolicy/MissingPolicy">missing policy</a>.</p>
+<p class="has-line-data" data-line-start="144" data-line-end="145">The cache is updated when <code>fetchTranslations()</code> is called. You can read more on that later.</p>
+<p class="has-line-data" data-line-start="146" data-line-end="147">The cache can be prepopulated by the developer, using the command-line tool’s <a href="#pulling">pull command</a>.</p>
+<h3 class="code-line" data-line-start="148" data-line-end="149"><a id="Standard_Cache_148"></a>Standard Cache</h3>
+<p class="has-line-data" data-line-start="150" data-line-end="151">The default cache strategy used by the SDK, if no other cache is provided by the developer, is returned by <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxStandardCache.html#getCache(android.content.Context,java.lang.Integer,java.io.File)">TxStandardCache.getCache()</a>. The standard cache operates by making use of the publicly exposed classes and interfaces from the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/package-summary">com.transifex.txnative.cache</a> package of the SDK, so it’s easy to construct another cache strategy if that’s desired.</p>
+<p class="has-line-data" data-line-start="152" data-line-end="153">The standard cache is initialized with a memory cache that manages all cached entries in memory. When the memory cache gets initialized, it tries to look up if there are any already stored translations in the file system:</p>
 <ul>
-<li>First, it looks for translations saved in the app&#39;s <a href="https://developer.android.com/reference/android/content/res/AssetManager">Assets directory</a> that may have been offered by the developer, using the command-line tool when building the app.</li>
-<li>Secondly, it looks for translations in the app&#39;s <a href="https://developer.android.com/training/data-storage/app-specific#internal-create-cache">internal cache directory</a>, in case the app had already downloaded the translations from the server from a previous launch. These translations take precedence over the previous ones, if found.</li>
+<li class="has-line-data" data-line-start="154" data-line-end="155">First, it looks for translations saved in the app’s <a href="https://developer.android.com/reference/android/content/res/AssetManager">Assets directory</a> that may have been offered by the developer, using the command-line tool when building the app.</li>
+<li class="has-line-data" data-line-start="155" data-line-end="157">Secondly, it looks for translations in the app’s <a href="https://developer.android.com/training/data-storage/app-specific#internal-create-cache">internal cache directory</a>, in case the app had already downloaded the translations from the server from a previous launch. These translations take precedence over the previous ones, if found.</li>
 </ul>
-<p>Whenever new translations are fetched from the server using the <code>fetchTranslations()</code> method, the standard cache is updated and those translations are stored as-is in the app&#39;s cache directory, in the same directory used previsouly during initialization. <strong>The in-memory cache though is not affected by the update.</strong> An app restart is required to read the newly saved translations.</p>
-<p>Under the SDK&#39;s default configuration, the first time the app is launched, the source strings are displayed, unless the developer has bundled translations via the command-line tool.</p>
-<h3 id="alternative-cache-strategy">Alternative cache strategy</h3>
-<p>The SDK allows you to implement your own cache from scratch by implementing the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxCache">TxCache</a> interface. Alternatively, you may change the standard cache strategy by implementing your own using the SDK&#39;s publicly exposed classes.</p>
-<p>In order to achieve that, you can create a a method that returns an object that implements <code>TxCache</code>. For example, the standard cache is created as follows (you can see the full source code <a href="https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/cache/TxStandardCache.java">here</a>):</p>
-<pre><code class="lang-java"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-type">TxFileOutputCacheDecorator</span>(
+<p class="has-line-data" data-line-start="157" data-line-end="158">Whenever new translations are fetched from the server using the <code>fetchTranslations()</code> method, the standard cache is updated and those translations are stored as-is in the app’s cache directory, in the same directory used previsouly during initialization. <strong>The in-memory cache though is not affected by the update.</strong> An app restart is required to read the newly saved translations.</p>
+<p class="has-line-data" data-line-start="159" data-line-end="160">Under the SDK’s default configuration, the first time the app is launched, the source strings are displayed, unless the developer has bundled translations via the command-line tool.</p>
+<h3 class="code-line" data-line-start="161" data-line-end="162"><a id="Alternative_cache_strategy_161"></a>Alternative cache strategy</h3>
+<p class="has-line-data" data-line-start="163" data-line-end="164">The SDK allows you to implement your own cache from scratch by implementing the <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/cache/TxCache">TxCache</a> interface. Alternatively, you may change the standard cache strategy by implementing your own using the SDK’s publicly exposed classes.</p>
+<p class="has-line-data" data-line-start="165" data-line-end="166">In order to achieve that, you can create a a method that returns an object that implements <code>TxCache</code>. For example, the standard cache is created as follows (you can see the full source code <a href="https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/cache/TxStandardCache.java">here</a>):</p>
+<pre><code class="has-line-data" data-line-start="168" data-line-end="181" class="language-java"><span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> TxFileOutputCacheDecorator(
     &lt;cached Translations Directory&gt;,
-    <span class="hljs-keyword">new</span> <span class="hljs-type">TXReadonlyCacheDecorator</span>(
-        <span class="hljs-keyword">new</span> <span class="hljs-type">TxProviderBasedCache</span>(
+    <span class="hljs-keyword">new</span> TXReadonlyCacheDecorator(
+        <span class="hljs-keyword">new</span> TxProviderBasedCache(
             &lt;providers array&gt;,
-            <span class="hljs-keyword">new</span> <span class="hljs-type">TxUpdateFilterCache</span>(
+            <span class="hljs-keyword">new</span> TxUpdateFilterCache(
                 &lt;update policy&gt;,
-                <span class="hljs-keyword">new</span> <span class="hljs-type">TxMemoryCache</span>()
+                <span class="hljs-keyword">new</span> TxMemoryCache()
             )
         )
     )
 );
 </code></pre>
-<p>If you want to have your memory cache updated with the new translations when <code>fetchTranslations()</code> is called, you can remove the <code>TXReadonlyCacheDecorator</code>.</p>
-<h2 id="fetching-translations">Fetching translations</h2>
-<p>As soon as <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations(java.lang.String,java.util.Set">fetchTranslations()</a>) is called, the SDK will attempt to download both the source locale strings
+<p class="has-line-data" data-line-start="182" data-line-end="183">If you want to have your memory cache updated with the new translations when <code>fetchTranslations()</code> is called, you can remove the <code>TXReadonlyCacheDecorator</code>.</p>
+<h2 class="code-line" data-line-start="184" data-line-end="185"><a id="Fetching_translations_184"></a>Fetching translations</h2>
+<p class="has-line-data" data-line-start="186" data-line-end="188">As soon as <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#fetchTranslations(java.lang.String,java.util.Set)">fetchTranslations()</a> is called, the SDK will attempt to download both the source locale strings<br>
 and the translations for the supported locales. If successful, it will update the cache.</p>
-<p>The <code>fetchTranslations()</code> method in the SDK configuration example is called as soon as the application launches, but that&#39;s not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).</p>
-<h2 id="transifex-command-line-tool">Transifex Command Line Tool</h2>
-<p>Transifex Command Line Tool is a command line tool that can assist developers in pushing the source strings of an Android app to Transifex.</p>
-<h3 id="building">Building</h3>
-<p>You can get the cli tool pre-built from the <a href="https://github.com/transifex/transifex-java/releases">release page</a>.</p>
-<p>If you want to build the tool yourself, enter the <code>TransifexNativeSDK</code> directory and run from the command line:</p>
-<pre><code><span class="hljs-selector-tag">gradlew</span> <span class="hljs-selector-pseudo">:clitool</span><span class="hljs-selector-pseudo">:assemble</span>
-</code></pre><p>You will find the built <code>.jar</code> file at <code>clitool/build/libs/transifex.jar</code>. You can copy it wherever you want.</p>
-<h3 id="running">Running</h3>
-<p>To run the tool, type:</p>
-<pre><code>java -jar /path/<span class="hljs-keyword">to</span>/transifex.jar
-</code></pre><p>where <code>/path/to/</code> is the path to the directory you placed &quot;transifex.jar&quot;.</p>
-<p>Note that even though the tool uses UTF-8 internally, it&#39;s recommended to have your JVM&#39;s default character encoding set to UTF-8. If this isn&#39;t the case for your system, you can use:</p>
-<pre><code>java -jar -Dfile.<span class="hljs-keyword">encoding</span>=UTF8 /path/<span class="hljs-keyword">to</span>/transifex.jar
-</code></pre><p>For simplicity, the following commands will not include the <code>java -jar</code> part required to run the file.</p>
-<h3 id="usage">Usage</h3>
-<p>To use the tool on your app&#39;s Android Studio project, enter the root directory of your project from the command line.</p>
-<h4 id="help">Help</h4>
-<p><code>transifex</code>, <code>transifex -h</code>, <code>transifex --help</code>
+<p class="has-line-data" data-line-start="189" data-line-end="190">The <code>fetchTranslations()</code> method in the SDK configuration example is called as soon as the application launches, but that’s not required. Depending on the application, the developer might choose to call that method whenever it is most appropriate (for example, each time the application is brought to the foreground or when the internet connectivity is established).</p>
+<h2 class="code-line" data-line-start="191" data-line-end="192"><a id="Transifex_Command_Line_Tool_191"></a>Transifex Command Line Tool</h2>
+<p class="has-line-data" data-line-start="193" data-line-end="194">Transifex Command Line Tool is a command line tool that can assist developers in pushing the source strings of an Android app to Transifex.</p>
+<h3 class="code-line" data-line-start="195" data-line-end="196"><a id="Building_195"></a>Building</h3>
+<p class="has-line-data" data-line-start="197" data-line-end="198">You can get the cli tool pre-built from the <a href="https://github.com/transifex/transifex-java/releases">release page</a>.</p>
+<p class="has-line-data" data-line-start="199" data-line-end="200">If you want to build the tool yourself, enter the <code>TransifexNativeSDK</code> directory and run from the command line:</p>
+<pre><code class="has-line-data" data-line-start="202" data-line-end="204">gradlew :clitool:assemble
+</code></pre>
+<p class="has-line-data" data-line-start="205" data-line-end="206">You will find the built <code>.jar</code> file at <code>clitool/build/libs/transifex.jar</code>. You can copy it wherever you want.</p>
+<h3 class="code-line" data-line-start="207" data-line-end="208"><a id="Running_207"></a>Running</h3>
+<p class="has-line-data" data-line-start="209" data-line-end="210">To run the tool, type:</p>
+<pre><code class="has-line-data" data-line-start="211" data-line-end="213">java -jar /path/to/transifex.jar
+</code></pre>
+<p class="has-line-data" data-line-start="213" data-line-end="214">where <code>/path/to/</code> is the path to the directory you placed “transifex.jar”.</p>
+<p class="has-line-data" data-line-start="215" data-line-end="216">Note that even though the tool uses UTF-8 internally, it’s recommended to have your JVM’s default character encoding set to UTF-8. If this isn’t the case for your system, you can use:</p>
+<pre><code class="has-line-data" data-line-start="218" data-line-end="220">java -jar -Dfile.encoding=UTF8 /path/to/transifex.jar
+</code></pre>
+<p class="has-line-data" data-line-start="221" data-line-end="222">For simplicity, the following commands will not include the <code>java -jar</code> part required to run the file.</p>
+<h3 class="code-line" data-line-start="223" data-line-end="224"><a id="Usage_223"></a>Usage</h3>
+<p class="has-line-data" data-line-start="225" data-line-end="226">To use the tool on your app’s Android Studio project, enter the root directory of your project from the command line.</p>
+<h4 class="code-line" data-line-start="227" data-line-end="228"><a id="Help_227"></a>Help</h4>
+<p class="has-line-data" data-line-start="229" data-line-end="231"><code>transifex</code>, <code>transifex -h</code>, <code>transifex --help</code><br>
 Displays a help dialog with all the options and commands.</p>
-<p><code>transifex help &lt;command&gt;</code>
+<p class="has-line-data" data-line-start="232" data-line-end="234"><code>transifex help &lt;command&gt;</code><br>
 Get help for a particular command.</p>
-<h4 id="pushing">Pushing</h4>
-<p><code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -m &lt;app_module_name&gt;</code>
-Pushes the source strings of your app found in a module named &quot;app_module_name&quot;. The tool reads the <code>strings.xml</code> resource file found in the main source set of the specified module: <code>app_module_name/src/main/res/values/strings.xml</code>. It processes it and pushes the result to the Transifex CDS.</p>
-<p><code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -f path/to/strings1.xml path2/to/strings2.xml ...</code>
+<h4 class="code-line" data-line-start="235" data-line-end="236"><a id="Pushing_235"></a>Pushing</h4>
+<p class="has-line-data" data-line-start="237" data-line-end="239"><code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -m &lt;app_module_name&gt;</code><br>
+Pushes the source strings of your app found in a module named “app_module_name”. The tool reads the <code>strings.xml</code> resource file found in the main source set of the specified module: <code>app_module_name/src/main/res/values/strings.xml</code>. It processes it and pushes the result to the Transifex CDS.</p>
+<p class="has-line-data" data-line-start="240" data-line-end="242"><code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -f path/to/strings1.xml path2/to/strings2.xml ...</code><br>
 If your app has a more complex string setup, you can specify one or more string resource files.</p>
-<p><code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -m &lt;app_module_name&gt; --dry-run -v</code>
+<p class="has-line-data" data-line-start="243" data-line-end="245"><code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -m &lt;app_module_name&gt; --dry-run -v</code><br>
 Append <code>--dry-run -v</code> to display the source strings that will be pushed without actually pushing them.</p>
-<p><code>transifex clear -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt;</code>
+<p class="has-line-data" data-line-start="246" data-line-end="248"><code>transifex clear -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt;</code><br>
 Clears all existing resource content from CDS. This action will also remove existing localizations.</p>
-<h4 id="pulling">Pulling</h4>
-<p><code>transifex pull -t &lt;transifex_token&gt; -m &lt;app_module_name&gt; -l &lt;locale&gt;...</code>
-Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the &quot;assets&quot; directory of the main source set of the specified app module: <code>app_module_name/src/main/assets/txnative</code>. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.</p>
-<p><code>transifex pull -t &lt;transifex_token&gt; -d &lt;directory&gt; -l &lt;locale&gt;...</code>
-If you have a different setup, you can enter the path to your app&#39;s <code>assets</code> directory.</p>
-<p>Note that cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex
-and you need to see them on your app immediately or pull them using the above command, you need to make an HTTP request
+<h4 class="code-line" data-line-start="249" data-line-end="250"><a id="Pulling_249"></a>Pulling</h4>
+<p class="has-line-data" data-line-start="251" data-line-end="253"><code>transifex pull -t &lt;transifex_token&gt; -m &lt;app_module_name&gt; -l &lt;locale&gt;...</code><br>
+Downloads the translations from Transifex CDS for the specified locales and stores them in txstrings.json files under the “assets” directory of the main source set of the specified app module: <code>app_module_name/src/main/assets/txnative</code>. The directory is created if needed. These files will be bundled inside your app and accessed by TxNative.</p>
+<p class="has-line-data" data-line-start="255" data-line-end="257"><code>transifex pull -t &lt;transifex_token&gt; -d &lt;directory&gt; -l &lt;locale&gt;...</code><br>
+If you have a different setup, you can enter the path to your app’s <code>assets</code> directory.</p>
+<p class="has-line-data" data-line-start="258" data-line-end="261">Note that cache of CDS has a TTL of 30 minutes. If you update some translations on Transifex<br>
+and you need to see them on your app immediately or pull them using the above command, you need to make an HTTP request<br>
 to the <a href="https://github.com/transifex/transifex-delivery/#invalidate-cache">invalidation endpoint</a> of CDS.</p>
-<h2 id="advanced-topics">Advanced topics</h2>
-<h3 id="disable-txnative-for-specific-strings">Disable TxNative for specific strings</h3>
-<p>There are cases where you don&#39;t want TxNative to interfere with string loading. For example, many apps have API keys or some configuration saved in non-translatable strings in their <code>strings.xml</code> file. A method like <code>getString()</code> is used to retrieve the strings. If you are using the SDK&#39;s default missing policy, <code>SourceStringPolicy</code>, the expected string will be returned. If, however, you are using some other policy, the string may be altered and your app will not behave as expected. In such a case, make sure that you are using a non-wrapped context when loading such a string:</p>
-<pre><code class="lang-java"><span class="hljs-selector-tag">getApplicationContext</span>()<span class="hljs-selector-class">.getString</span>(&lt;string_ID&gt;);
+<h2 class="code-line" data-line-start="262" data-line-end="263"><a id="Advanced_topics_262"></a>Advanced topics</h2>
+<h3 class="code-line" data-line-start="264" data-line-end="265"><a id="Disable_TxNative_for_specific_strings_264"></a>Disable TxNative for specific strings</h3>
+<p class="has-line-data" data-line-start="266" data-line-end="267">There are cases where you don’t want TxNative to interfere with string loading. For example, many apps have API keys or some configuration saved in non-translatable strings in their <code>strings.xml</code> file. A method like <code>getString()</code> is used to retrieve the strings. If you are using the SDK’s default missing policy, <code>SourceStringPolicy</code>, the expected string will be returned. If, however, you are using some other policy, the string may be altered and your app will not behave as expected. In such a case, make sure that you are using a non-wrapped context when loading such a string:</p>
+<pre><code class="has-line-data" data-line-start="269" data-line-end="271" class="language-java">getApplicationContext().getString(&lt;string_ID&gt;);
 </code></pre>
-<h3 id="string-styling">String styling</h3>
-<p>As explained in Android&#39;s <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">documentation</a>, strings can have styling applied to them if they contain HTML markup. There are two ways to accomplish that.</p>
-<p>Write a string  with HTML markup. For example:</p>
-<pre><code class="lang-xml">&lt;<span class="hljs-built_in">string</span> name=<span class="hljs-string">"styled_text"</span>&gt;A &lt;<span class="hljs-built_in">font</span> <span class="hljs-built_in">color</span>=<span class="hljs-string">"#FF7700"</span>&gt;localization&lt;/<span class="hljs-built_in">font</span>&gt; platform&lt;/<span class="hljs-built_in">string</span>&gt;
+<h3 class="code-line" data-line-start="271" data-line-end="272"><a id="String_styling_271"></a>String styling</h3>
+<p class="has-line-data" data-line-start="273" data-line-end="274">As explained in Android’s <a href="https://developer.android.com/guide/topics/resources/string-resource#StylingWithHTML">documentation</a>, strings can have styling applied to them if they contain HTML markup. There are two ways to accomplish that.</p>
+<p class="has-line-data" data-line-start="275" data-line-end="276">Write a string with HTML markup. For example:</p>
+<pre><code class="has-line-data" data-line-start="278" data-line-end="280" class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-title">string</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"styled_text"</span>&gt;</span>A <span class="hljs-tag">&lt;<span class="hljs-title">font</span> <span class="hljs-attribute">color</span>=<span class="hljs-value">"#FF7700"</span>&gt;</span>localization<span class="hljs-tag">&lt;/<span class="hljs-title">font</span>&gt;</span> platform<span class="hljs-tag">&lt;/<span class="hljs-title">string</span>&gt;</span>
 </code></pre>
-<p>The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use <code>getText()</code> (not <code>getString()</code>) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean"><code>TxNative.setSupportSpannable(false)</code></a>).
+<p class="has-line-data" data-line-start="281" data-line-end="283">The SDK will parse the tags into spans so that styling is applied. You can reference such a string in a layout XML file or use <code>getText()</code> (not <code>getString()</code>) and set it programmatically to the desired view. To disable this behavior and treat tags as plain text, you can disable span support by calling <a href="https://transifex.github.io/transifex-java/com/transifex/txnative/TxNative.html#setSupportSpannable(boolean)"><code>TxNative.setSupportSpannable(false)</code></a>.<br>
 Note that when span support is enabled and tags are detected in a string, the SDK uses <code>fromHTML()</code>. This has the side-effect of new lines being converted to spaces and sequences of whitespace characters being collapsed into a single space.</p>
-<p>Alternatively, you can write a string with the opening brackets escaped (using <code>&amp;lt;</code> instead of <code>&lt;</code>):</p>
-<pre><code class="lang-xml">&lt;<span class="hljs-built_in">string</span> name=<span class="hljs-string">"styled_text"</span>&gt;A &amp;lt;<span class="hljs-built_in">font</span> <span class="hljs-built_in">color</span>=<span class="hljs-string">"#FF7700"</span>&gt;localization&amp;lt;/<span class="hljs-built_in">font</span>&gt; platform&lt;/<span class="hljs-built_in">string</span>&gt;
+<p class="has-line-data" data-line-start="284" data-line-end="285">Alternatively, you can write a string with the opening brackets escaped (using <code>&amp;lt;</code> instead of <code>&lt;</code>):</p>
+<pre><code class="has-line-data" data-line-start="287" data-line-end="289" class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-title">string</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"styled_text"</span>&gt;</span>A &amp;lt;font color="#FF7700"&gt;localization&amp;lt;/font&gt; platform<span class="hljs-tag">&lt;/<span class="hljs-title">string</span>&gt;</span>
 </code></pre>
-<p>Then, you can use <a href="https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler"><code>fromHTML()</code></a>) to get styled text as shown below:</p>
-<pre><code class="lang-java"><span class="hljs-keyword">String</span> <span class="hljs-keyword">string</span> = getResources().getString(R.<span class="hljs-keyword">string</span>.styled_text);
-Spanned styledTest = HtmlCompat.fromHtml(<span class="hljs-keyword">string</span>, HtmlCompat.FROM_HTML_MODE_COMPACT);
+<p class="has-line-data" data-line-start="290" data-line-end="291">Then, you can use <a href="https://developer.android.com/reference/androidx/core/text/HtmlCompat#fromHtml(java.lang.String,int,android.text.Html.ImageGetter,android.text.Html.TagHandler)"><code>fromHTML()</code></a> to get styled text as shown below:</p>
+<pre><code class="has-line-data" data-line-start="293" data-line-end="297" class="language-java">String string = getResources().getString(R.string.styled_text);
+Spanned styledTest = HtmlCompat.fromHtml(string, HtmlCompat.FROM_HTML_MODE_COMPACT);
 someView.setText(styledText);
 </code></pre>
-<h3 id="stylable-attributes">Stylable attributes</h3>
-<p>Android lets you define attributes that can point to different string resources, according to the current theme. For example you can create an <code>attr.xml</code> file that declares a stylable:</p>
-<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">declare-styleable</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"custom_view"</span>&gt;</span>
-    <span class="hljs-tag">&lt;<span class="hljs-name">attr</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"label"</span> <span class="hljs-attr">format</span>=<span class="hljs-string">"string|reference"</span>/&gt;</span>
-<span class="hljs-tag">&lt;/<span class="hljs-name">declare-styleable</span>&gt;</span>
+<h3 class="code-line" data-line-start="298" data-line-end="299"><a id="Stylable_attributes_298"></a>Stylable attributes</h3>
+<p class="has-line-data" data-line-start="300" data-line-end="301">Android lets you define attributes that can point to different string resources, according to the current theme. For example you can create an <code>attr.xml</code> file that declares a stylable:</p>
+<pre><code class="has-line-data" data-line-start="303" data-line-end="307" class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-title">declare-styleable</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"custom_view"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">attr</span> <span class="hljs-attribute">name</span>=<span class="hljs-value">"label"</span> <span class="hljs-attribute">format</span>=<span class="hljs-value">"string|reference"</span>/&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">declare-styleable</span>&gt;</span>
 </code></pre>
-<p>You can set the string value of this attribute to a TextView the following way:</p>
-<pre><code class="lang-java"><span class="hljs-type">TypedValue</span> typedValue = <span class="hljs-function"><span class="hljs-keyword">new</span> <span class="hljs-title">TypedValue</span>();
-<span class="hljs-title">getTheme</span>().<span class="hljs-title">resolveAttribute</span>(<span class="hljs-type">R</span>.attr.label, typedValue, true);
-<span class="hljs-title">textView</span>.<span class="hljs-title">setText</span>(typedValue.resourceId);
-<span class="hljs-comment">// textView.setText(typedValue.string); // DON'T DO THAT!!!</span></span>
+<p class="has-line-data" data-line-start="308" data-line-end="309">You can set the string value of this attribute to a TextView the following way:</p>
+<pre><code class="has-line-data" data-line-start="311" data-line-end="316" class="language-java">TypedValue typedValue = <span class="hljs-keyword">new</span> TypedValue();
+getTheme().resolveAttribute(R.attr.label, typedValue, <span class="hljs-keyword">true</span>);
+textView.setText(typedValue.resourceId);
+<span class="hljs-comment">// textView.setText(typedValue.string); // DON'T DO THAT!!!</span>
 </code></pre>
-<p>or the following way:</p>
-<pre><code class="lang-java"><span class="hljs-type">TypedArray</span> typedArray  = getTheme().obtainStyledAttributes(set, <span class="hljs-type">R</span>.styleable.custom_view, defStyleAttr, defStyleRes);
-<span class="hljs-title">textView</span>.setText(typedArray.getResourceId(<span class="hljs-type">R</span>.styleable.custom_view_label, -1)); // <span class="hljs-type">Get</span> the resource id of the stylable attribute under the current theme
-// textView.setText(typedArray.getString(<span class="hljs-type">R</span>.styleable.custom_view_label, -1)); // <span class="hljs-type">DON'T</span> <span class="hljs-type">DO</span> <span class="hljs-type">THAT</span>!!!
+<p class="has-line-data" data-line-start="317" data-line-end="318">or the following way:</p>
+<pre><code class="has-line-data" data-line-start="320" data-line-end="325" class="language-java">TypedArray typedArray  = getTheme().obtainStyledAttributes(set, R.styleable.custom_view, defStyleAttr, defStyleRes);
+textView.setText(typedArray.getResourceId(R.styleable.custom_view_label, -<span class="hljs-number">1</span>)); <span class="hljs-comment">// Get the resource id of the stylable attribute under the current theme</span>
+<span class="hljs-comment">// textView.setText(typedArray.getString(R.styleable.custom_view_label, -1)); // DON'T DO THAT!!!</span>
 typedArray.recycle();
 </code></pre>
-<p>Note that if you try to resolve the string value directly from the theme methods, the call will not pass through the SDK. The trick here is to resolve the resource id from the theme methods.</p>
-<h3 id="txnative-and-3rd-party-libraries">TxNative and 3rd party libraries</h3>
-<p>Some libs may contain their own localized strings, views or activities. In such as case, you don&#39;t want TxNative to interfere with string loading. To accomplish that, make sure that you pass a non-wrapped context to the library&#39;s initialization method:</p>
-<pre><code class="lang-java">SomeSDK.init(getApplicationContext())<span class="hljs-comment">;</span>
+<p class="has-line-data" data-line-start="326" data-line-end="327">Note that if you try to resolve the string value directly from the theme methods, the call will not pass through the SDK. The trick here is to resolve the resource id from the theme methods.</p>
+<h3 class="code-line" data-line-start="329" data-line-end="330"><a id="TxNative_and_3rd_party_libraries_329"></a>TxNative and 3rd party libraries</h3>
+<p class="has-line-data" data-line-start="331" data-line-end="332">Some libs may contain their own localized strings, views or activities. In such as case, you don’t want TxNative to interfere with string loading. To accomplish that, make sure that you pass a non-wrapped context to the library’s initialization method:</p>
+<pre><code class="has-line-data" data-line-start="334" data-line-end="336" class="language-java">SomeSDK.init(getApplicationContext());
 </code></pre>
-<p>Note however that if a <code>View</code> provided by the library is used inside your app&#39;s activity, <code>TxNative</code> will be used during that view&#39;s inflation (if your activity is set up correctly). In that case, any library strings will not be found in TxNative translations and the result will depend on the missing policy used. <code>SourceStringPolicy</code> will return the source string provided by the library, which will probably be in English. Using, <code>AndroidMissingPolicy</code> will return the localized string using the library&#39;s localized string resources, as expected.</p>
-<h3 id="multiple-private-libraries">Multiple private libraries</h3>
-<p>If your app is split into libraries that contain localized strings, views or activities, you need to set up your project in the following way to take advantage of TxNatve in said libs.</p>
-<p>The strings included in the libraries have to be pushed to the CDS. You can push all of them at once using the push CLI command, e.g.
+<p class="has-line-data" data-line-start="337" data-line-end="338">Note however that if a <code>View</code> provided by the library is used inside your app’s activity, <code>TxNative</code> will be used during that view’s inflation (if your activity is set up correctly). In that case, any library strings will not be found in TxNative translations and the result will depend on the missing policy used. <code>SourceStringPolicy</code> will return the source string provided by the library, which will probably be in English. Using, <code>AndroidMissingPolicy</code> will return the localized string using the library’s localized string resources, as expected.</p>
+<h3 class="code-line" data-line-start="339" data-line-end="340"><a id="Multiple_private_libraries_339"></a>Multiple private libraries</h3>
+<p class="has-line-data" data-line-start="341" data-line-end="342">If your app is split into libraries that contain localized strings, views or activities, you need to set up your project in the following way to take advantage of TxNatve in said libs.</p>
+<p class="has-line-data" data-line-start="343" data-line-end="345">The strings included in the libraries have to be pushed to the CDS. You can push all of them at once using the push CLI command, e.g.<br>
 <code>transifex push -t &lt;transifex_token&gt; -s &lt;transifex_secret&gt; -f path/to/strings1.xml path2/to/strings2.xml</code>. Alternatively, you can push each one separately as long as all strings reach the CDS resource used by the main app.</p>
-<p>If your lib has an initialization method, make sure that your main app passes the wrapped context:</p>
-<pre><code class="lang-java"><span class="hljs-selector-tag">YourLib</span><span class="hljs-selector-class">.init</span>(<span class="hljs-selector-tag">TxNative</span><span class="hljs-selector-class">.wrap</span>(<span class="hljs-selector-tag">getApplicationContext</span>()));
+<p class="has-line-data" data-line-start="346" data-line-end="347">If your lib has an initialization method, make sure that your main app passes the wrapped context:</p>
+<pre><code class="has-line-data" data-line-start="349" data-line-end="351" class="language-java">YourLib.init(TxNative.wrap(getApplicationContext()));
 </code></pre>
-<p>The following string operations will result in string rendering through TxNative:</p>
+<p class="has-line-data" data-line-start="352" data-line-end="353">The following string operations will result in string rendering through TxNative:</p>
 <ul>
-<li>The main app uses, in a layout or programmatically, the strings that the lib provides.</li>
-<li>The lib calls string resource methods such as <code>getString()</code>, e.g. for logging or something else, using the context that the main app passes through initialization.</li>
-<li>The lib has views that reference strings via layout or code and the main app displays these views in its activities.</li>
+<li class="has-line-data" data-line-start="353" data-line-end="354">The main app uses, in a layout or programmatically, the strings that the lib provides.</li>
+<li class="has-line-data" data-line-start="354" data-line-end="355">The lib calls string resource methods such as <code>getString()</code>, e.g. for logging or something else, using the context that the main app passes through initialization.</li>
+<li class="has-line-data" data-line-start="355" data-line-end="357">The lib has views that reference strings via layout or code and the main app displays these views in its activities.</li>
 </ul>
-<p>Note that if the main app starts any activity provided by the lib, string rendering won&#39;t go through TxNative. If you want to achieve this, you will have to integrate TxNative in the lib by following these steps:</p>
+<p class="has-line-data" data-line-start="357" data-line-end="358">Note that if the main app starts any activity provided by the lib, string rendering won’t go through TxNative. If you want to achieve this, you will have to integrate TxNative in the lib by following these steps:</p>
 <ol>
-<li>Use TxNative as a dependency in the lib.</li>
-<li>Implement TxNative in the lib&#39;s activities.</li>
-<li>Note that TxNative should not be initialized inside the lib. The main app is responsible for this.</li>
+<li class="has-line-data" data-line-start="358" data-line-end="359">Use TxNative as a dependency in the lib.</li>
+<li class="has-line-data" data-line-start="359" data-line-end="360">Implement TxNative in the lib’s activities.</li>
+<li class="has-line-data" data-line-start="360" data-line-end="362">Note that TxNative should not be initialized inside the lib. The main app is responsible for this.</li>
 </ol>
-<h2 id="limitations">Limitations</h2>
-<p>The SDK has some limitations, which most of the time can be overcome with workarouds.</p>
-<h3 id="string-arrrays">String Arrrays</h3>
-<p>Currently, the SDK does not support <a href="https://developer.android.com/guide/topics/resources/string-resource#StringArray">String arrays</a>. The command line tool will not upload them to Transifex and the SDK will not override the respective methods. String arrays presentation will work as normal using Android&#39;s localization system, which will require that you have them translated in the respective <code>strings.xml</code> files.</p>
-<h3 id="menu-xml-files">Menu XML files</h3>
-<p>Strings that are referenced in <a href="https://developer.android.com/guide/topics/ui/menus">menu</a> layout files will not be handled by the SDK. They will use Android&#39;s localization system as normal.</p>
-<h3 id="actionbar">ActionBar</h3>
-<p>Even though the SDK handles the strings referenced in a <a href="https://developer.android.com/reference/androidx/appcompat/widget/Toolbar"><code>Toolbar</code></a>, it won&#39;t handle strings referenced in an <a href="https://developer.android.com/reference/android/app/ActionBar"><code>ActionBar</code></a>. You will have to set them programmatically (e.g. by calling <a href="https://developer.android.com/reference/android/app/ActionBar#setTitle(java.lang.CharSequence"><code>setTitle()</code></a>)) to take advantage of the SDK. Otherwise, Android&#39;s localization system will be used.</p>
-<h2 id="video-resources">Video resources</h2>
+<h2 class="code-line" data-line-start="362" data-line-end="363"><a id="Limitations_362"></a>Limitations</h2>
+<p class="has-line-data" data-line-start="364" data-line-end="365">The SDK has some limitations, which most of the time can be overcome with workarouds.</p>
+<h3 class="code-line" data-line-start="366" data-line-end="367"><a id="String_Arrrays_366"></a>String Arrrays</h3>
+<p class="has-line-data" data-line-start="368" data-line-end="369">Currently, the SDK does not support <a href="https://developer.android.com/guide/topics/resources/string-resource#StringArray">String arrays</a>. The command line tool will not upload them to Transifex and the SDK will not override the respective methods. String arrays presentation will work as normal using Android’s localization system, which will require that you have them translated in the respective <code>strings.xml</code> files.</p>
+<h3 class="code-line" data-line-start="370" data-line-end="371"><a id="Menu_XML_files_370"></a>Menu XML files</h3>
+<p class="has-line-data" data-line-start="372" data-line-end="373">Strings that are referenced in <a href="https://developer.android.com/guide/topics/ui/menus">menu</a> layout files will not be handled by the SDK. They will use Android’s localization system as normal.</p>
+<h3 class="code-line" data-line-start="374" data-line-end="375"><a id="ActionBar_374"></a>ActionBar</h3>
+<p class="has-line-data" data-line-start="376" data-line-end="377">Even though the SDK handles the strings referenced in a <a href="https://developer.android.com/reference/androidx/appcompat/widget/Toolbar"><code>Toolbar</code></a>, it won’t handle strings referenced in an <a href="https://developer.android.com/reference/android/app/ActionBar"><code>ActionBar</code></a>. You will have to set them programmatically (e.g. by calling <a href="https://developer.android.com/reference/android/app/ActionBar#setTitle(java.lang.CharSequence)"><code>setTitle()</code></a>) to take advantage of the SDK. Otherwise, Android’s localization system will be used.</p>
+<h2 class="code-line" data-line-start="378" data-line-end="379"><a id="Video_resources_378"></a>Video resources</h2>
 <ul>
-<li><a href="https://youtu.be/1Z3eTtzI1IA">How to install the Transifex Native Android SDK</a></li>
-<li><a href="https://youtu.be/V0L1cjaQTGk">How to push strings with Transifex Native in Android</a></li>
-<li><a href="https://youtu.be/zNPh4bIYOxY">How to bundle translations with Transifex Native in your Android package</a></li>
+<li class="has-line-data" data-line-start="380" data-line-end="381"><a href="https://youtu.be/1Z3eTtzI1IA">How to install the Transifex Native Android SDK</a></li>
+<li class="has-line-data" data-line-start="381" data-line-end="382"><a href="https://youtu.be/V0L1cjaQTGk">How to push strings with Transifex Native in Android</a></li>
+<li class="has-line-data" data-line-start="382" data-line-end="383"><a href="https://youtu.be/zNPh4bIYOxY">How to bundle translations with Transifex Native in your Android package</a></li>
 </ul>
-<h2 id="license">License</h2>
-<p>Licensed under Apache License 2.0, see <a href="LICENSE">LICENSE</a> file.</p>
+<h2 class="code-line" data-line-start="385" data-line-end="386"><a id="License_385"></a>License</h2>
+<p class="has-line-data" data-line-start="386" data-line-end="387">Licensed under Apache License 2.0, see <a href="LICENSE">LICENSE</a> file.</p>
 </body></html>
