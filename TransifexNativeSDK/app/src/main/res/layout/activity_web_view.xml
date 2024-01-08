@@ -30,7 +30,8 @@
         android:hint="@string/hint_problem"
 
         app:layout_constraintBottom_toBottomOf="@+id/webview"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

@@ -27,12 +27,6 @@ public class TxContextWrapper extends ContextWrapper {
     @SuppressLint("RestrictedApi")
     @Override
     public Resources getResources() {
-        // If the base resources point to a new AssetManager object, re-wrap them.
-        if (mWrappedResources != null
-                && mWrappedResources.getAssets() != super.getResources().getAssets()) {
-            mWrappedResources = null;
-        }
-
         if (mWrappedResources == null) {
             mWrappedResources = new TxResources(super.getResources(), mNativeCore);
         }

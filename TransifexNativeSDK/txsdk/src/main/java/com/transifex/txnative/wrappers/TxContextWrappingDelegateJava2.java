@@ -24,11 +24,11 @@ import androidx.appcompat.widget.Toolbar;
 /**
  * Wrapper of AppcompatDelegate that enables TxNative functionality by wrapping the base context.
  */
-public class TxContextWrappingDelegateJava extends AppCompatDelegate {
+public class TxContextWrappingDelegateJava2 extends AppCompatDelegate {
 
     private final AppCompatDelegate superDelegate;
 
-    public TxContextWrappingDelegateJava(AppCompatDelegate superDelegate) {
+    public TxContextWrappingDelegateJava2(AppCompatDelegate superDelegate) {
         this.superDelegate = superDelegate;
     }
 

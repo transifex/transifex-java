@@ -59,9 +59,12 @@ configurations.configureEach {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
-    compileOnly "androidx.appcompat:appcompat:$versions.appcompat"
+    implementation "androidx.appcompat:appcompat:$versions.appcompat"
     compileOnly "com.google.android.material:material:$versions.material"
-    implementation 'io.github.inflationx:viewpump:2.0.3'
+    implementation("dev.b3nedikt.viewpump:viewpump:4.0.14") {
+        exclude(group : "androidx.appcompat", module :  "appcompat")
+    }
+
     api project(':common')
 
     testCompileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
