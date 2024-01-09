@@ -14,7 +14,8 @@ import com.transifex.txnative.TxNative;
  * If your app uses <code>Appcompat</code> don't use this class. Instead use
  * {@link TxBaseAppCompatActivity}.
  */
-public class TxBaseActivity extends Activity {
+@Deprecated
+class TxBaseActivity extends Activity {
 
 
     @Override

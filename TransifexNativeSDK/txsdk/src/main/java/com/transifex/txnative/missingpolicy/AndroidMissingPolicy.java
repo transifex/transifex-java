@@ -26,8 +26,7 @@ public class AndroidMissingPolicy implements MissingPolicy{
      * This constructor has been deprecated. A context is no longer needed.
      *
      * @param applicationContext The application context. <b>Do not provide</b> a context wrapped by
-     *                           {@link com.transifex.txnative.TxNative#wrap(Context) TxNative#wrap(Context)}
-     *                           or {@link com.transifex.txnative.TxNative#generalWrap(Context) TxNative#generalWrap(Context)}.
+     *                           {@link com.transifex.txnative.TxNative#wrap(Context) TxNative#wrap(Context)}.
      */
     @Deprecated
     public AndroidMissingPolicy(@NonNull Context applicationContext) {

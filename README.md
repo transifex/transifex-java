@@ -32,9 +32,9 @@ implementation 'com.transifex.txnative:txsdk:x.y.z'
 Please replace `x`, `y` and `z` with the latest version numbers: [![Maven Central](https://img.shields.io/maven-central/v/com.transifex.txnative/txsdk?color=32c955)](https://maven-badges.herokuapp.com/maven-central/com.transifex.txnative/txsdk)
 
 
-The library's minimum supported SDK is 18 (Android 4.3) and is compatible with [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat).
+The library's minimum supported SDK is 18 (Android 4.3).
 
-The SDK does not add Appcompat as a dependency. It can work in apps that don't use Appcompat and in apps that use Appcompat.
+The SDK requires [Appcompat](https://developer.android.com/jetpack/androidx/releases/appcompat) and automatically adds it as a dependency.
 
 ## SDK configuration
 
@@ -82,7 +82,7 @@ In this example, we fetch the translations for all locales. If you want, you can
 
 ## App configuration
 
-Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. If your app makes use of `Appcompat`, place the supported app languages in your app’s gradle file:
+Starting from Android N, Android has [multilingual support](https://developer.android.com/guide/topics/resources/multilingual-support.html): users can select more that one locale in Android's settings and the OS will try to pick the topmost locale that is supported by the app. Place the supported app languages in your app’s gradle file:
 
 ```gradle
 android {
@@ -106,8 +106,6 @@ For some languages such as Kinyarwanda, you will need to do some more work. You 
 
 If you don't do that, Android will never choose that language.
 
-If you don't use `Appcompat` you will have to place a `strings.xml` for all supported locales.
-
 ## Context Wrapping
 
 The SDK's functionality is enabled by wrapping the context, so that all string resource related methods, such a [`getString()`](https://developer.android.com/reference/android/content/res/Resources#getString(int,%20java.lang.Object...)), [`getText()`](https://developer.android.com/reference/android/content/res/Resources#getText(int)), flow through the SDK.
@@ -116,8 +114,6 @@ To enable context wrapping in your `AppCompatActivity`, extend the SDK's [TxBase
 If you are using an older `AppCompat` version, please read the class's implementation as you may need to uncomment some code.
 
 
-If you don't use `AppCompat`, extend the SDK's [TxBaseActivity](https://transifex.github.io/transifex-java/com/transifex/txnative/activity/TxBaseActivity) or copy its [implementation](https://github.com/transifex/transifex-java/blob/master/TransifexNativeSDK/txsdk/src/main/java/com/transifex/txnative/activity/TxBaseActivity.java) to your own base class.
-
 If you want to use the SDK outside an activity's context, such as a service context, make sure that you wrap the context:
 
 ```java
@@ -125,7 +121,7 @@ public class SimpleIntentService extends JobIntentService {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(TxNative.generalWrap(newBase));
+        super.attachBaseContext(TxNative.wrap(newBase));
     }
 }
 ```
@@ -135,12 +131,12 @@ If you want to use the SDK in some arbitrary place where you can get your applic
 ```java
 ...
 // Wrap the context
-Context wrappedContext = TxNative.generalWrap(getApplicationContext());
+Context wrappedContext = TxNative.wrap(getApplicationContext());
 // Use the wrapped context for getting a string
 wrappedContext.getString();
 ```
 
-If you want to disable the SDK functionality, don't initialize it and don't call any `TxNative` methods. `TxNative.wrap()` and `TxNative.generalWrap()` will be a no-op and the context will not be wrapped. Thus, all `getString()` etc methods, won't flow through the SDK.
+If you want to disable the SDK functionality, don't initialize it and don't call any `TxNative` methods. `TxNative.wrap()` will be a no-op and the context will not be wrapped. Thus, all `getString()` etc methods, won't flow through the SDK.
 
 ## Cache
 

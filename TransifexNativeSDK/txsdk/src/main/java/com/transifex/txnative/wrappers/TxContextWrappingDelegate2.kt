@@ -18,7 +18,7 @@ import com.transifex.txnative.TxNative
 /**
  * Wrapper of AppcompatDelegate that enables TxNative functionality by wrapping the base context.
  */
-class TxContextWrappingDelegate(private val superDelegate: AppCompatDelegate) : AppCompatDelegate() {
+class TxContextWrappingDelegate2(private val superDelegate: AppCompatDelegate) : AppCompatDelegate() {
 
     override fun getSupportActionBar() = superDelegate.supportActionBar
 

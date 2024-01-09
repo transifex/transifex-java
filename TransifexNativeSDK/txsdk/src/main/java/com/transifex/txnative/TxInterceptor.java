@@ -15,8 +15,8 @@ import com.transifex.txnative.transformers.ToolbarTransformer;
 import com.transifex.txnative.transformers.ViewTransformer;
 
 import androidx.annotation.NonNull;
-import io.github.inflationx.viewpump.InflateResult;
-import io.github.inflationx.viewpump.Interceptor;
+import dev.b3nedikt.viewpump.InflateResult;
+import dev.b3nedikt.viewpump.Interceptor;
 
 /**
  * ViewPump interceptor that transforms inflated views using the appropriate
@@ -52,13 +52,13 @@ class TxInterceptor implements Interceptor {
     public InflateResult intercept(@NonNull Chain chain) {
         InflateResult result = chain.proceed(chain.request());
 
-        View view = result.view();
+        View view = result.getView();
         if (view == null) {
             return result;
         }
 
-        AttributeSet attrs = result.attrs();
-        Context context = result.context();
+        AttributeSet attrs = result.getAttrs();
+        Context context = result.getContext();
         if (attrs != null) {
             if (view instanceof TextView) {
                 mTextViewTransformer.transform(context, view, attrs);

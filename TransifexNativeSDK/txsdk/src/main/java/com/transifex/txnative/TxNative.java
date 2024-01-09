@@ -12,8 +12,11 @@ import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import io.github.inflationx.viewpump.ViewPump;
-import io.github.inflationx.viewpump.ViewPumpContextWrapper;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.app.TxContextWrappingDelegateJava2;
+import androidx.appcompat.app.ViewPumpAppCompatDelegate;
+import dev.b3nedikt.viewpump.ViewPump;
 
 
 /**
@@ -57,10 +60,7 @@ public class TxNative {
         sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, cache, missingPolicy);
 
         // Initialize ViewPump with our interceptor
-        ViewPump.Builder viewPumpBuilder = ViewPump.builder();
-        viewPumpBuilder.addInterceptor(new TxInterceptor());
-        ViewPump viewPump = viewPumpBuilder.build();
-        ViewPump.init(viewPump);
+        ViewPump.init(new TxInterceptor());
     }
 
     /**
@@ -150,11 +150,15 @@ public class TxNative {
     }
 
     /**
-     * Wraps the activity's base context to enable TransifexNative functionality inside activities.
+     * Wraps a context to enable TransifexNative functionality inside activities, services or
+     * other scopes.
      *
      * <p>
      *     Check out the installation guide regarding the usage of this method.
-     * </p>
+     * <p>
+     *   <b>Warning: </b>You should use <code>getBaseContext()</code>, instead of
+     *      <code>getApplicationContext()</code> when using string methods in services.
+
      *
      * @param context The activity context to wrap.
      *
@@ -166,7 +170,7 @@ public class TxNative {
             return context;
         }
 
-        return ViewPumpContextWrapper.wrap(new TxContextWrapper(context, sNativeCore));
+        return new TxContextWrapper(context, sNativeCore);
     }
 
     /**
@@ -182,12 +186,25 @@ public class TxNative {
      *
      * @return The wrapped context.
      */
+    @Deprecated
     public static Context generalWrap(@NonNull Context context) {
-        if (sNativeCore == null) {
-            Log.e(TAG, "Wrapping failed because TxNative has not been initialized yet");
-            return context;
-        }
+        return wrap(context);
+    }
 
-        return new TxContextWrapper(context, sNativeCore);
+    /**
+     * Wraps the {@link AppCompatDelegate} to enable TransifexNative functionality in an activity
+     * that extends {@link androidx.appcompat.app.AppCompatActivity}.
+     * <p>
+     * This method should be called in {@link AppCompatActivity#getDelegate()}.
+     *
+     * @param delegate The activity's AppCompatDelegate.
+     * @param baseContext The activity's base context.
+     *
+     * @return The wrapped AppCompatDelegate.
+     */
+    public static @NonNull AppCompatDelegate wrapAppCompatDelegate(@NonNull AppCompatDelegate delegate, @NonNull Context baseContext) {
+        // TxContextWrappingDelegateJava has to be the last wrapper so the base resources that are
+        // used by ViewPumpAppCompatDelegate in WebViews are not TxResources, but the original ones.
+        return new TxContextWrappingDelegateJava2( new ViewPumpAppCompatDelegate(delegate, baseContext));
     }
 }

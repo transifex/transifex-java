@@ -33,6 +33,6 @@ public class SimpleIntentService extends JobIntentService {
     @Override
     protected void attachBaseContext(Context newBase) {
         // Wrap the base context
-        super.attachBaseContext(TxNative.generalWrap(newBase));
+        super.attachBaseContext(TxNative.wrap(newBase));
     }
 }
