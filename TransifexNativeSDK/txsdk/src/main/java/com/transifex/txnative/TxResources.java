@@ -96,7 +96,7 @@ public class TxResources extends Resources {
      *
      * @param id The string resource ID to check.
      *
-     * @return true if it belong's to Android's resource package, false otherwise.
+     * @return true if it belongs to Android's resource package, false otherwise.
      *
      * @throws NotFoundException Throws NotFoundException if the given ID does not exist.
      */
