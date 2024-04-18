@@ -3,4 +3,9 @@
     <string name="key1">"multiple spaces are allowed     here" but not    here</string>
     <string name="key2">"single quotes ' ''" are allowed here but not here''</string>
     <string name="key3">HTML entity quotes behave like normal &quot;       &quot;quotes</string>
+	<string name="key4">multiple new lines"
+
+" and "new lines 
+ 
+ with   spaces" are allowed when in double quotes</string>
 </resources>

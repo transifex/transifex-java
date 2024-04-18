@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key1">multiple spaces,
+		
+     a tab and new lines should be collapsed into a single space</string>
+</resources>

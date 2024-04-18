@@ -170,6 +170,11 @@ public class TxNative {
             return context;
         }
 
+        if (context.getResources() instanceof TxResources) {
+            Log.w(TAG, "Provided context is already wrapped.");
+            return context;
+        }
+
         return new TxContextWrapper(context, sNativeCore);
     }
 
@@ -203,8 +208,6 @@ public class TxNative {
      * @return The wrapped AppCompatDelegate.
      */
     public static @NonNull AppCompatDelegate wrapAppCompatDelegate(@NonNull AppCompatDelegate delegate, @NonNull Context baseContext) {
-        // TxContextWrappingDelegateJava has to be the last wrapper so the base resources that are
-        // used by ViewPumpAppCompatDelegate in WebViews are not TxResources, but the original ones.
-        return new TxContextWrappingDelegateJava2( new ViewPumpAppCompatDelegate(delegate, baseContext));
+        return new ViewPumpAppCompatDelegate(delegate, baseContext, TxNative::wrap);
     }
 }

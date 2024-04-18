@@ -167,10 +167,8 @@ class StringXMLConverter {
 
         // We follow Android XML Parser's special character handling.
 
-        // Replace new lines with spaces.
-        String unescapedString = originalString.replace('\n', ' ');
         // Replace tabs with spaces.
-        unescapedString = unescapedString.replace('\t', ' ');
+        String unescapedString = originalString.replace('\t', ' ');
         // Unescape special chars. For example convert a typed "\n" ("\\n" in Java) to a new line
         // ("\n" in Java) and do some extra processing similar to the Android XML parser.
         unescapedString= unescapeJavaString(unescapedString);
@@ -194,6 +192,8 @@ class StringXMLConverter {
      *     <ul>
      *         <li>Whitespace character sequences are collapsed into a single space, unless they
      *         are enclosed in double quotes.</li>
+     *         <li>New lines are converted and collapsed into a single space, unless they are
+     *         enclosed in double quotes.</li>
      *         <li>Double quotes are removed, unless escaped.</li>
      *         <li>Single quotes are removed (you can't actually write them using Android Studio's
      *         string editor), unless escaped or quoted.</li>
@@ -271,12 +271,15 @@ class StringXMLConverter {
                     continue;
                 }
             }
-            else if (ch == ' ') {
+            else if (ch == ' ' || ch == '\n') {
                 if (!isInsideDoubleQuotes) {
-                    // Collapse sequences of whitespace characters into a single space, unless we're
-                    // inside double quotes
+                    //
+                    // Collapse sequences of whitespace characters or new lines into a single space,
+                    // unless we're inside double quotes. This also, implicitly replaces a new line
+                    // with a space.
+                    ch = ' ';
                     for (int nextIndex = i+1; nextIndex < st.length(); nextIndex++) {
-                        if (st.charAt(nextIndex) == ' ') {
+                        if (st.charAt(nextIndex) == ' ' || st.charAt(nextIndex) == '\n') {
                             i = nextIndex;
                         }
                         else {
