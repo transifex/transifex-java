@@ -144,6 +144,11 @@ public class StringXMLConverterTest {
         return getXMlFromFile("strings-test-htmlentities.xml");
     }
 
+    static Document getXMLAt() {
+
+        return getXMlFromFile("strings-test-at.xml");
+    }
+
     static Document getPluralsXML() {
         return getXML(stringsXMLPlurals);
     }
@@ -350,6 +355,22 @@ public class StringXMLConverterTest {
 
         assertThat(stringMap.keySet()).containsExactly("key1").inOrder();
         assertThat(stringMap.get("key1").string).isEqualTo("these html entities &amp; &lt; &gt; should be left as is");
+    }
+
+    @Test
+    public void testProcess_at() {
+        Document document = getXMLAt();
+        try {
+            converter.process(document, stringMap);
+        } catch (JDOMException | StringXMLConverter.XMLConverterException e) {
+            e.printStackTrace();
+        }
+
+        // key 2 should be ignored by our parser
+        assertThat(stringMap.keySet()).containsExactly("key1", "key3", "key4").inOrder();
+        assertThat(stringMap.get("key1").string).isEqualTo("using it here @ or escaped @ is ok");
+        assertThat(stringMap.get("key3").string).isEqualTo("@ this is ok");
+        assertThat(stringMap.get("key4").string).isEqualTo("<b>@</b> this is ok");
     }
 
     // endregion parse strings
