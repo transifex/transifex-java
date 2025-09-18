@@ -136,6 +136,43 @@ Context wrappedContext = TxNative.wrap(getApplicationContext());
 wrappedContext.getString();
 ```
 
+If you want to wrap the application context itself, you need to move the SDK's initialization from the application's `onCreate()` to `attachBaseContext()`:
+
+```java
+ @Override
+ protected void attachBaseContext(Context base) {
+    // Initialize TxNative
+    String token = "<transifex_token>";
+
+    LocaleState localeState = new LocaleState(
+        base,   // Use the base context instead of getApplicationContext()
+        // source locale
+        "en",
+        // supported locales
+        new String[]{"en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"},
+        null);
+
+    TxNative.init(
+        // application context
+        base,   // Use the base context instead of getApplicationContext()
+        // a LocaleState instance
+        localeState,
+        // token
+        token,
+        // cdsHost URL
+        null,
+        // a TxCache implementation
+        null,
+        // a MissingPolicy implementation
+        new AndroidMissingPolicy());
+        
+        // Wrap the base application context
+        super.attachBaseContext(TxNative.wrap(base));
+}
+```
+
+Note though that this global wrapper can interfere with third-party libraries that use their own string resources. In that case, use "AndroidMissingPolicy" so that these libraries have their strings translated.
+
 If you want to disable the SDK functionality, don't initialize it and don't call any `TxNative` methods. `TxNative.wrap()` will be a no-op and the context will not be wrapped. Thus, all `getString()` etc methods, won't flow through the SDK.
 
 ## Cache
