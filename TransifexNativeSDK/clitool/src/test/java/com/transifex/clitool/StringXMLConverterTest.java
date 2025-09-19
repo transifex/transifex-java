@@ -119,6 +119,11 @@ public class StringXMLConverterTest {
         return getXMlFromFile("strings-test-space.xml");
     }
 
+    static Document getXMLNewLineSpaceTab() {
+
+        return getXMlFromFile("strings-test-new-line-space-tab.xml");
+    }
+
     static Document getXMLInsideDoubleQuotes() {
 
         return getXMlFromFile("strings-test-insidedoublequotes.xml");
@@ -137,6 +142,11 @@ public class StringXMLConverterTest {
     static Document getXMLHTMLEntities() {
 
         return getXMlFromFile("strings-test-htmlentities.xml");
+    }
+
+    static Document getXMLAt() {
+
+        return getXMlFromFile("strings-test-at.xml");
     }
 
     static Document getPluralsXML() {
@@ -210,10 +220,11 @@ public class StringXMLConverterTest {
             e.printStackTrace();
         }
 
-        assertThat(stringMap.keySet()).containsExactly("key1", "key2").inOrder();
+        assertThat(stringMap.keySet()).containsExactly("key1", "key2", "key3").inOrder();
         // This should be rendered as: "anew line \n \newline \\nb"
         assertThat(stringMap.get("key1").string).isEqualTo("a\n \\n \\\n \\\\nb");
         assertThat(stringMap.get("key2").string).isEqualTo("actual new line should be replaced by space");
+        assertThat(stringMap.get("key3").string).isEqualTo("multiple actual new lines should be replaced by a single space");
     }
 
     @Test
@@ -268,6 +279,19 @@ public class StringXMLConverterTest {
     }
 
     @Test
+    public void testProcess_newLineSpaceTab() {
+        Document document = getXMLNewLineSpaceTab();
+        try {
+            converter.process(document, stringMap);
+        } catch (JDOMException | StringXMLConverter.XMLConverterException e) {
+            e.printStackTrace();
+        }
+
+        assertThat(stringMap.keySet()).containsExactly("key1").inOrder();
+        assertThat(stringMap.get("key1").string).isEqualTo("multiple spaces, a tab and new lines should be collapsed into a single space");
+    }
+
+    @Test
     public void testProcess_insideDoubleQuotes() {
         Document document = getXMLInsideDoubleQuotes();
         try {
@@ -276,10 +300,15 @@ public class StringXMLConverterTest {
             e.printStackTrace();
         }
 
-        assertThat(stringMap.keySet()).containsExactly("key1", "key2", "key3").inOrder();
+        assertThat(stringMap.keySet()).containsExactly("key1", "key2", "key3", "key4").inOrder();
         assertThat(stringMap.get("key1").string).isEqualTo("multiple spaces are allowed     here but not here");
         assertThat(stringMap.get("key2").string).isEqualTo("single quotes ' '' are allowed here but not here");
         assertThat(stringMap.get("key3").string).isEqualTo("HTML entity quotes behave like normal        quotes");
+        assertThat(stringMap.get("key4").string).isEqualTo("multiple new lines\n" +
+                "\n" +
+                " and new lines \n" +
+                " \n" +
+                " with   spaces are allowed when in double quotes");
     }
 
     @Test
@@ -326,6 +355,22 @@ public class StringXMLConverterTest {
 
         assertThat(stringMap.keySet()).containsExactly("key1").inOrder();
         assertThat(stringMap.get("key1").string).isEqualTo("these html entities &amp; &lt; &gt; should be left as is");
+    }
+
+    @Test
+    public void testProcess_at() {
+        Document document = getXMLAt();
+        try {
+            converter.process(document, stringMap);
+        } catch (JDOMException | StringXMLConverter.XMLConverterException e) {
+            e.printStackTrace();
+        }
+
+        // key 2 should be ignored by our parser
+        assertThat(stringMap.keySet()).containsExactly("key1", "key3", "key4").inOrder();
+        assertThat(stringMap.get("key1").string).isEqualTo("using it here @ or escaped @ is ok");
+        assertThat(stringMap.get("key3").string).isEqualTo("@ this is ok");
+        assertThat(stringMap.get("key4").string).isEqualTo("<b>@</b> this is ok");
     }
 
     // endregion parse strings

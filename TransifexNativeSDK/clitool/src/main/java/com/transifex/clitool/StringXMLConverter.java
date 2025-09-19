@@ -105,11 +105,14 @@ class StringXMLConverter {
 
             if (child.getName().equals("string")) {
                 String key = child.getAttribute("name").getValue();
-                String string = getXMLText(child);
+                String xmlText = getXMLText(child);
                 // Ignore resource references
-                if (string.startsWith("@")) {
+                if (xmlText.startsWith("@")) {
                     continue;
                 }
+                // Unescape special chars. For example convert a typed "\n" ("\\n" in Java) to a new line
+                // ("\n" in Java) and do some extra processing similar to the Android XML parser.
+                String string = unescapeJavaString(xmlText);
                 stringMap.put(key, new LocaleData.StringInfo(string));
             }
             else if (child.getName().equals("plurals")) {
@@ -145,13 +148,7 @@ class StringXMLConverter {
     }
 
     /**
-     * Returns the content of the provided element as text, including any XML content. It also
-     * applies the special character handling of Android's XML parser as defined
-     * <a href="https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes">here</a>.
-     * <p>
-     * The final processing of HTML entities and tags is left for the SDK at runtime. So, any tags
-     * are left as is. HTML entities such as {@code "&amp;", "&lt;" and "&gt;"}
-     * (with the exception of {@code "&quot;" which is converted to """} are left untouched.
+     * Returns the content of the provided element as text, including any XML content.
      */
     @NonNull
     private String getXMLText(@NonNull Element element) {
@@ -163,28 +160,21 @@ class StringXMLConverter {
             return "";
         }
 
-        String originalString = stringWriter.toString();
-
-        // We follow Android XML Parser's special character handling.
-
-        // Replace new lines with spaces.
-        String unescapedString = originalString.replace('\n', ' ');
-        // Replace tabs with spaces.
-        unescapedString = unescapedString.replace('\t', ' ');
-        // Unescape special chars. For example convert a typed "\n" ("\\n" in Java) to a new line
-        // ("\n" in Java) and do some extra processing similar to the Android XML parser.
-        unescapedString= unescapeJavaString(unescapedString);
-
-        return unescapedString;
+        return stringWriter.toString();
     }
 
     /**
      * Unescapes a string that contains standard Java escape sequences.
+     * <p>
+     * It also applies the special character handling of Android's XML parser as defined
+     * <a href="https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes">here</a>.
+     * <p>
+     * The final processing of HTML entities and tags is left for the SDK at runtime. So, any tags
+     * are left as is. HTML entities such as {@code "&amp;", "&lt;" and "&gt;"}
+     * (with the exception of {@code "&quot;" which is converted to """} are left untouched.
      * <ul>
      * <li><strong>&#92;b &#92;f &#92;n &#92;r &#92;t &#92;" &#92;'</strong> :
      * BS, FF, NL, CR, TAB, double and single quote.</li>
-     * <li><strong>&#92;X &#92;XX &#92;XXX</strong> : Octal character
-     * specification (0 - 377, 0x00 - 0xFF).</li>
      * <li><strong>&#92;uXXXX</strong> : Hexadecimal based Unicode character.</li>
      * </ul>
      *
@@ -192,8 +182,12 @@ class StringXMLConverter {
      *     original code</a> to follow the Android XML Parser behavior. Octal support has been
      *     removed. The following are now supported:
      *     <ul>
-     *         <li>Whitespace character sequences are collapsed into a single space, unless they
-     *         are enclosed in double quotes.</li>
+     *         <li>Tabs are converted to spaces.</li>
+     *         <li>New lines are converted and collapsed into a single space, unless they are
+     *         enclosed in double quotes.</li>
+     *         <li>Whitespace character sequences, either typed as such or converted from tabs or
+     *         new lines, are collapsed into a single space, unless they are enclosed in double
+     *         quotes.</li>
      *         <li>Double quotes are removed, unless escaped.</li>
      *         <li>Single quotes are removed (you can't actually write them using Android Studio's
      *         string editor), unless escaped or quoted.</li>
@@ -209,6 +203,8 @@ class StringXMLConverter {
      * @return The unescaped string.
      */
     public String unescapeJavaString(String st) {
+        // Replace tabs with spaces.
+        st = st.replace('\t', ' ');
 
         StringBuilder sb = new StringBuilder(st.length());
 
@@ -271,12 +267,15 @@ class StringXMLConverter {
                     continue;
                 }
             }
-            else if (ch == ' ') {
+            else if (ch == ' ' || ch == '\n') {
                 if (!isInsideDoubleQuotes) {
-                    // Collapse sequences of whitespace characters into a single space, unless we're
-                    // inside double quotes
+                    //
+                    // Collapse sequences of whitespace characters or new lines into a single space,
+                    // unless we're inside double quotes. This also, implicitly replaces a new line
+                    // with a space.
+                    ch = ' ';
                     for (int nextIndex = i+1; nextIndex < st.length(); nextIndex++) {
-                        if (st.charAt(nextIndex) == ' ') {
+                        if (st.charAt(nextIndex) == ' ' || st.charAt(nextIndex) == '\n') {
                             i = nextIndex;
                         }
                         else {

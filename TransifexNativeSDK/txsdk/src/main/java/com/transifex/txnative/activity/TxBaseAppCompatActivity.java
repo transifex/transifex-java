@@ -31,7 +31,7 @@ public class TxBaseAppCompatActivity extends AppCompatActivity {
    // following lines. Otherwise, TxNative functionality will be impaired when running on older
    // platforms (< API 21).
    //
-   // Starting from AppCompat 1.5.0, "setCompatVectorFromResourcesEnabled()" does not need this
+   // Starting from AppCompat 1.4.0, "setCompatVectorFromResourcesEnabled()" does not need this
    // workaround.
 
 //   private Resources mResources; // final resources (VectorEnabledTintResourcesWrapper or TxResources)

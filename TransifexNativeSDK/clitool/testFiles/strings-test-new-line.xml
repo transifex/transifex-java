@@ -3,4 +3,8 @@
     <string name="key1">a\n \\n \\\n \\\\nb</string>
     <string name="key2">actual new line
 should be replaced by space</string>
+<string name="key3">multiple actual new lines
+
+
+should be replaced by a single space</string>
 </resources>

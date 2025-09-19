@@ -65,7 +65,7 @@ public class NativeCore {
                       @Nullable String cdsHost,
                       @Nullable TxCache cache,
                       @Nullable MissingPolicy missingPolicy) {
-        mContext = applicationContext.getApplicationContext();
+        mContext = applicationContext;
         mMainHandler = new Handler(mContext.getMainLooper());
         mLocaleState = localeState;
         mLocaleState.setCurrentLocaleListener(mCurrentLocaleListener);
