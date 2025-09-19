@@ -24,8 +24,8 @@ public class SimpleIntentService extends JobIntentService {
 
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
-        // Make sure that you use getBaseContext() and not getApplicationContext()
-        String success = getBaseContext().getResources().getString(R.string.success);
+        // Make sure that you do not use an app context via getApplicationContext().getString()
+        String success = getString(R.string.success);
 
         Log.d(TAG, "Service status: " + success);
     }

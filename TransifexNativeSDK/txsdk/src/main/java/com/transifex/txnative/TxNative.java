@@ -29,9 +29,10 @@ public class TxNative {
     private static NativeCore sNativeCore = null;
 
     /**
-     * Initialize the SDK.
+     * Initialize the SDK. The method should only be called once.
      * <p>
-     *     Should be called in {@link Application#onCreate()}.
+     *     Should be called in {@link Application#onCreate()} or
+     *     {@link Application#attachBaseContext(Context)}.
      * </p>
      *
      * @param applicationContext The application context.
@@ -61,6 +62,16 @@ public class TxNative {
 
         // Initialize ViewPump with our interceptor
         ViewPump.init(new TxInterceptor());
+    }
+
+    /**
+     * Checks if the SDK has been initialized by a previous call to
+     * {@link #init(Context, LocaleState, String, String, TxCache, MissingPolicy)}.
+     *
+     * @return <code>true</code> if the SDK has been initialized, <code>false</code> otherwise.
+     */
+    public static boolean isInitialized() {
+        return sNativeCore != null;
     }
 
     /**
@@ -158,9 +169,8 @@ public class TxNative {
      * <p>
      *   <b>Warning: </b>You should use <code>getBaseContext()</code>, instead of
      *      <code>getApplicationContext()</code> when using string methods in services.
-
      *
-     * @param context The activity context to wrap.
+     * @param context The context to wrap.
      *
      * @return The wrapped context.
      */
@@ -181,15 +191,9 @@ public class TxNative {
     /**
      * Wraps a context to enable TransifexNative functionality in services and other scopes besides
      * activities.
-     * <p>
-     * <b>Warning: </b>You should use <code>getBaseContext()</code>, instead of
-     * <code>getApplicationContext()</code> when using string methods in services.
-     * <p>
-     * Check out the installation guide regarding the usage of this method.
-     *
-     * @param context The service context to wrap.
      *
      * @return The wrapped context.
+     * @deprecated Use {@link #wrap(Context)} instead.
      */
     @Deprecated
     public static Context generalWrap(@NonNull Context context) {
@@ -201,6 +205,9 @@ public class TxNative {
      * that extends {@link androidx.appcompat.app.AppCompatActivity}.
      * <p>
      * This method should be called in {@link AppCompatActivity#getDelegate()}.
+     * <p>
+     * If your activity is extending {@link com.transifex.txnative.activity.TxBaseAppCompatActivity TxBaseAppCompatActivity}
+     * you don't have to call this method.
      *
      * @param delegate The activity's AppCompatDelegate.
      * @param baseContext The activity's base context.
