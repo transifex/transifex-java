@@ -15,7 +15,7 @@ buildscript {
             'androidxEspressoCore' : '3.5.1'
     ]
     ext {
-        sdkVersionCode = 11                      // version code for txsdk
+        sdkVersionCode = 11                     // version code for txsdk
         sdkVersion = '1.4.0'                    // version for txsdk and common
         pomGroupID = "com.transifex.txnative"   // pom group id for txsdk and common
 
