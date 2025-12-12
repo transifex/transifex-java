@@ -46,7 +46,7 @@ public class TranslationsDownloaderTest {
     @Test
     public void testSaveTranslations_dirDoesNotExist() {
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
@@ -63,7 +63,7 @@ public class TranslationsDownloaderTest {
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
@@ -108,7 +108,7 @@ public class TranslationsDownloaderTest {
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
@@ -132,7 +132,7 @@ public class TranslationsDownloaderTest {
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         HashMap<String, File> translationFiles = downloader.downloadTranslations("el", null, tempDir.getFile(), "strings.txt");
@@ -156,7 +156,7 @@ public class TranslationsDownloaderTest {
         assertThat(tempDirCreated).isTrue();
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         Set<String> tags = new HashSet<>(Arrays.asList("tag a", "tag b"));
@@ -198,7 +198,7 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         String[] localeCodes = new String[]{"el"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");
@@ -231,7 +231,7 @@ public class TranslationsDownloaderTest {
         } catch (IOException ignored) {}
 
         String[] localeCodes = new String[]{"es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
         TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
 
         HashMap<String, File> translationFiles = downloader.downloadTranslations(null, null, tempDir.getFile(), "strings.txt");

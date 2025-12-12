@@ -130,7 +130,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
@@ -146,7 +146,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache memoryCache = getEnElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, memoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
@@ -163,7 +163,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
@@ -179,7 +179,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
@@ -195,7 +195,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache memoryCache = getEnElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, memoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence string = nativeCore.translate(txResources, R.string.tx_test_key);
@@ -210,7 +210,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         final TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         assertThrows(Resources.NotFoundException.class, new ThrowingRunnable() {
@@ -228,7 +228,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         final TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence string = nativeCore.translate(txResources, 0, "default");
@@ -244,7 +244,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         nativeCore.setTestMode(true);
         final TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
@@ -261,7 +261,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         nativeCore.setTestMode(true);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
@@ -285,7 +285,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(true);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITH_TAGS);
@@ -317,7 +317,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(true);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITH_TAGS_HTML_ESCAPED);
@@ -351,7 +351,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(true);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITHOUT_TAGS);
@@ -370,7 +370,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(true);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITHOUT_TAGS_AND_HTML_ENTITIES);
@@ -390,7 +390,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(false);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITH_TAGS);
@@ -425,7 +425,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(false);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITH_TAGS_HTML_ESCAPED);
@@ -464,7 +464,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache dummyCache = getEmptyMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, dummyCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, dummyCache, null);
         nativeCore.setSupportSpannable(false);
 
         CharSequence string = nativeCore.getSpannedString(STRING_WITHOUT_TAGS_AND_HTML_ENTITIES);
@@ -611,7 +611,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -629,7 +629,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache memoryCache = getEnElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, memoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -647,7 +647,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -668,7 +668,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -689,7 +689,7 @@ public class NativeCoreTest {
                 new String[]{"sl", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -710,7 +710,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache memoryCache = getEnElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, memoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -731,7 +731,7 @@ public class NativeCoreTest {
                 new String[]{"sl", "el"},
                 null);
         TxMemoryCache memoryCache = getSLElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, memoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, memoryCache, null);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         CharSequence stringOne = nativeCore.translateQuantityString(txResources, R.plurals.tx_plural_test_key, 1);
@@ -748,7 +748,7 @@ public class NativeCoreTest {
                 new String[]{"sl", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        final NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         final TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 
         assertThrows(Resources.NotFoundException.class, new ThrowingRunnable() {
@@ -767,7 +767,7 @@ public class NativeCoreTest {
                 new String[]{"en", "el"},
                 null);
         TxMemoryCache elMemoryCache = getElMemoryCache();
-        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, elMemoryCache, null);
+        NativeCore nativeCore = new NativeCore(mockContext, localeState, "token", null, null, elMemoryCache, null);
         nativeCore.setTestMode(true);
         TxResources txResources = new TxResources(mockContext.getResources(), nativeCore);
 

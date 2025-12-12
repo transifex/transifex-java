@@ -14,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.app.TxContextWrappingDelegateJava2;
 import androidx.appcompat.app.ViewPumpAppCompatDelegate;
 import dev.b3nedikt.viewpump.ViewPump;
 
@@ -46,6 +45,8 @@ public class TxNative {
      * @param missingPolicy Determines how to handle translations that are not available;
      * {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used
      *                     if set to <code>null</code>.
+     * @deprecated Use {@link #initializer(Context, LocaleState, String)} to initialize the SDK with a builder pattern.
+     *             For example: {@code TxNative.builder(applicationContext, locales, token).init();}
      */
     public static void init(@NonNull Context applicationContext,
                             @NonNull LocaleState locales,
@@ -54,19 +55,133 @@ public class TxNative {
                             @Nullable TxCache cache,
                             @Nullable MissingPolicy missingPolicy) {
 
-        if (sNativeCore != null) {
-            throw new RuntimeException("TxNative is already initialized");
+        TxNative.initializer(applicationContext, locales, token)
+                .withCdsHost(cdsHost)
+                .withCache(cache)
+                .withMissingPolicy(missingPolicy)
+                .init();
+    }
+
+    // region Builder pattern for Initialization
+
+    /**
+     * Entry point for initializing the SDK. You need to call {@link Initializer#init()} to complete
+     * initialization.
+     * <p>
+     *     Should be called in {@link Application#onCreate()} or
+     *     {@link Application#attachBaseContext(Context)}.
+     * </p>
+     *
+     * @param applicationContext The application context.
+     * @param locales Configures the locales supported by the SDK.
+     * @param token The Transifex token that can be used for retrieving translations from CDS.
+     *
+     * @return An Initializer instance to configure optional parameters and finally call
+     * {@code init()}.
+     */
+    public static Initializer initializer(@NonNull Context applicationContext,
+                                          @NonNull LocaleState locales,
+                                          @NonNull String token) {
+        return new Initializer(applicationContext, locales, token);
+    }
+
+
+    /**
+     * Builder class for initializing the SDK.
+     */
+    public static class Initializer {
+        private final Context applicationContext;
+        private final LocaleState locales;
+        private final String token;
+        private String cdsHost = null;
+        private TxCache cache = null;
+        private MissingPolicy missingPolicy = null;
+        private String customAuthorizationHeaderKey = null;
+
+        /**
+         * Creates an Initializer with mandatory parameters.
+         *
+         * @param applicationContext The application context.
+         * @param locales Configures the locales supported by the SDK.
+         * @param token The Transifex token that can be used for retrieving translations from CDS.
+         */
+        public Initializer(@NonNull Context applicationContext,
+                           @NonNull LocaleState locales,
+                           @NonNull String token) {
+            this.applicationContext = applicationContext;
+            this.locales = locales;
+            this.token = token;
         }
 
-        sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, cache, missingPolicy);
+        /**
+         * Initializes the TransifexNative SDK with the configured parameters.
+         *
+         * @throws RuntimeException if the SDK has already been initialized.
+         */
+        public void init() {
+            if (TxNative.isInitialized()) {
+                throw new RuntimeException("TxNative is already initialized");
+            }
 
-        // Initialize ViewPump with our interceptor
-        ViewPump.init(new TxInterceptor());
+            sNativeCore = new NativeCore(applicationContext, locales, token, cdsHost, customAuthorizationHeaderKey, cache, missingPolicy);
+
+            // Initialize ViewPump with our interceptor
+            ViewPump.init(new TxInterceptor());
+        }
+
+        /**
+         * Sets an optional host for the Content Delivery Service.
+         * If set to {@code null}, the production host provided by Transifex is used.
+         *
+         * @param cdsHost The CDS host.
+         * @return The Initializer instance for chaining.
+         */
+        public Initializer withCdsHost(@Nullable String cdsHost) {
+            this.cdsHost = cdsHost;
+            return this;
+        }
+
+        /**
+         * Sets a custom key for the HTTP Header used for passing the token to the Content Delivery
+         * Service. If set to {@code null}, the default key is used.
+         *
+         * @param customAuthorizationHeaderKey The custom authorization key.
+         * @return The Initializer instance for chaining.
+         */
+        public Initializer withCustomAuthorizationHeaderKey(@Nullable String customAuthorizationHeaderKey) {
+            this.customAuthorizationHeaderKey = customAuthorizationHeaderKey;
+            return this;
+        }
+
+        /**
+         * Sets the translation cache that holds the translations from the CDS.
+         * If set to {@code null}, {@link com.transifex.txnative.cache.TxStandardCache TxStandardCache} is used.
+         *
+         * @param cache The translation cache.
+         * @return The Initializer instance for chaining.
+         */
+        public Initializer withCache(@Nullable TxCache cache) {
+            this.cache = cache;
+            return this;
+        }
+
+        /**
+         * Sets the missing policy that determines how to handle translations that are not available.
+         * If set to {@code null}, {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used.
+         *
+         * @param missingPolicy The missing policy.
+         * @return The Initializer instance for chaining.
+         */
+        public Initializer withMissingPolicy(@Nullable MissingPolicy missingPolicy) {
+            this.missingPolicy = missingPolicy;
+            return this;
+        }
     }
+    // endregion
 
     /**
      * Checks if the SDK has been initialized by a previous call to
-     * {@link #init(Context, LocaleState, String, String, TxCache, MissingPolicy)}.
+     * {@link #initializer(Context, LocaleState, String) TxNative.builder().init()}.
      *
      * @return <code>true</code> if the SDK has been initialized, <code>false</code> otherwise.
      */
@@ -149,8 +264,8 @@ public class TxNative {
 
     /**
      * Fetches the translations from CDS and updates the cache.
-     * 
-     * @see #fetchTranslations(String, Set) 
+     *
+     * @see #fetchTranslations(String, Set)
      */
     public static void fetchTranslations(@Nullable String localeCode) {
         if (sNativeCore == null) {

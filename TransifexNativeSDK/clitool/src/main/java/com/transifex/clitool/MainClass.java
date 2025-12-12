@@ -211,7 +211,7 @@ public class MainClass {
 
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, token, secret,
-                    mainClass.hostURL);
+                    mainClass.hostURL, null);
             LocaleData.TxJobStatus jobStatus = null;
             try {
                 jobStatus = cdsHandler.pushSourceStrings(postData);
@@ -265,7 +265,7 @@ public class MainClass {
 
             // Push to CDS
             CDSHandler cdsHandler = new CDSHandler(null, token, secret,
-                    mainClass.hostURL);
+                    mainClass.hostURL, null);
             LocaleData.TxJobStatus jobStatus = null;
             try {
                 jobStatus = cdsHandler.pushSourceStrings(postData);
@@ -358,7 +358,7 @@ public class MainClass {
 
             // Pull from CDS
             CDSHandler cdsHandler = new CDSHandler(translatedLocales, token, null,
-                    mainClass.hostURL);
+                    mainClass.hostURL, null);
             TranslationsDownloader downloader = new TranslationsDownloader(cdsHandler);
             HashMap<String, File> downloadedFiles = downloader.downloadTranslations(null, tags, outDir, OUT_FILE_NAME);
 

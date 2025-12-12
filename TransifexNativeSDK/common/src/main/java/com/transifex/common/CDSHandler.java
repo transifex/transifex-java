@@ -52,6 +52,9 @@ public class CDSHandler {
     // The host of the Content Delivery Service
     private final String mCdsHost;
 
+    // A custom authorization header key
+    private final String mCustomAuthorizationHeaderKey;
+
     private final Gson mGson;
 
     /**
@@ -99,18 +102,21 @@ public class CDSHandler {
     /**
      * Creates a CDSHandler instance.
      *
-     * @param localeCodes An array of locale codes that can be downloaded from CDS. The source
-     *                    locale can also be included.
-     * @param token The API token to use for connecting to the CDS.
-     * @param secret The API secret to use for connecting to the CDS.
-     * @param csdHost The host of the Content Delivery Service.
+     * @param localeCodes                  An array of locale codes that can be downloaded from CDS. The source
+     *                                     locale can also be included.
+     * @param token                        The API token to use for connecting to the CDS.
+     * @param secret                       The API secret to use for connecting to the CDS.
+     * @param csdHost                      The host of the Content Delivery Service.
+     * @param customAuthorizationHeaderKey A custom HTTP header name used to pass the token to CDS.
      */
     public CDSHandler(@Nullable String[] localeCodes,
-                      @NonNull String token, @Nullable String secret, @NonNull String csdHost) {
+                      @NonNull String token, @Nullable String secret, @NonNull String csdHost,
+                      String customAuthorizationHeaderKey) {
         mLocaleCodes = localeCodes;
         mToken = token;
         mSecret = secret;
         mCdsHost = csdHost;
+        mCustomAuthorizationHeaderKey = customAuthorizationHeaderKey;
 
         mGson = new Gson();
     }
@@ -547,11 +553,13 @@ public class CDSHandler {
 
         connection.addRequestProperty("Content-type", "application/json; charset=utf-8");
 
+        String authorizationKey = (mCustomAuthorizationHeaderKey != null) ?
+                mCustomAuthorizationHeaderKey : "Authorization";
         if (withSecret) {
-            connection.addRequestProperty("Authorization", "Bearer " + mToken + ":" + mSecret);
+            connection.addRequestProperty(authorizationKey, "Bearer " + mToken + ":" + mSecret);
         }
         else {
-            connection.addRequestProperty("Authorization", "Bearer " + mToken);
+            connection.addRequestProperty(authorizationKey, "Bearer " + mToken);
         }
 
         connection.addRequestProperty("x-native-sdk", "mobile/android/" + BuildProperties.getSDKVersion());

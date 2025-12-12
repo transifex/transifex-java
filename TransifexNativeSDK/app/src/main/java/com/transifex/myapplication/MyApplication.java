@@ -48,13 +48,11 @@ public class MyApplication extends Application {
                 new String[]{"en", "el", "de", "fr", "ar", "sl"},
                 null);
 
-        TxNative.init(
-                base,                      // application context
-                localeState,               // a LocaleState instance
-                token,                     // token
-                null,                      // cdsHost URL
-                null,                      // a TxCache implementation
-                null);                     // a MissingPolicy implementation
+        TxNative.initializer(base, localeState, token)
+                .withCdsHost(null)           // cdsHost URL
+                .withCache(null)             // a TxCache implementation
+                .withMissingPolicy(null)     // a MissingPolicy implementation
+                .init();
 
         // OPTIONAL:
         // Wrap the application's base context to allow TxNative to intercept all string resource
@@ -64,7 +62,8 @@ public class MyApplication extends Application {
         // strings translated.
         super.attachBaseContext(TxNative.wrap(base));
 
-        // SAFER: Do not wrap the application's base context.
+        // SAFER: Do not wrap the application's base context. Just pass the base context as you
+        // would normally do.
         // super.attachBaseContext(base);
     }
 }
