@@ -50,6 +50,10 @@ android {
             withSourcesJar()
         }
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 tasks.withType(Test).configureEach {
@@ -63,7 +67,6 @@ configurations.configureEach {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     compileOnly "androidx.annotation:annotation:$versions.androidXAnnotation"
     implementation "androidx.appcompat:appcompat:$versions.appcompat"
     compileOnly "com.google.android.material:material:$versions.material"
