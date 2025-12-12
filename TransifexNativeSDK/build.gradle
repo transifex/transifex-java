@@ -16,10 +16,10 @@ buildscript {
     ]
     ext {
         sdkVersionCode = 11                     // version code for txsdk
-        sdkVersion = '1.4.0'                    // version for txsdk and common
+        sdkVersion = '1.4.1'                    // version for txsdk and common
         pomGroupID = "com.transifex.txnative"   // pom group id for txsdk and common
 
-        cliVersion = '1.4.0'                    // clitool version
+        cliVersion = '1.4.1'                    // clitool version
     }
     repositories {
         google()
