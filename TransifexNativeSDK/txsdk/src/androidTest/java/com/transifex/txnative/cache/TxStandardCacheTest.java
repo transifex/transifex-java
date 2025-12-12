@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import java.io.File;
 import java.lang.reflect.Field;
 
-import androidx.test.espresso.core.internal.deps.guava.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.MoreExecutors;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.SmallTest;
 import androidx.test.platform.app.InstrumentationRegistry;

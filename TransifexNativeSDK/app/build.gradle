@@ -39,6 +39,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 // Uncomment in combination with "setCompatVectorFromResourcesEnabled()" in "MyApplication" to
@@ -50,7 +54,6 @@ android {
 //}
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.appcompat:appcompat:$versions.appcompat"
     implementation "com.google.android.material:material:$versions.material"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
