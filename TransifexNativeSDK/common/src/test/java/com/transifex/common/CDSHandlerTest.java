@@ -11,8 +11,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-
-import javax.naming.TimeLimitExceededException;
+import java.util.concurrent.TimeoutException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -354,7 +353,7 @@ public class CDSHandlerTest {
         LocaleData.TxJobStatus jobStatus = null;
         try {
             jobStatus = cdsHandler.pushSourceStrings(postData);
-        } catch (TimeLimitExceededException ignored) {}
+        } catch (TimeoutException ignored) {}
 
         assertThat(jobStatus).isNull();
     }
@@ -369,7 +368,7 @@ public class CDSHandlerTest {
         LocaleData.TxJobStatus jobStatus = null;
         try {
             jobStatus = cdsHandler.pushSourceStrings(postData);
-        } catch (TimeLimitExceededException ignored) {}
+        } catch (TimeoutException ignored) {}
 
         assertThat(jobStatus).isNotNull();
 
@@ -405,7 +404,7 @@ public class CDSHandlerTest {
         LocaleData.TxJobStatus jobStatus = null;
         try {
             jobStatus = cdsHandler.pushSourceStrings(postData);
-        } catch (TimeLimitExceededException ignored) {}
+        } catch (TimeoutException ignored) {}
 
 
         assertThat(jobStatus).isNull();
@@ -421,7 +420,7 @@ public class CDSHandlerTest {
         LocaleData.TxJobStatus jobStatus = null;
         try {
             jobStatus = cdsHandler.pushSourceStrings(postData);
-        } catch (TimeLimitExceededException ignored) {}
+        } catch (TimeoutException ignored) {}
 
         assertThat(jobStatus).isNotNull();
 

@@ -21,10 +21,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.naming.TimeLimitExceededException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -345,11 +344,11 @@ public class CDSHandler {
      * The job status can be either <code>"completed"</code> or <code>"failed"</code>.
      * If everything fails, <code>null</code> is returned.
      *
-     * @throws TimeLimitExceededException When the server takes longer than 20 seconds to complete
+     * @throws TimeoutException When the server takes longer than 20 seconds to complete
      * processing the job.
      */
     public @Nullable
-    LocaleData.TxJobStatus pushSourceStrings(@NonNull LocaleData.TxPostData postData) throws TimeLimitExceededException {
+    LocaleData.TxJobStatus pushSourceStrings(@NonNull LocaleData.TxPostData postData) throws TimeoutException {
         LocaleData.TxPostResponseData response = pushSourceStringsInternal(postData);
         if (response == null) {
             return null;
@@ -462,13 +461,13 @@ public class CDSHandler {
      * @return The job status object or <code>null</code> if everything failed. The job status can
      * be either <code>"completed"</code> or <code>"failed"</code>.
      *
-     * @throws TimeLimitExceededException When the server takes longer than 20 seconds to complete
+     * @throws TimeoutException When the server takes longer than 20 seconds to complete
      * processing the job.
      *
      * @see <a href="https://github.com/transifex/transifex-delivery/#job-status">
      *     https://github.com/transifex/transifex-delivery/#job-status</a>
      */
-    private @Nullable LocaleData.TxJobStatus getJobStatus(@NonNull LocaleData.TxPostResponseData responseData) throws TimeLimitExceededException {
+    private @Nullable LocaleData.TxJobStatus getJobStatus(@NonNull LocaleData.TxPostResponseData responseData) throws TimeoutException {
         URL url = null;
         try {
             URI cdsContentURI = new URI(mCdsHost);
@@ -531,7 +530,7 @@ public class CDSHandler {
             }
         }
 
-        throw new TimeLimitExceededException("Server is still processing the pushed strings");
+        throw new TimeoutException("Server is still processing the pushed strings");
     }
 
     /**

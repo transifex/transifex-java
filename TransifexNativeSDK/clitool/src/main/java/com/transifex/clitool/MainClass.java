@@ -18,9 +18,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
-
-import javax.naming.TimeLimitExceededException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -216,7 +215,7 @@ public class MainClass {
             LocaleData.TxJobStatus jobStatus = null;
             try {
                 jobStatus = cdsHandler.pushSourceStrings(postData);
-            } catch (TimeLimitExceededException e) {
+            } catch (TimeoutException e) {
                 System.out.println("Strings are queued for processing");
                 return 0;
             }
@@ -270,7 +269,7 @@ public class MainClass {
             LocaleData.TxJobStatus jobStatus = null;
             try {
                 jobStatus = cdsHandler.pushSourceStrings(postData);
-            } catch (TimeLimitExceededException e) {
+            } catch (TimeoutException e) {
                 System.out.println("Source string clearing is queued for processing");
                 return 0;
             }
