@@ -64,7 +64,7 @@ public class NativeCore {
                       @NonNull LocaleState localeState,
                       @NonNull String token,
                       @Nullable String cdsHost,
-                      String customAuthorizationHeaderKey,
+                      @Nullable String customAuthorizationHeaderKey,
                       @Nullable TxCache cache,
                       @Nullable MissingPolicy missingPolicy) {
         mContext = applicationContext;
@@ -77,7 +77,8 @@ public class NativeCore {
         if (cdsHost == null) {
             cdsHost = CDSHandlerAndroid.CDS_HOST;
         }
-        mCDSHandler = new CDSHandlerAndroid(mLocaleState.getAppLocales(), token, null, cdsHost);
+        mCDSHandler = new CDSHandlerAndroid(mLocaleState.getAppLocales(), token, null,
+                cdsHost, customAuthorizationHeaderKey);
 
         mSourceLocaleResources = Utils.getLocalizedResources(mContext, new Locale(mLocaleState.getSourceLocale()));
 

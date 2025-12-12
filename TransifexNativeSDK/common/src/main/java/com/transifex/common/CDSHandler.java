@@ -111,7 +111,7 @@ public class CDSHandler {
      */
     public CDSHandler(@Nullable String[] localeCodes,
                       @NonNull String token, @Nullable String secret, @NonNull String csdHost,
-                      String customAuthorizationHeaderKey) {
+                      @Nullable String customAuthorizationHeaderKey) {
         mLocaleCodes = localeCodes;
         mToken = token;
         mSecret = secret;

@@ -53,8 +53,10 @@ public class CDSHandlerAndroid extends CDSHandler {
      * @param secret      The API secret to use for connecting to the CDS.
      * @param csdHost     The host of the Content Delivery Service.
      */
-    public CDSHandlerAndroid(@Nullable String[] localeCodes, @NonNull String token, @Nullable String secret, @NonNull String csdHost) {
-        super(localeCodes, token, secret, csdHost, null);
+    public CDSHandlerAndroid(@Nullable String[] localeCodes, @NonNull String token,
+                             @Nullable String secret, @NonNull String csdHost,
+                             @Nullable String customAuthorizationHeaderKey) {
+        super(localeCodes, token, secret, csdHost, customAuthorizationHeaderKey);
         mExecutor = Executors.newSingleThreadExecutor();
     }
 
