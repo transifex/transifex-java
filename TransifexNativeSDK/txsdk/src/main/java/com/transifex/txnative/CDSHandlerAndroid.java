@@ -54,7 +54,7 @@ public class CDSHandlerAndroid extends CDSHandler {
      * @param csdHost     The host of the Content Delivery Service.
      */
     public CDSHandlerAndroid(@Nullable String[] localeCodes, @NonNull String token, @Nullable String secret, @NonNull String csdHost) {
-        super(localeCodes, token, secret, csdHost);
+        super(localeCodes, token, secret, csdHost, null);
         mExecutor = Executors.newSingleThreadExecutor();
     }
 

@@ -47,22 +47,24 @@ public class NativeCore {
      * <p>
      * We initialize and set-up the rest of the SDK classes and enable ViewPump interception.
      *
-     * @param applicationContext The application context.
-     * @param localeState Keeps track of the available and current locales.
-     * @param token The Transifex token that can be used for retrieving translations from CDS.
-     * @param cdsHost An optional host for the Content Delivery Service; defaults to the production
-     *                host provided by Transifex.
-     * @param cache The translation cache that holds the translations from the CDS;
-     * {@link com.transifex.txnative.cache.TxStandardCache TxStandardCache} is used if set to
-     *              <code>null</code>.
-     * @param missingPolicy Determines how to handle translations that are not available;
-     * {@link com.transifex.txnative.missingpolicy.SourceStringPolicy SourceStringPolicy} is used
-     *                     if set to <code>null</code>.
+     * @param applicationContext           The application context.
+     * @param localeState                  Keeps track of the available and current locales.
+     * @param token                        The Transifex token that can be used for retrieving translations from CDS.
+     * @param cdsHost                      An optional host for the Content Delivery Service; defaults to the production
+     *                                     host provided by Transifex.
+     * @param customAuthorizationHeaderKey
+     * @param cache                        The translation cache that holds the translations from the CDS;
+     *                                     {@link TxStandardCache TxStandardCache} is used if set to
+     *                                     <code>null</code>.
+     * @param missingPolicy                Determines how to handle translations that are not available;
+     *                                     {@link SourceStringPolicy SourceStringPolicy} is used
+     *                                     if set to <code>null</code>.
      */
     public NativeCore(@NonNull Context applicationContext,
                       @NonNull LocaleState localeState,
                       @NonNull String token,
                       @Nullable String cdsHost,
+                      String customAuthorizationHeaderKey,
                       @Nullable TxCache cache,
                       @Nullable MissingPolicy missingPolicy) {
         mContext = applicationContext;

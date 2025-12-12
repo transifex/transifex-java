@@ -72,7 +72,7 @@ public class CDSHandlerTest {
     @Test
     public void testFetchTranslationsCallback_badURL() {
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL");
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL", null);
 
         DummyFetchCallback callback = new DummyFetchCallback();
 
@@ -88,7 +88,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         DummyFetchCallback callback = new DummyFetchCallback() {
 
@@ -137,11 +137,37 @@ public class CDSHandlerTest {
     }
 
     @Test
+    public void testFetchTranslationsCallback_customAuthorizationHeaderKey() {
+        cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
+
+        String[] localeCodes = new String[]{"el", "es"};
+        String customAuthorizationHeaderKey = "CustomKey";
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), customAuthorizationHeaderKey);
+
+        DummyFetchCallback callback = new DummyFetchCallback();
+
+        cdsHandler.fetchTranslations(null, null, callback);
+
+        assertThat(callback.onFetchingTranslationsCalled).isTrue();
+        assertThat(callback.onFetchingTranslationsCalled).isTrue();
+        assertThat(callback.onFailureCalled).isFalse();
+
+        RecordedRequest recordedRequest = null;
+        try {
+            recordedRequest = cdsMock.getServer().takeRequest();
+        } catch (InterruptedException ignored) {
+        }
+        assertThat(recordedRequest).isNotNull();
+        assertThat(recordedRequest.getMethod()).isEqualTo("GET");
+        assertThat(recordedRequest.getHeader(customAuthorizationHeaderKey)).isEqualTo("Bearer token");
+    }
+
+    @Test
     public void testFetchTranslationsCallback_onlyElInResponse() {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcher());
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         DummyFetchCallback callback = new DummyFetchCallback() {
 
@@ -193,7 +219,7 @@ public class CDSHandlerTest {
     @Test
     public void testFetchTranslations_badURL() {
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL");
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, "invalidHostURL", null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
@@ -205,7 +231,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
 
@@ -241,7 +267,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcher());
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
@@ -259,7 +285,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsDispatcher());
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations("el", null);
         assertThat(map).isNotNull();
@@ -277,7 +303,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElEsWithTagsDispatcher());
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         HashSet<String> tags = new HashSet<>(Arrays.asList("tag a", "tag b"));
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, tags);
@@ -302,7 +328,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElEs202OnceDispatcher(10));
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
@@ -326,7 +352,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElEs202OnceDispatcher(30));
 
         String[] localeCodes = new String[]{"el", "es"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
@@ -338,7 +364,7 @@ public class CDSHandlerTest {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getElDispatcherBadJsonFormatting());
 
         String[] localeCodes = new String[]{"el"};
-        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(localeCodes, "token", null, cdsMock.getBaseUrl(), null);
 
         LocaleData.TranslationMap map = cdsHandler.fetchTranslations(null, null);
         assertThat(map).isNotNull();
@@ -347,7 +373,7 @@ public class CDSHandlerTest {
 
     @Test
     public void testPushSourceStrings_badURL() {
-        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", "invalidHostURL");
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", "invalidHostURL", null);
 
         LocaleData.TxPostData postData = getPostData();
         LocaleData.TxJobStatus jobStatus = null;
@@ -362,7 +388,7 @@ public class CDSHandlerTest {
     public void testPushSourceStrings_normal() {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getPostDispatcher());
 
-        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", cdsMock.getBaseUrl(), null);
 
         LocaleData.TxPostData postData = getPostData();
         LocaleData.TxJobStatus jobStatus = null;
@@ -398,7 +424,7 @@ public class CDSHandlerTest {
     public void testPushSourceStrings_CDSRespondsWith409_returnNull() {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getPostWith409Dispatcher());
 
-        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", cdsMock.getBaseUrl(), null);
 
         LocaleData.TxPostData postData = getPostData();
         LocaleData.TxJobStatus jobStatus = null;
@@ -414,7 +440,7 @@ public class CDSHandlerTest {
     public void testPushSourceStrings_CDSRespondsWithFailedJob_returnErrorInResponse() {
         cdsMock.getServer().setDispatcher(CDSMockHelper.getPostWithFailedJobDispatcher());
 
-        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", cdsMock.getBaseUrl());
+        CDSHandler cdsHandler = new CDSHandler(null, "token", "secret", cdsMock.getBaseUrl(), null);
 
         LocaleData.TxPostData postData = getPostData();
         LocaleData.TxJobStatus jobStatus = null;

@@ -57,19 +57,11 @@ public void onCreate() {
         new String[]{"en", "el", "de", "fr", "ar", "sl", "es_ES", "es_MX"},
         null);
 
-    TxNative.init(
-        // application context
-        getApplicationContext(),
-        // a LocaleState instance
-        localeState,
-        // token
-        token,
-        // cdsHost URL
-        null,
-        // a TxCache implementation
-        null,
-        // a MissingPolicy implementation
-        null);
+    TxNative.initializer(base, localeState, token)
+                .withCdsHost(null)           // cdsHost URL
+                .withCache(null)             // a TxCache implementation
+                .withMissingPolicy(null)     // a MissingPolicy implementation
+                .init();
 
     // Fetch all translations from CDS
     TxNative.fetchTranslations(null, null);
